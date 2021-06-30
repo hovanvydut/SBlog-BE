@@ -9,4 +9,5 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController("/api/v1/tags")
 public class TagController {
+
 }

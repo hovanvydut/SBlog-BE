@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 /**
  * @author hovanvydut
@@ -30,4 +31,10 @@ public class Tag {
 
     @Column(name = "image", nullable = true, length = 255)
     private String image;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "last_edited_at", nullable = false)
+    private LocalDateTime lastEditedAt;
 }

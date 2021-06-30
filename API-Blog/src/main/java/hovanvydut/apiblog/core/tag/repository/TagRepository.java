@@ -11,4 +11,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TagRepository extends PagingAndSortingRepository<Tag, Long> {
+
+    Tag findBySlug(String slug);
+
 }
