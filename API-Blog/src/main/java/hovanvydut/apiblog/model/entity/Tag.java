@@ -3,6 +3,7 @@ package hovanvydut.apiblog.model.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 @Accessors(chain = true)
 @Entity
 public class Tag {
@@ -35,6 +37,6 @@ public class Tag {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "last_edited_at", nullable = false)
+    @Column(name = "last_edited_at", nullable = true)
     private LocalDateTime lastEditedAt;
 }
