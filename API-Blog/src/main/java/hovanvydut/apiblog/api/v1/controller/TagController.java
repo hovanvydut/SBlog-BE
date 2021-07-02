@@ -8,6 +8,7 @@ import hovanvydut.apiblog.core.tag.dto.UpdateTagDTO;
 import hovanvydut.apiblog.core.tag.service.TagService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,10 +25,12 @@ public class TagController {
 
     private final TagService tagService;
     private final ModelMapper modelMapper;
+    private final RedisTemplate redisTemplate;
 
-    public TagController(TagService tagService, ModelMapper modelMapper) {
+    public TagController(TagService tagService, ModelMapper modelMapper, RedisTemplate redisTemplate) {
         this.tagService = tagService;
         this.modelMapper = modelMapper;
+        this.redisTemplate = redisTemplate;
     }
 
     @GetMapping("")
@@ -44,7 +47,16 @@ public class TagController {
 
     @GetMapping("/{id}")
     public TagDTO getTag(@PathVariable("id") Long tagId) {
-        return this.tagService.getTag(tagId);
+
+        if (this.redisTemplate.opsForValue().get("lastUser") != null) {
+            return (TagDTO) this.redisTemplate.opsForValue().get("lastUser");
+        }
+
+        TagDTO tagDTO = this.tagService.getTag(tagId);
+
+        this.redisTemplate.opsForValue().set("lastUser", tagDTO);
+
+        return tagDTO;
     }
 
     @PostMapping("")
