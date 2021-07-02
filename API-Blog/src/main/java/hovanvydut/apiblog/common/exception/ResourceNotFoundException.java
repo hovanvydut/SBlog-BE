@@ -1,7 +1,8 @@
 package hovanvydut.apiblog.common.exception;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 /**
  * @author hovanvydut

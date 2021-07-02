@@ -1,8 +1,8 @@
 package hovanvydut.apiblog.common.util;
 
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 
 import java.util.ArrayList;
 import java.util.List;

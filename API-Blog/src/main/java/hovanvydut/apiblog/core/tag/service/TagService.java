@@ -3,9 +3,7 @@ package hovanvydut.apiblog.core.tag.service;
 import hovanvydut.apiblog.core.tag.dto.CreateTagDTO;
 import hovanvydut.apiblog.core.tag.dto.TagDTO;
 import hovanvydut.apiblog.core.tag.dto.UpdateTagDTO;
-import hovanvydut.apiblog.model.entity.Tag;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import javax.validation.Valid;
 

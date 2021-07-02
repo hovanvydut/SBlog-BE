@@ -2,6 +2,9 @@ package hovanvydut.apiblog.api.v1.controller;
 
 import hovanvydut.apiblog.api.v1.request.CreateTagReq;
 import hovanvydut.apiblog.api.v1.request.UpdateTagReq;
+import hovanvydut.apiblog.api.v1.response.TagPageResp;
+import hovanvydut.apiblog.api.v1.response.TagResp;
+import hovanvydut.apiblog.common.constant.PagingConstant;
 import hovanvydut.apiblog.core.tag.dto.CreateTagDTO;
 import hovanvydut.apiblog.core.tag.dto.TagDTO;
 import hovanvydut.apiblog.core.tag.dto.UpdateTagDTO;
@@ -9,10 +12,12 @@ import hovanvydut.apiblog.core.tag.service.TagService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author hovanvydut
@@ -34,41 +39,46 @@ public class TagController {
     }
 
     @GetMapping("")
-    public Page<TagDTO> getAllTags(@RequestParam(required = false) Optional<String> keyword,
-                                   @RequestParam(required = false) Optional<Integer> page,
-                                   @RequestParam(required = false) Optional<Integer> size,
-                                   @RequestParam(required = false, defaultValue = "id,asc") String[] sort) {
+    public ResponseEntity<TagPageResp> getAllTags(@RequestParam(required = false) Optional<String> keyword,
+                                                  @RequestParam(required = false) Optional<Integer> page,
+                                                  @RequestParam(required = false) Optional<Integer> size,
+                                                  @RequestParam(required = false, defaultValue = "id,asc") String[] sort) {
 
-        // NOTE: USERS_PER_PAGE
-        final int USERS_PER_PAGE = 3;
-        Page<TagDTO> pageTags = this.tagService.getTags(page.orElse(1), size.orElse(USERS_PER_PAGE), sort, keyword.orElse(""));
-        return pageTags;
+        Page<TagDTO> pageTags = this.tagService.getTags(page.orElse(1),
+                size.orElse(PagingConstant.TAGS_PER_PAGE), sort, keyword.orElse(""));
+
+        return ResponseEntity.ok(this.modelMapper.map(pageTags, TagPageResp.class));
     }
 
     @GetMapping("/{id}")
-    public TagDTO getTag(@PathVariable("id") Long tagId) {
+    public ResponseEntity<TagResp> getTag(@PathVariable("id") Long tagId) {
 
-        if (this.redisTemplate.opsForValue().get("lastUser") != null) {
-            return (TagDTO) this.redisTemplate.opsForValue().get("lastUser");
+        if (this.redisTemplate.opsForValue().get("lastUser" + tagId) != null) {
+            TagDTO oldTag = (TagDTO) this.redisTemplate.opsForValue().get("lastUser");
+            return ResponseEntity.ok(this.modelMapper.map(oldTag, TagResp.class));
         }
 
         TagDTO tagDTO = this.tagService.getTag(tagId);
 
-        this.redisTemplate.opsForValue().set("lastUser", tagDTO);
+        this.redisTemplate.opsForValue().set("lastUser" + tagId, tagDTO, 60, TimeUnit.SECONDS);
 
-        return tagDTO;
+        return ResponseEntity.ok(this.modelMapper.map(tagDTO, TagResp.class));
     }
 
     @PostMapping("")
-    public TagDTO createTag(@Valid @RequestBody CreateTagReq req) {
+    public TagResp createTag(@Valid @RequestBody CreateTagReq req) {
         CreateTagDTO dto = this.modelMapper.map(req, CreateTagDTO.class);
-        return this.tagService.createTag(dto);
+        TagDTO tagDTO = this.tagService.createTag(dto);
+
+        return this.modelMapper.map(tagDTO, TagResp.class);
     }
 
     @PutMapping("/{id}")
-    public TagDTO updateTag(@PathVariable("id") Long tagId, @Valid @RequestBody UpdateTagReq req) {
+    public TagResp updateTag(@PathVariable("id") Long tagId, @Valid @RequestBody UpdateTagReq req) {
         UpdateTagDTO dto = this.modelMapper.map(req, UpdateTagDTO.class);
-        return this.tagService.updateTag(tagId, dto);
+        TagDTO tagDTO = this.tagService.updateTag(tagId, dto);
+
+        return this.modelMapper.map(tagDTO, TagResp.class);
     }
 
     @DeleteMapping("/{id}")

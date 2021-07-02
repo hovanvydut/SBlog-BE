@@ -2,7 +2,6 @@ package hovanvydut.apiblog;
 
 import hovanvydut.apiblog.core.tag.dto.UpdateTagDTO;
 import hovanvydut.apiblog.model.entity.Tag;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +10,8 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
 import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author hovanvydut
