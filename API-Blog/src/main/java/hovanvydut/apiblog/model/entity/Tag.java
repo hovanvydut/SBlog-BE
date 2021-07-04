@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @ToString
 @Accessors(chain = true)
 @Entity
+@Table(name = "tag")
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
