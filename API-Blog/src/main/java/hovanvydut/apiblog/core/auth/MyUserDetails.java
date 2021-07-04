@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.core.security;
+package hovanvydut.apiblog.core.auth;
 
 import hovanvydut.apiblog.model.entity.Role;
 import hovanvydut.apiblog.model.entity.User;

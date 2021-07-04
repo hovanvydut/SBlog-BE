@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.core.security;
+package hovanvydut.apiblog.core.auth;
 
 import hovanvydut.apiblog.common.util.JwtTokenUtil;
 import org.springframework.http.HttpHeaders;

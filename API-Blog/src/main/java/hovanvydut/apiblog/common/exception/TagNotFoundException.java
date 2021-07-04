@@ -8,11 +8,11 @@ package hovanvydut.apiblog.common.exception;
 public class TagNotFoundException extends ResourceNotFoundException{
 
     public TagNotFoundException(long id) {
-        super("Could not find tag with id = " + id);
+        super("Could not find Tag with id = " + id);
     }
 
     public TagNotFoundException(String slug) {
-        super("Could not find tag with slug = '" + slug + "'");
+        super("Could not find Tag with slug = '" + slug + "'");
     }
 
 }

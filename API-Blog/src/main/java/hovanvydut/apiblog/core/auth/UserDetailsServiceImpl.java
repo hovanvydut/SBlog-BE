@@ -1,6 +1,5 @@
-package hovanvydut.apiblog.core.security;
+package hovanvydut.apiblog.core.auth;
 
-import hovanvydut.apiblog.core.security.MyUserDetails;
 import hovanvydut.apiblog.core.user.repository.UserRepository;
 import hovanvydut.apiblog.model.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
