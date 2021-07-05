@@ -2,9 +2,10 @@ package hovanvydut.apiblog.core.tag.dto;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 
 /**
@@ -15,10 +16,17 @@ import java.time.LocalDateTime;
 @Data
 @Accessors(chain = true)
 public class UpdateTagDTO {
-    @NotBlank
+
+    @NotNull
+    @Pattern(regexp = "^[a-zA-Z0-9]+(?:\\s[a-zA-Z0-9]+)*$", message = "Only include character a-z,A-Z,0-9 and space between words")
     private String name;
 
-    @NotBlank
+    private String description;
+
+    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$", message = "Only include character a-z,0-9 and - between words")
+    private String slug;
+
+    @URL
     private String image;
 
     @NotNull

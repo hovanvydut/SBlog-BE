@@ -1,6 +1,7 @@
 package hovanvydut.apiblog.core.tag.service;
 
-import hovanvydut.apiblog.common.exception.TagExistingException;
+import hovanvydut.apiblog.common.exception.MyError;
+import hovanvydut.apiblog.common.exception.MyRuntimeException;
 import hovanvydut.apiblog.common.exception.TagNotFoundException;
 import hovanvydut.apiblog.common.util.SlugUtil;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -86,13 +88,16 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public TagDTO createTag(@Valid CreateTagDTO dto) {
-        Tag existTag = this.tagRepository.findByName(dto.getName());
-        if (existTag != null) {
-            throw new TagExistingException(dto.getName());
+        List<MyError> errors = checkUnique(dto);
+        if (errors.size() > 0) {
+            throw new MyRuntimeException(errors);
         }
 
         Tag tag = this.modelMapper.map(dto, Tag.class);
-        tag.setSlug(SlugUtil.slugify(tag.getName()));
+
+        if (tag.getSlug() == null) {
+            tag.setSlug(SlugUtil.slugify(tag.getName()));
+        }
 
         Tag savedTag = this.tagRepository.save(tag);
         return this.modelMapper.map(savedTag, TagDTO.class);
@@ -100,10 +105,18 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public TagDTO updateTag(long tagId, UpdateTagDTO dto) {
+        List<MyError> errors = checkUnique(tagId, dto);
+        if (errors.size() > 0) {
+            throw new MyRuntimeException(errors);
+        }
+
         Tag tag = this.tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
 
         this.modelMapper.map(dto, tag);
-        tag.setSlug(SlugUtil.slugify(tag.getName()));
+
+        if (tag.getSlug() == null) {
+            tag.setSlug(SlugUtil.slugify(tag.getName()));
+        }
 
         Tag savedTag = this.tagRepository.save(tag);
 
@@ -114,5 +127,36 @@ public class TagServiceImpl implements TagService{
     public void deleteTag(long tagId) {
         Tag tag = this.tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
         this.tagRepository.delete(tag);
+    }
+
+    private List<MyError> checkUnique(CreateTagDTO dto) {
+        List<MyError> errorList = new ArrayList<>();
+
+        Tag existName = this.tagRepository.findByName(dto.getName());
+        if (existName != null) {
+            errorList.add(new MyError().setSource("name").setMessage("The name has already been taken"));
+        }
+
+        Tag existSlug = this.tagRepository.findBySlug(dto.getSlug());
+        if (existSlug != null) {
+            errorList.add(new MyError().setSource("slug").setMessage("The slug has already been taken"));
+        }
+
+        return errorList;
+    }
+    private List<MyError> checkUnique(long id, UpdateTagDTO dto) {
+        List<MyError> errorList = new ArrayList<>();
+
+        Tag existName = this.tagRepository.findByName(dto.getName());
+        if (existName != null && existName.getId() != id) {
+            errorList.add(new MyError().setSource("name").setMessage("The name has already been taken"));
+        }
+
+        Tag existSlug = this.tagRepository.findBySlug(dto.getSlug());
+        if (existSlug != null && existSlug.getId() != id) {
+            errorList.add(new MyError().setSource("slug").setMessage("The slug has already been taken"));
+        }
+
+        return errorList;
     }
 }

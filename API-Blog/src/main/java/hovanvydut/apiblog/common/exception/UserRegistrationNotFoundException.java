@@ -5,7 +5,7 @@ package hovanvydut.apiblog.common.exception;
  * Created on 7/4/21
  */
 
-public class UserRegistrationNotFoundException extends ResourceExistingException{
+public class UserRegistrationNotFoundException extends ResourceNotFoundException{
 
     public UserRegistrationNotFoundException() {
         super("Could not find UserRegistration");

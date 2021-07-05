@@ -1,20 +1,21 @@
 package hovanvydut.apiblog.api.v1.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.time.LocalDateTime;
 
 /**
  * @author hovanvydut
- * Created on 7/1/21
+ * Created on 7/5/21
  */
 
 @Getter
@@ -23,9 +24,10 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UpdateTagReq {
-
-    @Pattern(regexp = "^[a-zA-Z0-9]+(?:\\s[a-zA-Z0-9]+)*$")
+@ToString
+public class CreateCategoryReq {
+    @NotBlank
+    @Length(min = 1, max = 255)
     private String name;
 
     private String description;
@@ -35,7 +37,4 @@ public class UpdateTagReq {
 
     @URL
     private String image;
-
-    @JsonIgnore
-    private LocalDateTime lastEditedAt = LocalDateTime.now();
 }

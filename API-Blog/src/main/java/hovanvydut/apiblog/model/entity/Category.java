@@ -7,29 +7,28 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 /**
  * @author hovanvydut
- * Created on 6/27/21
+ * Created on 7/5/21
  */
 
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
-@ToString
 @Accessors(chain = true)
+@ToString
 @Entity
-@Table(name = "tag")
-public class Tag {
+@Table(name = "category")
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true, length = 32)
+    @Column(name = "name", unique = true, nullable = false, length = 255)
     private String name;
 
-    @Column(name = "slug", nullable = false, unique = true, length = 255)
+    @Column(name = "slug", unique = true, nullable = false, length = 255)
     private String slug;
 
     @Column(name = "description", nullable = true, length = 255)
@@ -37,10 +36,4 @@ public class Tag {
 
     @Column(name = "image", nullable = true, length = 255)
     private String image;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "last_edited_at", nullable = true)
-    private LocalDateTime lastEditedAt;
 }

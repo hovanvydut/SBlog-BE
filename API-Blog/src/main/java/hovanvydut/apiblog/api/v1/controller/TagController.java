@@ -66,19 +66,19 @@ public class TagController {
     }
 
     @PostMapping("")
-    public TagResp createTag(@Valid @RequestBody CreateTagReq req) {
+    public ResponseEntity<TagResp> createTag(@Valid @RequestBody CreateTagReq req) {
         CreateTagDTO dto = this.modelMapper.map(req, CreateTagDTO.class);
         TagDTO tagDTO = this.tagService.createTag(dto);
 
-        return this.modelMapper.map(tagDTO, TagResp.class);
+        return ResponseEntity.ok(this.modelMapper.map(tagDTO, TagResp.class));
     }
 
-    @PutMapping("/{id}")
-    public TagResp updateTag(@PathVariable("id") Long tagId, @Valid @RequestBody UpdateTagReq req) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<TagResp> updateTag(@PathVariable("id") Long tagId, @Valid @RequestBody UpdateTagReq req) {
         UpdateTagDTO dto = this.modelMapper.map(req, UpdateTagDTO.class);
         TagDTO tagDTO = this.tagService.updateTag(tagId, dto);
 
-        return this.modelMapper.map(tagDTO, TagResp.class);
+        return ResponseEntity.ok(this.modelMapper.map(tagDTO, TagResp.class));
     }
 
     @DeleteMapping("/{id}")
