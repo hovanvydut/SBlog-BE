@@ -1,6 +1,5 @@
-* CreateCategoryDTO nen them @NotBlank, ... javax.constraint
-* Check update, create Tag with slug, name is unique
-* Kiem tra api update xem nen dung Path hay PUT
+* Image: http://localhost:3000/assets/static/uploaded/images/avt_20210709211905_1203788484.jpg
+
 ```zhs
 # start mysql
 sudo systemctl start mysql

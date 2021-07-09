@@ -8,6 +8,7 @@ import hovanvydut.apiblog.core.auth.UserRegistrationService;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.auth.dto.UserRegistrationDTO;
 import hovanvydut.apiblog.core.mail.EmailService;
+import hovanvydut.apiblog.core.upload.UploadService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,18 +43,21 @@ public class AuthController {
     private final UserRegistrationService userRegistrationService;
     private final ModelMapper modelMapper;
     private final EmailService emailService;
+    private final UploadService uploadService;
 
     public AuthController(AuthenticationManager authenticationManager,
                           JwtTokenUtil jwtTokenUtil,
                           UserRegistrationService userRegistrationService,
                           ModelMapper modelMapper,
-                          EmailService emailService) {
+                          EmailService emailService,
+                          UploadService uploadService) {
 
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.userRegistrationService = userRegistrationService;
         this.modelMapper = modelMapper;
         this.emailService = emailService;
+        this.uploadService = uploadService;
     }
 
     @PostMapping("/login")
@@ -127,5 +133,10 @@ public class AuthController {
         this.emailService.sendMessageUsingThymeleafTemplate("hovanvydut@gmail.com", "Check Healthy", templateModel);
 
         return "Fine!";
+    }
+
+    @PostMapping("/check-healthy/upload")
+    public void UploadImage(@RequestParam("image") MultipartFile multipartFile) throws IOException {
+        this.uploadService.save(multipartFile, "uploaded/images", "dfafda");
     }
 }
