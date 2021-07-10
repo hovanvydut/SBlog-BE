@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.model.entity;
 
-import hovanvydut.apiblog.common.constant.Gender;
+import hovanvydut.apiblog.common.constant.GenderEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -54,7 +54,7 @@ public class User {
 
     @Column(name = "gender", nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
-    private Gender gender = Gender.UNKNOWN;
+    private GenderEnum gender = GenderEnum.UNKNOWN;
 
     @Column(name = "biography", nullable = true, length = 255)
     private String biography;
@@ -66,4 +66,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<ArticleVote> votes = new HashSet<>();
 }

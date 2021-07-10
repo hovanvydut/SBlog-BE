@@ -100,7 +100,7 @@ public class AuthController {
     }
 
     @PreAuthorize("hasRole('Admin')")
-    @GetMapping("/test")
+    @GetMapping("/admin-site")
     public String testAuthen() {
         return "abc";
     }

@@ -2,7 +2,7 @@ package hovanvydut.apiblog.core.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import hovanvydut.apiblog.common.constant.Gender;
+import hovanvydut.apiblog.common.constant.GenderEnum;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -29,6 +29,6 @@ public class UserDTO {
     private LocalDateTime createdAt;
     private boolean enabled;
     private LocalDate birthday;
-    private Gender gender;
+    private GenderEnum gender;
     private String biography;
 }

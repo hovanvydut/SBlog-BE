@@ -2,7 +2,7 @@ package hovanvydut.apiblog.core.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import hovanvydut.apiblog.common.constant.Gender;
+import hovanvydut.apiblog.common.constant.GenderEnum;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -27,5 +27,5 @@ public class CreateUserDTO {
     private String username;
     private String password;
     private LocalDate birthday;
-    private Gender gender;
+    private GenderEnum gender;
 }
