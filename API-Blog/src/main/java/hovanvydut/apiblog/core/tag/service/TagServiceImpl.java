@@ -62,7 +62,7 @@ public class TagServiceImpl implements TagService{
 
         // mapping Tag list --> TagDTO list
         List<Tag> tags = pageTag.getContent();
-        List<TagDTO> tagDTOs = this.modelMapper.map(tags, new TypeToken<List<Tag>>() {}.getType());
+        List<TagDTO> tagDTOs = this.modelMapper.map(tags, new TypeToken<List<TagDTO>>() {}.getType());
 
         return new PageImpl<>(tagDTOs, pageable, pageTag.getTotalElements());
     }

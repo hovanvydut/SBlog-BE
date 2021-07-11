@@ -1,9 +1,11 @@
 package hovanvydut.apiblog.core.auth;
 
+import hovanvydut.apiblog.common.exception.MyError;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.auth.dto.UserRegistrationDTO;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author hovanvydut
@@ -18,4 +20,5 @@ public interface UserRegistrationService {
     public UserRegistrationDTO createUserRegistration(@Valid CreateUserRegistrationDTO dto);
     void acceptRegistration(String token);
     void declineRegistration(String token);
+    public List<MyError> checkUnique(CreateUserRegistrationDTO dto);
 }

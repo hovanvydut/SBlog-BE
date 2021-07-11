@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.core.auth;
 
-import hovanvydut.apiblog.core.user.repository.UserRepository;
+import hovanvydut.apiblog.core.user.UserRepository;
 import hovanvydut.apiblog.model.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = this.userRepository.findByUsernameIs(username);
+        User user = this.userRepository.findByUsername(username);
 
         if (user == null) {
             throw new UsernameNotFoundException(username);

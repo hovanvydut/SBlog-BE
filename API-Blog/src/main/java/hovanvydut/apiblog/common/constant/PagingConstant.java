@@ -7,4 +7,6 @@ package hovanvydut.apiblog.common.constant;
 
 public class PagingConstant {
     public static final int TAGS_PER_PAGE = 3;
+    public static final int USERS_PER_PAGE = 3;
+    public static final int CATEGORIES_PER_PAGE = 3;
 }

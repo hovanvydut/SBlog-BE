@@ -1,3 +1,8 @@
+### TODO List
+* send email khi register xong
+
+---
+
 * Image: http://localhost:3000/assets/static/uploaded/images/avt_20210709211905_1203788484.jpg
 
 ```zhs

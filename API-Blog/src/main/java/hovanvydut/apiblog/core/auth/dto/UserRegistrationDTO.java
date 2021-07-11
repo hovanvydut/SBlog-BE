@@ -29,10 +29,13 @@ public class UserRegistrationDTO {
     @Length(min = 1, max = 32)
     private String fullName;
 
+    @NotNull
     @Email
     private String email;
 
-    @Pattern(regexp = "[a-zA-Z0-9]{3,32}")
+    @NotNull
+    @Pattern(regexp = "^[a-zA-Z0-9]+([a-zA-Z0-9]{2,}|_[a-zA-Z0-9]+|-[a-zA-Z0-9]+|\\.[a-zA-Z0-9]+)+$")
+    @Length(min = 3, max = 32)
     private String username;
 
     @NotNull

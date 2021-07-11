@@ -2,6 +2,7 @@ package hovanvydut.apiblog.api.v1.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import hovanvydut.apiblog.common.constant.GenderEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,10 +14,11 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 
 /**
  * @author hovanvydut
- * Created on 7/4/21
+ * Created on 7/11/21
  */
 
 @Getter
@@ -26,7 +28,8 @@ import javax.validation.constraints.Pattern;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
-public class RegistrationReq {
+public class CreateUserReq {
+
     @NotBlank
     private String fullName;
 
@@ -35,11 +38,17 @@ public class RegistrationReq {
     private String email;
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9]+([a-zA-Z0-9]{2,}|_[a-zA-Z0-9]+|-[a-zA-Z0-9]+|\\.[a-zA-Z0-9]+)+$")
     @Length(min = 3, max = 32)
+    @Pattern(regexp = "^[a-zA-Z0-9]+([a-zA-Z0-9]{2,}|_[a-zA-Z0-9]+|-[a-zA-Z0-9]+|\\.[a-zA-Z0-9]+)+$")
     private String username;
 
     @NotBlank
     @Length(min = 8, max = 32)
     private String password;
+
+    private LocalDate birthday;
+
+    private GenderEnum gender;
+
+    private String biography;
 }

@@ -41,7 +41,7 @@ public class CategoryController {
                                                              @RequestParam(required = false, defaultValue = "id,asc") String[] sort) {
 
         Page<CategoryDTO> pageCategoryDTOS = this.categoryService.getCategories(page.orElse(1),
-                size.orElse(PagingConstant.TAGS_PER_PAGE), sort, keyword.orElse(""));
+                size.orElse(PagingConstant.CATEGORIES_PER_PAGE), sort, keyword.orElse(""));
 
         return ResponseEntity.ok(this.modelMapper.map(pageCategoryDTOS, CategoryPageResp.class));
     }

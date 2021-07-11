@@ -6,9 +6,9 @@ import hovanvydut.apiblog.common.exception.UserRegistrationNotFoundException;
 import hovanvydut.apiblog.common.exception.UserRegistrationTokenNotFoundException;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.auth.dto.UserRegistrationDTO;
+import hovanvydut.apiblog.core.user.UserRepository;
 import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
-import hovanvydut.apiblog.core.user.dto.UserDTO;
-import hovanvydut.apiblog.core.user.service.UserService;
+import hovanvydut.apiblog.core.user.UserService;
 import hovanvydut.apiblog.model.entity.User;
 import hovanvydut.apiblog.model.entity.UserRegistration;
 import org.modelmapper.ModelMapper;
@@ -35,15 +35,18 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     private final ModelMapper modelMapper;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     public UserRegistrationServiceImpl(UserRegistrationRepository userRegistrationRepo,
                                        ModelMapper modelMapper,
                                        UserService userService,
-                                       PasswordEncoder passwordEncoder) {
+                                       PasswordEncoder passwordEncoder,
+                                       UserRepository userRepository) {
         this.userRegistrationRepo = userRegistrationRepo;
         this.modelMapper = modelMapper;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -143,13 +146,13 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         this.userRegistrationRepo.delete(userRegistration);
     }
 
-    private List<MyError> checkUnique(CreateUserRegistrationDTO dto) {
+    public List<MyError> checkUnique(CreateUserRegistrationDTO dto) {
         // check email, username unique in two table: user and userregistration
         List<MyError> errorList = new ArrayList<>();
 
         UserRegistration existEmailRegistration = this.userRegistrationRepo.findByEmail(dto.getEmail());
         if (existEmailRegistration == null) {
-            UserDTO existEmailUser = this.userService.getUserByEmail(dto.getEmail());
+            User existEmailUser = this.userRepository.findByEmail(dto.getEmail());
             if (existEmailUser != null) {
                 errorList.add(new MyError().setSource("email").setMessage("The email has already been taken"));
             }
@@ -159,7 +162,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
         UserRegistration existUsernameRegistration = this.userRegistrationRepo.findByUsername(dto.getUsername());
         if (existUsernameRegistration == null) {
-            UserDTO existUsernameUser = this.userService.getUserByUsername(dto.getUsername());
+            User existUsernameUser = this.userRepository.findByUsername(dto.getUsername());
             if (existUsernameUser != null) {
                 errorList.add(new MyError().setSource("username").setMessage("The username has already been taken"));
             }
@@ -169,4 +172,6 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
         return errorList;
     }
+
+
 }
