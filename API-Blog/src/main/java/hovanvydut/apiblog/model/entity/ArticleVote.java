@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author hovanvydut
@@ -36,15 +37,13 @@ public class ArticleVote implements Serializable {
 
     @Column(name = "vote", nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private ArticleVoteEnum vote;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "last_edited_at")
+    private LocalDateTime lastEditedAt;
 }
 
 
-@Embeddable
-class ArticleVoteId implements Serializable {
-    
-    @Column(name = "user_id")
-    private Long user_id;
 
-    @Column(name = "article_id")
-    private Long article_id;
-}

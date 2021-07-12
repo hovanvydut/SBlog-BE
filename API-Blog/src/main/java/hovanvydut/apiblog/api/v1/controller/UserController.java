@@ -12,9 +12,11 @@ import hovanvydut.apiblog.core.user.dto.UserDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.Optional;
 
 /**
@@ -23,7 +25,7 @@ import java.util.Optional;
  */
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1")
 public class UserController {
 
     private final UserService userService;
@@ -34,7 +36,7 @@ public class UserController {
         this.modelMapper = modelMapper;
     }
 
-    @GetMapping("")
+    @GetMapping("/users")
     public ResponseEntity<UserPageResp> getAllUsers(@RequestParam(required = false) Optional<String> keyword,
                                                     @RequestParam(required = false) Optional<Integer> page,
                                                     @RequestParam(required = false) Optional<Integer> size,
@@ -46,13 +48,13 @@ public class UserController {
         return ResponseEntity.ok(this.modelMapper.map(pageUserDTO, UserPageResp.class));
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/users/{username}")
     public ResponseEntity<UserResp> getUser(@PathVariable String username) {
         UserDTO userDTO = this.userService.getUserByUsername(username);
         return ResponseEntity.ok(this.modelMapper.map(userDTO, UserResp.class));
     }
 
-    @GetMapping("/{username}/articles")
+    @GetMapping("/users/{username}/articles")
     public void getArticlesOfUser(@PathVariable String username,
                                   @RequestParam(required = false) Optional<String> keyword,
                                   @RequestParam(required = false) Optional<Integer> page,
@@ -61,7 +63,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/{username}/series")
+    @GetMapping("/users/{username}/series")
     public void getSeriesOfUser(@PathVariable String username,
                                 @RequestParam(required = false) Optional<String> keyword,
                                 @RequestParam(required = false) Optional<Integer> page,
@@ -70,7 +72,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/{username}/clipped-articles")
+    @GetMapping("/users/{username}/clipped-articles")
     public void getClippedArticlesOfUser(@PathVariable String username,
                                 @RequestParam(required = false) Optional<String> keyword,
                                 @RequestParam(required = false) Optional<Integer> page,
@@ -79,7 +81,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/{username}/following-users")
+    @GetMapping("/users/{username}/following-users")
     public void getFollowingOfUser(@PathVariable String username,
                                    @RequestParam(required = false) Optional<String> keyword,
                                    @RequestParam(required = false) Optional<Integer> page,
@@ -88,7 +90,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/{username}/followers")
+    @GetMapping("/users/{username}/followers")
     public void getFollowersOfUser(@PathVariable String username,
                                    @RequestParam(required = false) Optional<String> keyword,
                                    @RequestParam(required = false) Optional<Integer> page,
@@ -97,7 +99,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/{username}/following-tags")
+    @GetMapping("/users/{username}/following-tags")
     public void getFollowingTagsOfuser(@PathVariable String username,
                                    @RequestParam(required = false) Optional<String> keyword,
                                    @RequestParam(required = false) Optional<Integer> page,
@@ -108,12 +110,13 @@ public class UserController {
 
 
 
-    @GetMapping("{username}/hovercard")
+    @GetMapping("/users/{username}/hovercard")
     public void getHoverCard(@PathVariable String username) {
 
     }
 
-    @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/users")
     public ResponseEntity<UserResp> createNewUser(@Valid @RequestBody CreateUserReq req) {
         CreateUserDTO dto = this.modelMapper.map(req, CreateUserDTO.class);
         UserDTO userDTO = this.userService.createUser(dto, true);
@@ -121,7 +124,8 @@ public class UserController {
         return ResponseEntity.ok(this.modelMapper.map(userDTO, UserResp.class));
     }
 
-    @PatchMapping("/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/users/{username}")
     public ResponseEntity<UserResp> updateUser(@PathVariable String username, @Valid @RequestBody UpdateUserReq req) {
         UpdateUserDTO dto = this.modelMapper.map(req, UpdateUserDTO.class);
         UserDTO userDTO = this.userService.updateUser(username, dto);
@@ -129,13 +133,28 @@ public class UserController {
         return ResponseEntity.ok(this.modelMapper.map(userDTO, UserResp.class));
     }
 
-    @DeleteMapping("/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/users/{username}")
     public void deleteUser(@PathVariable String username) {
         this.userService.deleteUser(username);
     }
 
-    @PostMapping("/{username}/banned")
-    public void bannedUser() {
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR') and #username != authentication.principal.username")
+    @PostMapping("/users/{username}/banned")
+    public void bannedUser(@PathVariable String username, Principal principal) {
+        System.out.println(principal);
+        System.out.println("Test hasRoleAny");
+    }
 
+    @PreAuthorize("isAuthenticated() and authentication.principal.username != #username")
+    @PutMapping("/me/following/users/{username}")
+    public void followingUser(@PathVariable String username, Principal principal) {
+        this.userService.followingUser(principal.getName(), username);
+    }
+
+    @PreAuthorize("isAuthenticated() and authentication.principal.username != #username")
+    @DeleteMapping("/me/following/users/{username}")
+    public void cancelFollowingUser(@PathVariable String username, Principal principal) {
+        this.userService.unFollowingUser(principal.getName(), username);
     }
 }

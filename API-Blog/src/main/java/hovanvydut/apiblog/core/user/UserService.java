@@ -23,4 +23,6 @@ public interface UserService {
     public List<MyError> checkUnique(String email, String username);
     public UserDTO updateUser(String username, UpdateUserDTO dto);
     public void deleteUser(String username);
+    public void followingUser(String fromUsername, String toUsername);
+    public void unFollowingUser(String fromUsername, String toUsername);
 }

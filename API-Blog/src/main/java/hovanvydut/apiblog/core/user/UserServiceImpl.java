@@ -9,9 +9,7 @@ import hovanvydut.apiblog.core.tag.dto.TagDTO;
 import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UpdateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UserDTO;
-import hovanvydut.apiblog.model.entity.Tag;
-import hovanvydut.apiblog.model.entity.User;
-import hovanvydut.apiblog.model.entity.UserRegistration;
+import hovanvydut.apiblog.model.entity.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.*;
@@ -35,13 +33,18 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserRegistrationRepository userRegistrationRepo;
+    private final FollowerRepository followerRepository;
 
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder,
-                           UserRegistrationRepository userRegistrationRepo) {
+    public UserServiceImpl(UserRepository userRepository,
+                           ModelMapper modelMapper,
+                           PasswordEncoder passwordEncoder,
+                           UserRegistrationRepository userRegistrationRepo,
+                           FollowerRepository followerRepository) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
         this.userRegistrationRepo = userRegistrationRepo;
+        this.followerRepository = followerRepository;
     }
 
     @Override
@@ -161,4 +164,48 @@ public class UserServiceImpl implements UserService {
 
         this.userRepository.delete(user);
     }
+
+    @Override
+    public void followingUser(String fromUsername, String toUsername) {
+        User fromUser = this.userRepository.findByUsername(fromUsername);
+        User toUser = this.userRepository.findByUsername(toUsername);
+
+        if (fromUser == null) {
+            throw new MyUsernameNotFoundException(fromUsername);
+        }
+
+        if (toUser == null) {
+            throw new MyUsernameNotFoundException(toUsername);
+        }
+
+        FollowerId followerId = new FollowerId().setFromUserId(fromUser.getId()).setToUserId(toUser.getId());
+
+        Follower follower = new Follower().setId(followerId).setFromUser(fromUser).setToUser(toUser);
+
+        this.followerRepository.save(follower);
+    }
+
+    @Override
+    public void unFollowingUser(String fromUsername, String toUsername) {
+        User fromUser = this.userRepository.findByUsername(fromUsername);
+        User toUser = this.userRepository.findByUsername(toUsername);
+
+        if (fromUser == null) {
+            throw new MyUsernameNotFoundException(fromUsername);
+        }
+
+        if (toUser == null) {
+            throw new MyUsernameNotFoundException(toUsername);
+        }
+
+        String msgError = "User with username = " + fromUsername + " is not following User with username = " + toUsername;
+
+        FollowerId followerId = new FollowerId().setFromUserId(fromUser.getId()).setToUserId(toUser.getId());
+
+        Follower follower = this.followerRepository.findById(followerId)
+                .orElseThrow(() -> new MyRuntimeException(List.of(new MyError().setMessage(msgError))));
+
+        this.followerRepository.delete(follower);
+    }
+
 }

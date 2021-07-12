@@ -25,7 +25,7 @@ public class ControllerAdvisor {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", 400);
         body.put("path", req.getContextPath());
-        body.put("errors", myRuntimeException.getErrors());
+        body.put("error", myRuntimeException.getErrors());
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }

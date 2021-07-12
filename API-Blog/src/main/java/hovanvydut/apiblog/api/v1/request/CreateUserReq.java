@@ -33,6 +33,7 @@ public class CreateUserReq {
     @NotBlank
     private String fullName;
 
+    //FIXME: Validate email seriously
     @NotNull
     @Email
     private String email;

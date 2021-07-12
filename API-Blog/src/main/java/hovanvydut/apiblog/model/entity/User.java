@@ -67,6 +67,12 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
-    private Set<ArticleVote> votes = new HashSet<>();
+//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+//    private Set<ArticleVote> votes = new HashSet<>();
+
+    @OneToMany(mappedBy = "toUser", fetch = FetchType.LAZY)
+    private Set<Follower> followers;
+
+    @OneToMany(mappedBy = "fromUser", fetch = FetchType.LAZY)
+    private Set<Follower> followings;
 }
