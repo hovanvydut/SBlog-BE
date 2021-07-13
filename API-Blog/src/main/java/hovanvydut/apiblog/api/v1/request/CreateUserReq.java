@@ -30,6 +30,7 @@ import java.time.LocalDate;
 @ToString
 public class CreateUserReq {
 
+    //FIXME: Remove multiple space with one space
     @NotBlank
     private String fullName;
 

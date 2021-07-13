@@ -43,9 +43,6 @@ public class Article {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "short_content", nullable = false, length = 255)
-    private String shortContent;
-
     @Column(name = "thumbnail", nullable = true, length = 255)
     private String thumbnail;
 
@@ -56,7 +53,7 @@ public class Article {
     private ArticleStatusEnum status;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "last_updated_at")
     private LocalDateTime lastUpdatedAt;
@@ -69,4 +66,25 @@ public class Article {
 
     @OneToMany(mappedBy = "article")
     private Set<ArticleVote> votes = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "article_tag",
+            joinColumns = @JoinColumn(name = "article_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User author;
+
+//    @PreUpdate
+//    protected void onUpdate() {
+//        lastUpdatedAt = LocalDateTime.now();
+//    }
 }

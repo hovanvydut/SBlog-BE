@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * @author hovanvydut
@@ -43,4 +44,7 @@ public class Tag {
 
     @Column(name = "last_edited_at", nullable = true)
     private LocalDateTime lastEditedAt;
+
+    @ManyToMany(mappedBy = "tags")
+    private Set<Article> articles;
 }

@@ -60,7 +60,7 @@ public class UserController {
                                   @RequestParam(required = false) Optional<Integer> page,
                                   @RequestParam(required = false) Optional<Integer> size,
                                   @RequestParam(required = false, defaultValue = "id,asc") String[] sort) {
-
+    // get all published article of user
     }
 
     @GetMapping("/users/{username}/series")
@@ -156,5 +156,16 @@ public class UserController {
     @DeleteMapping("/me/following/users/{username}")
     public void cancelFollowingUser(@PathVariable String username, Principal principal) {
         this.userService.unFollowingUser(principal.getName(), username);
+    }
+
+    @GetMapping("/me/images")
+    public void getImagesOfUser(Principal principal) {
+        // must have pagination
+        // get all images of user
+    }
+
+    @PostMapping("/me/images")
+    public void uploadImage() {
+        // upload image
     }
 }

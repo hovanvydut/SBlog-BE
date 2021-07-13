@@ -70,9 +70,12 @@ public class User {
 //    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 //    private Set<ArticleVote> votes = new HashSet<>();
 
-    @OneToMany(mappedBy = "toUser", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "toUser")
     private Set<Follower> followers;
 
-    @OneToMany(mappedBy = "fromUser", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "fromUser")
     private Set<Follower> followings;
+
+    @OneToMany(mappedBy = "author")
+    private Set<Article> articles;
 }

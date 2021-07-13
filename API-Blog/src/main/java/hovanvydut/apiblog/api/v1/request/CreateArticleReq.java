@@ -7,15 +7,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.Set;
 
 /**
  * @author hovanvydut
- * Created on 7/5/21
+ * Created on 7/12/21
  */
 
 @Getter
@@ -25,19 +27,27 @@ import javax.validation.constraints.Pattern;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
-public class CreateCategoryReq {
+public class CreateArticleReq {
 
-    // FIXME: Remove multiple space with 1 space
     @NotBlank
-    @Length(min = 1, max = 255)
-    private String name;
+    private String title;
 
-    private String description;
+    @NotBlank
+    private String content;
 
-    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$")
-    private String slug;
+    @NotNull
+    @Size(min = 1, max = 5)
+    private Set<Long> tagIds;
+
+    @NotNull
+    @Min(1)
+    private long categoryId;
 
     @URL
-    private String image;
+    private String thumbnail;
+
+    public void setTitle(String title) {
+        this.title = title.trim().replaceAll("\\s{2,}", " ");
+    }
 
 }

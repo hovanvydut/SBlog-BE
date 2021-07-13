@@ -1,5 +1,8 @@
 package hovanvydut.apiblog.model.entity;
 
+import lombok.*;
+import lombok.experimental.Accessors;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
@@ -9,6 +12,12 @@ import java.io.Serializable;
  * Created on 7/12/21
  */
 
+@Setter
+@Getter
+@NoArgsConstructor
+@EqualsAndHashCode
+@Accessors(chain = true)
+@ToString
 @Embeddable
 public class ArticleVoteId implements Serializable {
 

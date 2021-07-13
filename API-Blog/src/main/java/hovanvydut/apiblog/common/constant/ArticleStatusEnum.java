@@ -9,7 +9,7 @@ public enum ArticleStatusEnum {
     DRAFT(0),
     SPAM(1),
     PENDING(2),
-    PUBLISHED(3),
+    PUBLISHED_GLOBAL(3),
     PUBLISHED_LINK(4);
 
     private int status;
