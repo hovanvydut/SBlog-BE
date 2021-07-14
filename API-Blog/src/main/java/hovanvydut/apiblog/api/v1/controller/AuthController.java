@@ -25,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -135,8 +134,4 @@ public class AuthController {
         return "Fine!";
     }
 
-    @PostMapping("/check-healthy/upload")
-    public void UploadImage(@RequestParam("image") MultipartFile multipartFile) throws IOException {
-        this.uploadService.save(multipartFile, "uploaded/images", "dfafda");
-    }
 }

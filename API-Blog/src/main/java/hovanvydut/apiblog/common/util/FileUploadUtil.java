@@ -61,11 +61,14 @@ public class FileUploadUtil {
 
     public static String generateFileName(MultipartFile multipartFile) {
         String originFileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-        String filePrefix = originFileName.substring(0, originFileName.lastIndexOf(".")).replace("\\s+", "_");
+        String extensionFile = originFileName.substring(originFileName.lastIndexOf(".") + 1).toLowerCase();
+//        String filePrefix = originFileName.substring(0, originFileName.lastIndexOf(".")).replace("\\s+", "_");
         String fileSuffix = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
         Random random = new Random();
 
-        return filePrefix + "_" + fileSuffix + "_" + Math.abs(random.nextInt());
+//        return filePrefix + "_" + fileSuffix + "_" + Math.abs(random.nextInt());
+        return fileSuffix + "_" + Math.abs(random.nextInt()) + "." + extensionFile;
+
     }
 
 
@@ -80,8 +83,6 @@ public class FileUploadUtil {
         if (read == -1) {
             throw new RuntimeException("File has no content");
         }
-
-        System.out.println(bytes);
 
         String fileType = getFileTypeBySignature(bytes);
 

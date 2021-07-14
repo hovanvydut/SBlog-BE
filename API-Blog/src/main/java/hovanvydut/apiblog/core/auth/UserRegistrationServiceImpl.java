@@ -7,8 +7,8 @@ import hovanvydut.apiblog.common.exception.UserRegistrationTokenNotFoundExceptio
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.auth.dto.UserRegistrationDTO;
 import hovanvydut.apiblog.core.user.UserRepository;
-import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
 import hovanvydut.apiblog.core.user.UserService;
+import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
 import hovanvydut.apiblog.model.entity.User;
 import hovanvydut.apiblog.model.entity.UserRegistration;
 import org.modelmapper.ModelMapper;

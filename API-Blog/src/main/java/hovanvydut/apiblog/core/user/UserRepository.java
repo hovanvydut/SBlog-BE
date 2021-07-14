@@ -1,6 +1,5 @@
 package hovanvydut.apiblog.core.user;
 
-import hovanvydut.apiblog.model.entity.Tag;
 import hovanvydut.apiblog.model.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

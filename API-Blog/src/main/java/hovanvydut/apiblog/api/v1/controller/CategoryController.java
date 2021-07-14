@@ -12,6 +12,7 @@ import hovanvydut.apiblog.core.category.dto.UpdateCategoryDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -53,6 +54,7 @@ public class CategoryController {
         return ResponseEntity.ok(this.modelMapper.map(dto, CategoryResp.class));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
     public ResponseEntity<CategoryResp> createCategory(@Valid @RequestBody CreateCategoryReq req) {
         CreateCategoryDTO dto = this.modelMapper.map(req, CreateCategoryDTO.class);
@@ -61,6 +63,7 @@ public class CategoryController {
         return ResponseEntity.ok(this.modelMapper.map(categoryDTO, CategoryResp.class));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<CategoryResp> updateCategory(@PathVariable("id") long id, @Valid @RequestBody UpdateCategoryReq req) {
         UpdateCategoryDTO dto = this.modelMapper.map(req,UpdateCategoryDTO.class);
@@ -69,6 +72,7 @@ public class CategoryController {
         return ResponseEntity.ok(this.modelMapper.map(categoryDTO, CategoryResp.class));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteCategory(@PathVariable("id") long id) {
         this.categoryService.deleteCategory(id);

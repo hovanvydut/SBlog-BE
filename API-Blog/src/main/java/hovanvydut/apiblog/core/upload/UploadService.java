@@ -1,5 +1,6 @@
 package hovanvydut.apiblog.core.upload;
 
+import hovanvydut.apiblog.core.upload.dto.UserImageDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.io.IOException;
 
 public interface UploadService {
 
-    public void save(MultipartFile multipartFile, String uploadDir, String expectedFileName) throws IOException;
+    public UserImageDTO save(MultipartFile multipartFile, String uploadDir, String ownerUsername) throws IOException;
 
+    public void deleteImageById(long imageId, String ownerUsername) throws IOException;
 }

@@ -146,26 +146,4 @@ public class UserController {
         System.out.println("Test hasRoleAny");
     }
 
-    @PreAuthorize("isAuthenticated() and authentication.principal.username != #username")
-    @PutMapping("/me/following/users/{username}")
-    public void followingUser(@PathVariable String username, Principal principal) {
-        this.userService.followingUser(principal.getName(), username);
-    }
-
-    @PreAuthorize("isAuthenticated() and authentication.principal.username != #username")
-    @DeleteMapping("/me/following/users/{username}")
-    public void cancelFollowingUser(@PathVariable String username, Principal principal) {
-        this.userService.unFollowingUser(principal.getName(), username);
-    }
-
-    @GetMapping("/me/images")
-    public void getImagesOfUser(Principal principal) {
-        // must have pagination
-        // get all images of user
-    }
-
-    @PostMapping("/me/images")
-    public void uploadImage() {
-        // upload image
-    }
 }

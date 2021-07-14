@@ -2,7 +2,6 @@ package hovanvydut.apiblog.api.v1.controller;
 
 import hovanvydut.apiblog.api.v1.request.CreateArticleReq;
 import hovanvydut.apiblog.api.v1.request.UpdateArticleReq;
-import hovanvydut.apiblog.common.constant.ArticleStatusEnum;
 import hovanvydut.apiblog.core.article.ArticleService;
 import hovanvydut.apiblog.core.article.dto.ArticleDTO;
 import hovanvydut.apiblog.core.article.dto.CreateArticleDTO;
@@ -33,6 +32,11 @@ public class ArticleController {
         this.modelMapper = modelMapper;
     }
 
+    @GetMapping("/articles")
+    public void getAllPublishedArticles() {
+
+    }
+
     /**
      * Anyone can get Article with status is PUBLISHED_GLOBAL or PUBLISHED_LINK. User logged in can get owning Article
      * with any status
@@ -41,8 +45,6 @@ public class ArticleController {
      */
     @GetMapping("/articles/{slug}")
     public ResponseEntity<ArticleDTO> getPublishedArticle(@PathVariable String slug, Principal principal) {
-        // only get article with status published | only_who_has_link (not required login), or user logged in can get owing article with any status
-        // get with author info (following, followers, count articles)
         String usernameViewer = null;
         if (principal != null) {
             usernameViewer = principal.getName();

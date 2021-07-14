@@ -10,7 +10,9 @@ import lombok.experimental.Accessors;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -78,4 +80,8 @@ public class User {
 
     @OneToMany(mappedBy = "author")
     private Set<Article> articles;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserImage> images = new ArrayList<>();
+
 }

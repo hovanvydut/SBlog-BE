@@ -3,16 +3,20 @@ package hovanvydut.apiblog.core.user;
 import hovanvydut.apiblog.common.exception.MyError;
 import hovanvydut.apiblog.common.exception.MyRuntimeException;
 import hovanvydut.apiblog.common.exception.MyUsernameNotFoundException;
+import hovanvydut.apiblog.common.exception.UserNotFoundException;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.auth.UserRegistrationRepository;
-import hovanvydut.apiblog.core.tag.dto.TagDTO;
 import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UpdateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UserDTO;
-import hovanvydut.apiblog.model.entity.*;
+import hovanvydut.apiblog.model.entity.Follower;
+import hovanvydut.apiblog.model.entity.FollowerId;
+import hovanvydut.apiblog.model.entity.User;
+import hovanvydut.apiblog.model.entity.UserRegistration;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -83,19 +87,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserByEmail(String email) {
-        return null;
+        User user = this.userRepository.findByEmail(email);
+
+        if (user == null) {
+            throw new UserNotFoundException("Could not found user with email = '" + email + "'");
+        }
+
+        return this.modelMapper.map(user, UserDTO.class);
     }
 
     @Override
     public UserDTO getUserByUsername(String username) {
-        return null;
+        User user = this.userRepository.findByUsername(username);
+
+        if (user == null) {
+            throw new MyUsernameNotFoundException(username);
+        }
+
+        return this.modelMapper.map(user, UserDTO.class);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public UserDTO createUser(@Valid CreateUserDTO dto, boolean needHashPassword) {
         // check username, email is unique on both User table and UserRegistration table
         List<MyError> errorList = this.checkUnique(dto.getEmail(), dto.getUsername());
-        System.out.println(errorList.size());
+
         if (errorList.size() > 0) {
             throw new MyRuntimeException(errorList);
         }
@@ -139,6 +156,7 @@ public class UserServiceImpl implements UserService {
         return errorList;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public UserDTO updateUser(String username, UpdateUserDTO dto) {
         User user = this.userRepository.findByUsername(username);
@@ -154,6 +172,7 @@ public class UserServiceImpl implements UserService {
         return this.modelMapper.map(savedUser, UserDTO.class);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteUser(String username) {
         User user = this.userRepository.findByUsername(username);

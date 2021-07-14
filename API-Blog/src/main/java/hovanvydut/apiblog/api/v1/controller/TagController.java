@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -65,6 +66,7 @@ public class TagController {
         return ResponseEntity.ok(this.modelMapper.map(tagDTO, TagResp.class));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
     public ResponseEntity<TagResp> createTag(@Valid @RequestBody CreateTagReq req) {
         CreateTagDTO dto = this.modelMapper.map(req, CreateTagDTO.class);
@@ -73,6 +75,7 @@ public class TagController {
         return ResponseEntity.ok(this.modelMapper.map(tagDTO, TagResp.class));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<TagResp> updateTag(@PathVariable("id") Long tagId, @Valid @RequestBody UpdateTagReq req) {
         UpdateTagDTO dto = this.modelMapper.map(req, UpdateTagDTO.class);
@@ -81,6 +84,7 @@ public class TagController {
         return ResponseEntity.ok(this.modelMapper.map(tagDTO, TagResp.class));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteTag(@PathVariable("id") Long tagId) {
         this.tagService.deleteTag(tagId);
