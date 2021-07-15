@@ -17,6 +17,7 @@ import hovanvydut.apiblog.model.entity.Category;
 import hovanvydut.apiblog.model.entity.Tag;
 import hovanvydut.apiblog.model.entity.User;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -52,17 +53,27 @@ public class ArticleServiceImpl implements ArticleService {
 
         Article article = this.articleRepo.findBySlug(slug);
 
-        if (usernameViewer == null) {
-            if (article.getStatus() != ArticleStatusEnum.PUBLISHED_GLOBAL
-                    && article.getStatus() != ArticleStatusEnum.PUBLISHED_LINK) {
+        if (article == null) {
+            throw new ArticleNotFoundException(slug);
+        }
+
+        if (article.getStatus() != ArticleStatusEnum.PUBLISHED_GLOBAL
+                && article.getStatus() != ArticleStatusEnum.PUBLISHED_LINK) {
+
+            if (usernameViewer == null) {
                 throw new ArticleNotFoundException(slug);
             }
-        } else {
+
             User user = this.userRepo.findByUsername(usernameViewer);
+
+            if (user == null) {
+                throw new UsernameNotFoundException(usernameViewer);
+            }
 
             if (article.getAuthor().getId() != user.getId()) {
                 throw new ArticleNotFoundException(slug);
             }
+
         }
 
         return this.modelMapper.map(article, ArticleDTO.class);

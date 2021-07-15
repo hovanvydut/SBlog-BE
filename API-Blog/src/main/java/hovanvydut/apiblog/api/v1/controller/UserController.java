@@ -60,20 +60,11 @@ public class UserController {
                                   @RequestParam(required = false) Optional<Integer> page,
                                   @RequestParam(required = false) Optional<Integer> size,
                                   @RequestParam(required = false, defaultValue = "id,asc") String[] sort) {
-    // get all published article of user
+        // get all published article of user
     }
 
     @GetMapping("/users/{username}/series")
     public void getSeriesOfUser(@PathVariable String username,
-                                @RequestParam(required = false) Optional<String> keyword,
-                                @RequestParam(required = false) Optional<Integer> page,
-                                @RequestParam(required = false) Optional<Integer> size,
-                                @RequestParam(required = false, defaultValue = "id,asc") String[] sort) {
-
-    }
-
-    @GetMapping("/users/{username}/clipped-articles")
-    public void getClippedArticlesOfUser(@PathVariable String username,
                                 @RequestParam(required = false) Optional<String> keyword,
                                 @RequestParam(required = false) Optional<Integer> page,
                                 @RequestParam(required = false) Optional<Integer> size,

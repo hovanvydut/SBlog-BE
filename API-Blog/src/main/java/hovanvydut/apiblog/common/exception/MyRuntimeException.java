@@ -25,6 +25,11 @@ public class MyRuntimeException extends RuntimeException{
         this.errors.add(error);
     }
 
+    public MyRuntimeException add(String msg) {
+        this.errors.add(new MyError().setMessage(msg));
+        return this;
+    }
+
     public List<MyError> getErrors() {
         return this.errors;
     }
