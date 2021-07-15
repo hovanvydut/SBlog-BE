@@ -35,6 +35,11 @@ public class CategoryController {
         this.modelMapper = modelMapper;
     }
 
+    @GetMapping("/{slug}/articles")
+    public void getAllArticlesOfCategory(@PathVariable String slug) {
+
+    }
+
     @GetMapping("")
     public ResponseEntity<CategoryPageResp> getAllCategories(@RequestParam(required = false) Optional<String> keyword,
                                                              @RequestParam(required = false) Optional<Integer> page,

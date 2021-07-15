@@ -1,29 +1,18 @@
 package hovanvydut.apiblog.core.upload;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import hovanvydut.apiblog.common.util.FileUploadUtil;
 import hovanvydut.apiblog.core.upload.dto.UserImageDTO;
 import hovanvydut.apiblog.core.user.UserService;
 import hovanvydut.apiblog.core.user.dto.UserDTO;
 import hovanvydut.apiblog.model.entity.User;
 import hovanvydut.apiblog.model.entity.UserImage;
-import net.coobird.thumbnailator.Thumbnails;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.io.IOException;
 
 /**
  * @author hovanvydut

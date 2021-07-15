@@ -83,6 +83,7 @@ public class Article {
     @JoinColumn(name = "user_id", nullable = false)
     private User author;
 
+
 //    @PreUpdate
 //    protected void onUpdate() {
 //        lastUpdatedAt = LocalDateTime.now();
