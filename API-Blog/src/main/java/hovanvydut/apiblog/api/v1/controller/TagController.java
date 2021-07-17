@@ -9,6 +9,8 @@ import hovanvydut.apiblog.core.tag.TagService;
 import hovanvydut.apiblog.core.tag.dto.CreateTagDTO;
 import hovanvydut.apiblog.core.tag.dto.TagDTO;
 import hovanvydut.apiblog.core.tag.dto.UpdateTagDTO;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -38,6 +40,7 @@ public class TagController {
         this.redisTemplate = redisTemplate;
     }
 
+    @ApiOperation(value = "Get all tags")
     @GetMapping("")
     public ResponseEntity<TagPageResp> getAllTags(@Valid TagPaginationParams req) {
 
@@ -47,6 +50,7 @@ public class TagController {
         return ResponseEntity.ok(this.modelMapper.map(pageTags, TagPageResp.class));
     }
 
+    @ApiOperation(value = "Get Tag by id")
     @GetMapping("/{id}")
     public ResponseEntity<TagResp> getTag(@PathVariable("id") Long tagId) {
 
@@ -62,6 +66,7 @@ public class TagController {
         return ResponseEntity.ok(this.modelMapper.map(tagDTO, TagResp.class));
     }
 
+    @ApiOperation(value = "Create a new tag", authorizations = {@Authorization(value = "BEARER ")})
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
     public ResponseEntity<TagResp> createTag(@Valid @RequestBody CreateTagReq req) {
@@ -71,6 +76,7 @@ public class TagController {
         return ResponseEntity.ok(this.modelMapper.map(tagDTO, TagResp.class));
     }
 
+    @ApiOperation(value = "Update tag by id", authorizations = {@Authorization(value = "BEARER ")})
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<TagResp> updateTag(@PathVariable("id") Long tagId, @Valid @RequestBody UpdateTagReq req) {
@@ -80,6 +86,7 @@ public class TagController {
         return ResponseEntity.ok(this.modelMapper.map(tagDTO, TagResp.class));
     }
 
+    @ApiOperation(value = "Delete tag by id", authorizations = {@Authorization(value = "BEARER ")})
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteTag(@PathVariable("id") Long tagId) {
