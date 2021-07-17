@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author hovanvydut
@@ -86,22 +87,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserByEmail(String email) {
-        User user = this.userRepository.findByEmail(email);
-
-        if (user == null) {
-            throw new UserNotFoundException("Could not found user with email = '" + email + "'");
-        }
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Could not found user with email = '" + email + "'"));
 
         return this.modelMapper.map(user, UserDTO.class);
     }
 
     @Override
     public UserDTO getUserByUsername(String username) {
-        User user = this.userRepository.findByUsername(username);
-
-        if (user == null) {
-            throw new MyUsernameNotFoundException(username);
-        }
+        User user = this.userRepository.findByUsername(username)
+                .orElseThrow(() ->new MyUsernameNotFoundException(username));
 
         return this.modelMapper.map(user, UserDTO.class);
     }
@@ -132,22 +127,20 @@ public class UserServiceImpl implements UserService {
         // check email, username unique in two table: user and userregistration
         List<MyError> errorList = new ArrayList<>();
 
-        UserRegistration existEmailRegistration = this.userRegistrationRepo.findByEmail(email);
-        if (existEmailRegistration == null) {
-            User existEmailUser = this.userRepository.findByEmail(email);
-            if (existEmailUser != null) {
+        Optional<UserRegistration> existEmailRegistration = this.userRegistrationRepo.findByEmail(email);
+        if (existEmailRegistration.isEmpty()) {
+            this.userRepository.findByEmail(email).ifPresent(user -> {
                 errorList.add(new MyError().setSource("email").setMessage("The email has already been taken"));
-            }
+            });
         } else {
             errorList.add(new MyError().setSource("email").setMessage("The email has already been taken"));
         }
 
-        UserRegistration existUsernameRegistration = this.userRegistrationRepo.findByUsername(username);
-        if (existUsernameRegistration == null) {
-            User existUsernameUser = this.userRepository.findByUsername(username);
-            if (existUsernameUser != null) {
+        Optional<UserRegistration> existUsernameRegistration = this.userRegistrationRepo.findByUsername(username);
+        if (existUsernameRegistration.isEmpty()) {
+            this.userRepository.findByUsername(username).ifPresent(user -> {
                 errorList.add(new MyError().setSource("username").setMessage("The username has already been taken"));
-            }
+            });
         } else {
             errorList.add(new MyError().setSource("username").setMessage("The username has already been taken"));
         }
@@ -158,11 +151,8 @@ public class UserServiceImpl implements UserService {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public UserDTO updateUser(String username, UpdateUserDTO dto) {
-        User user = this.userRepository.findByUsername(username);
-
-        if (user == null) {
-            throw new MyUsernameNotFoundException(username);
-        }
+        User user = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new MyUsernameNotFoundException(username));
 
         this.modelMapper.map(dto, user);
 
@@ -174,27 +164,16 @@ public class UserServiceImpl implements UserService {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteUser(String username) {
-        User user = this.userRepository.findByUsername(username);
-
-        if (user == null) {
-            throw new MyUsernameNotFoundException(username);
-        }
+        User user = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new MyUsernameNotFoundException(username));
 
         this.userRepository.delete(user);
     }
 
     @Override
     public void followingUser(String fromUsername, String toUsername) {
-        User fromUser = this.userRepository.findByUsername(fromUsername);
-        User toUser = this.userRepository.findByUsername(toUsername);
-
-        if (fromUser == null) {
-            throw new MyUsernameNotFoundException(fromUsername);
-        }
-
-        if (toUser == null) {
-            throw new MyUsernameNotFoundException(toUsername);
-        }
+        User fromUser = this.userRepository.findByUsername(fromUsername).orElseThrow(() -> new MyUsernameNotFoundException(fromUsername));
+        User toUser = this.userRepository.findByUsername(toUsername).orElseThrow(() -> new MyUsernameNotFoundException(toUsername));
 
         FollowerId followerId = new FollowerId().setFromUserId(fromUser.getId()).setToUserId(toUser.getId());
 
@@ -205,16 +184,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void unFollowingUser(String fromUsername, String toUsername) {
-        User fromUser = this.userRepository.findByUsername(fromUsername);
-        User toUser = this.userRepository.findByUsername(toUsername);
-
-        if (fromUser == null) {
-            throw new MyUsernameNotFoundException(fromUsername);
-        }
-
-        if (toUser == null) {
-            throw new MyUsernameNotFoundException(toUsername);
-        }
+        User fromUser = this.userRepository.findByUsername(fromUsername).orElseThrow(() -> new MyUsernameNotFoundException(fromUsername));
+        User toUser = this.userRepository.findByUsername(toUsername).orElseThrow(() -> new MyUsernameNotFoundException(toUsername));
 
         String msgError = "User with username = " + fromUsername + " is not following User with username = " + toUsername;
 

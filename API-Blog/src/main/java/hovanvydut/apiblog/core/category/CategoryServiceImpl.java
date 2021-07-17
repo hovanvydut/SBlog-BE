@@ -39,15 +39,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Page<CategoryDTO> getCategories(int page, int size, String[] sort, String searchKeyword) {
-        if (page <= 0) {
-            page = 1;
-        }
-
-        if (size <= 0) {
-            // NOTE: use default constant
-            size = 5;
-        }
-
         Sort sortObj = SortAndPaginationUtil.processSort(sort);
         Pageable pageable = PageRequest.of(page - 1, size, sortObj);
 
@@ -121,30 +112,28 @@ public class CategoryServiceImpl implements CategoryService {
     private List<MyError> checkUnique(CreateCategoryDTO dto) {
         List<MyError> errorList = new ArrayList<>();
 
-        Category existName = this.categoryRepo.findByName(dto.getName());
-        if (existName != null) {
-            errorList.add(new MyError().setSource("name").setMessage("The name has already been taken"));
-        }
+        this.categoryRepo.findByName(dto.getName())
+                .ifPresent(category -> errorList.add(new MyError().setSource("name").setMessage("The name has already been taken")));
 
-        Category existSlug = this.categoryRepo.findBySlug(dto.getSlug());
-        if (existSlug != null) {
-            errorList.add(new MyError().setSource("slug").setMessage("The slug has already been taken"));
-        }
+        this.categoryRepo.findBySlug(dto.getSlug())
+                .ifPresent(category -> errorList.add(new MyError().setSource("slug").setMessage("The slug has already been taken")));
 
         return errorList;
     }
     private List<MyError> checkUnique(Long id, UpdateCategoryDTO dto) {
         List<MyError> errorList = new ArrayList<>();
 
-        Category existName = this.categoryRepo.findByName(dto.getName());
-        if (existName != null && existName.getId() != id) {
-            errorList.add(new MyError().setSource("name").setMessage("The name has already been taken"));
-        }
+        this.categoryRepo.findByName(dto.getName()).ifPresent(category -> {
+            if (category.getId() != id) {
+                errorList.add(new MyError().setSource("name").setMessage("The name has already been taken"));
+            }
+        });
 
-        Category existSlug = this.categoryRepo.findBySlug(dto.getSlug());
-        if (existSlug != null && existSlug.getId() != id) {
-            errorList.add(new MyError().setSource("slug").setMessage("The slug has already been taken"));
-        }
+        this.categoryRepo.findBySlug(dto.getSlug()).ifPresent(category -> {
+            if (category.getId() != id) {
+                errorList.add(new MyError().setSource("slug").setMessage("The slug has already been taken"));
+            }
+        });
 
         return errorList;
     }

@@ -20,6 +20,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -59,33 +60,24 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     @Override
     public UserRegistrationDTO getUserRegistrationByEmail(String email) {
-        UserRegistration userRegistration = this.userRegistrationRepo.findByEmail(email);
-
-        if (userRegistration == null) {
-            throw new UserRegistrationNotFoundException(email, "");
-        }
+        UserRegistration userRegistration = this.userRegistrationRepo.findByEmail(email)
+                .orElseThrow(() -> new UserRegistrationNotFoundException(email, ""));
 
         return this.modelMapper.map(userRegistration, UserRegistrationDTO.class);
     }
 
     @Override
     public UserRegistrationDTO getUserRegistrationByUsername(String username) {
-        UserRegistration userRegistration = this.userRegistrationRepo.findByUsername(username);
-
-        if (userRegistration == null) {
-            throw new UserRegistrationNotFoundException("", username);
-        }
+        UserRegistration userRegistration = this.userRegistrationRepo.findByUsername(username)
+                .orElseThrow(() -> new UserRegistrationNotFoundException("", username));
 
         return this.modelMapper.map(userRegistration, UserRegistrationDTO.class);
     }
 
     @Override
     public UserRegistrationDTO getUserRegistrationBy(String email, String username) {
-        UserRegistration userRegistration = this.userRegistrationRepo.findByEmailOrUsername(email, username);
-
-        if (userRegistration == null) {
-            throw new UserRegistrationNotFoundException(email, username);
-        }
+        UserRegistration userRegistration = this.userRegistrationRepo.findByEmailOrUsername(email, username)
+                .orElseThrow(() -> new UserRegistrationNotFoundException(email, username));
 
         return this.modelMapper.map(userRegistration, UserRegistrationDTO.class);
     }
@@ -118,11 +110,8 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     @Override
     public void acceptRegistration(String token) {
-        UserRegistration userRegistration = this.userRegistrationRepo.findByRegistrationToken(token);
-
-        if (userRegistration == null) {
-            throw new UserRegistrationTokenNotFoundException(token);
-        }
+        UserRegistration userRegistration = this.userRegistrationRepo.findByRegistrationToken(token)
+                .orElseThrow(() -> new UserRegistrationTokenNotFoundException(token));
 
         User user = new User();
         this.modelMapper.typeMap(UserRegistration.class, User.class)
@@ -137,11 +126,8 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     @Override
     public void declineRegistration(String token) {
-        UserRegistration userRegistration = this.userRegistrationRepo.findByRegistrationToken(token);
-
-        if (userRegistration == null) {
-            throw new UserRegistrationTokenNotFoundException(token);
-        }
+        UserRegistration userRegistration = this.userRegistrationRepo.findByRegistrationToken(token)
+                .orElseThrow(() -> new UserRegistrationTokenNotFoundException(token));
 
         this.userRegistrationRepo.delete(userRegistration);
     }
@@ -150,22 +136,20 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         // check email, username unique in two table: user and userregistration
         List<MyError> errorList = new ArrayList<>();
 
-        UserRegistration existEmailRegistration = this.userRegistrationRepo.findByEmail(dto.getEmail());
-        if (existEmailRegistration == null) {
-            User existEmailUser = this.userRepository.findByEmail(dto.getEmail());
-            if (existEmailUser != null) {
+        Optional<UserRegistration> existEmailRegistration = this.userRegistrationRepo.findByEmail(dto.getEmail());
+        if (existEmailRegistration.isEmpty()) {
+            this.userRepository.findByEmail(dto.getEmail()).ifPresent(user -> {
                 errorList.add(new MyError().setSource("email").setMessage("The email has already been taken"));
-            }
+            });
         } else {
             errorList.add(new MyError().setSource("email").setMessage("The email has already been taken"));
         }
 
-        UserRegistration existUsernameRegistration = this.userRegistrationRepo.findByUsername(dto.getUsername());
-        if (existUsernameRegistration == null) {
-            User existUsernameUser = this.userRepository.findByUsername(dto.getUsername());
-            if (existUsernameUser != null) {
+        Optional<UserRegistration> existUsernameRegistration = this.userRegistrationRepo.findByUsername(dto.getUsername());
+        if (existUsernameRegistration.isEmpty()) {
+            this.userRepository.findByUsername(dto.getUsername()).ifPresent(user -> {
                 errorList.add(new MyError().setSource("username").setMessage("The username has already been taken"));
-            }
+            });
         } else {
             errorList.add(new MyError().setSource("username").setMessage("The username has already been taken"));
         }

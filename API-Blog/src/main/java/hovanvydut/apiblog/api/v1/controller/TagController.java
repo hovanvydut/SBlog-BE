@@ -1,14 +1,14 @@
 package hovanvydut.apiblog.api.v1.controller;
 
 import hovanvydut.apiblog.api.v1.request.CreateTagReq;
+import hovanvydut.apiblog.api.v1.request.TagPaginationParams;
 import hovanvydut.apiblog.api.v1.request.UpdateTagReq;
 import hovanvydut.apiblog.api.v1.response.TagPageResp;
 import hovanvydut.apiblog.api.v1.response.TagResp;
-import hovanvydut.apiblog.common.constant.PagingConstant;
+import hovanvydut.apiblog.core.tag.TagService;
 import hovanvydut.apiblog.core.tag.dto.CreateTagDTO;
 import hovanvydut.apiblog.core.tag.dto.TagDTO;
 import hovanvydut.apiblog.core.tag.dto.UpdateTagDTO;
-import hovanvydut.apiblog.core.tag.service.TagService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -17,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,13 +39,10 @@ public class TagController {
     }
 
     @GetMapping("")
-    public ResponseEntity<TagPageResp> getAllTags(@RequestParam(required = false) Optional<String> keyword,
-                                                  @RequestParam(required = false) Optional<Integer> page,
-                                                  @RequestParam(required = false) Optional<Integer> size,
-                                                  @RequestParam(required = false, defaultValue = "id,asc") String[] sort) {
+    public ResponseEntity<TagPageResp> getAllTags(@Valid TagPaginationParams req) {
 
-        Page<TagDTO> pageTags = this.tagService.getTags(page.orElse(1),
-                size.orElse(PagingConstant.TAGS_PER_PAGE), sort, keyword.orElse(""));
+        Page<TagDTO> pageTags = this.tagService.getTags(req.getPage(),
+                req.getSize(), req.getSort(), req.getKeyword());
 
         return ResponseEntity.ok(this.modelMapper.map(pageTags, TagPageResp.class));
     }

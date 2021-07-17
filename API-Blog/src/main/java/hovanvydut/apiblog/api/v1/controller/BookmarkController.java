@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.api.v1.controller;
 
-import hovanvydut.apiblog.api.v1.request.PaginationParams;
+import hovanvydut.apiblog.api.v1.request.BookmarkPaginationParams;
 import hovanvydut.apiblog.api.v1.response.ArticlePageResp;
 import hovanvydut.apiblog.core.article.dto.ArticleDTO;
 import hovanvydut.apiblog.core.bookmark.BookmarkService;
@@ -38,7 +38,7 @@ public class BookmarkController {
      */
     @GetMapping("/users/{username}/clipped-articles")
     public ResponseEntity<ArticlePageResp> getClippedArticlesOfUser(@PathVariable String username,
-                                                                    @Valid PaginationParams req) {
+                                                                    @Valid BookmarkPaginationParams req) {
         Page<ArticleDTO> pageArticleDTO = this.bookmarkService
                 .getAllClippedArticlesOfUser(username, req.getPage(), req.getSize(), req.getSort(), req.getKeyword());
 

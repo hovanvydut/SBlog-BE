@@ -51,11 +51,8 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public ArticleDTO getArticle(String slug, String usernameViewer) {
 
-        Article article = this.articleRepo.findBySlug(slug);
-
-        if (article == null) {
-            throw new ArticleNotFoundException(slug);
-        }
+        Article article = this.articleRepo.findBySlug(slug)
+                .orElseThrow(() -> new ArticleNotFoundException(slug));
 
         if (article.getStatus() != ArticleStatusEnum.PUBLISHED_GLOBAL
                 && article.getStatus() != ArticleStatusEnum.PUBLISHED_LINK) {
@@ -64,11 +61,8 @@ public class ArticleServiceImpl implements ArticleService {
                 throw new ArticleNotFoundException(slug);
             }
 
-            User user = this.userRepo.findByUsername(usernameViewer);
-
-            if (user == null) {
-                throw new UsernameNotFoundException(usernameViewer);
-            }
+            User user = this.userRepo.findByUsername(usernameViewer)
+                    .orElseThrow(() -> new UsernameNotFoundException(usernameViewer));
 
             if (article.getAuthor().getId() != user.getId()) {
                 throw new ArticleNotFoundException(slug);
@@ -86,11 +80,8 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         // get author and validate username
-        User author = this.userRepo.findByUsername(authorUsername);
-
-        if (author == null) {
-            throw new MyUsernameNotFoundException(authorUsername);
-        }
+        User author = this.userRepo.findByUsername(authorUsername)
+                .orElseThrow(() -> new MyUsernameNotFoundException(authorUsername));
 
         // mapping dto --> entity
         Article article = new Article();
@@ -135,11 +126,8 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public void approveArticle(String slug) {
-        Article article = this.articleRepo.findBySlug(slug);
-
-        if (article == null) {
-            throw new ArticleNotFoundException(slug);
-        }
+        Article article = this.articleRepo.findBySlug(slug)
+                .orElseThrow(() -> new ArticleNotFoundException(slug));
 
         switch (article.getScope()) {
             case GLOBAL:
@@ -158,11 +146,8 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public void markArticleSpam(String slug) {
-        Article article = this.articleRepo.findBySlug(slug);
-
-        if (article == null) {
-            throw new ArticleNotFoundException(slug);
-        }
+        Article article = this.articleRepo.findBySlug(slug)
+                .orElseThrow(() -> new ArticleNotFoundException(slug));
 
         article.setPublishedAt(null);
         article.setStatus(ArticleStatusEnum.SPAM);
@@ -172,11 +157,8 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleDTO updateArticle(String slug, UpdateArticleDTO dto, PublishOption publishOption, String authorUsername) {
-        Article article = this.articleRepo.findBySlug(slug);
-
-        if (article == null) {
-            throw new ArticleNotFoundException(slug);
-        }
+        Article article = this.articleRepo.findBySlug(slug)
+                .orElseThrow(() -> new ArticleNotFoundException(slug));
 
         if (!article.getAuthor().getUsername().equals(authorUsername)) {
             throw new RuntimeException("User with username = '" + authorUsername + "' is not owning this article");

@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * @author hovanvydut
  * Created on 7/4/21
@@ -15,9 +17,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
-    User findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     @Query("SELECT u FROM User u WHERE u.fullName LIKE %?1%")
     Page<User> search(String keyword, Pageable pageable);

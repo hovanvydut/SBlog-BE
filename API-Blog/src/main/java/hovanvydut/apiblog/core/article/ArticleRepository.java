@@ -4,6 +4,8 @@ import hovanvydut.apiblog.model.entity.Article;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * @author hovanvydut
  * Created on 7/12/21
@@ -11,5 +13,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ArticleRepository extends PagingAndSortingRepository<Article, Long> {
-    Article findBySlug(String slug);
+    Optional<Article> findBySlug(String slug);
 }

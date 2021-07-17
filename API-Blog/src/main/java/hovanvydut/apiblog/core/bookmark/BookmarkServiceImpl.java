@@ -47,17 +47,11 @@ public class BookmarkServiceImpl implements BookmarkService {
 
     @Override
     public void clipArticle(String articleSlug, String subscriberUsername) {
-        Article article = this.articleRepo.findBySlug(articleSlug);
+        Article article = this.articleRepo.findBySlug(articleSlug)
+                .orElseThrow(() -> new ArticleNotFoundException(articleSlug));
 
-        if (article == null) {
-            throw new ArticleNotFoundException(articleSlug);
-        }
-
-        User subscriber = this.userRepo.findByUsername(subscriberUsername);
-
-        if (subscriber == null) {
-            throw new MyUsernameNotFoundException(subscriberUsername);
-        }
+        User subscriber = this.userRepo.findByUsername(subscriberUsername)
+                .orElseThrow(() -> new MyUsernameNotFoundException(subscriberUsername));
 
         BookmarkArticleId bookmarkArticleId = new BookmarkArticleId().setArticleId(article.getId()).setUserId(subscriber.getId());
 
@@ -78,17 +72,11 @@ public class BookmarkServiceImpl implements BookmarkService {
 
     @Override
     public void deleteBookmark(String articleSlug, String subscriberUsername) {
-        Article article = this.articleRepo.findBySlug(articleSlug);
+        Article article = this.articleRepo.findBySlug(articleSlug)
+                .orElseThrow(() -> new ArticleNotFoundException(articleSlug));
 
-        if (article == null) {
-            throw new ArticleNotFoundException(articleSlug);
-        }
-
-        User subscriber = this.userRepo.findByUsername(subscriberUsername);
-
-        if (subscriber == null) {
-            throw new MyUsernameNotFoundException(subscriberUsername);
-        }
+        User subscriber = this.userRepo.findByUsername(subscriberUsername)
+                .orElseThrow(() -> new MyUsernameNotFoundException(subscriberUsername));
 
         BookmarkArticleId bookmarkArticleId = new BookmarkArticleId()
                 .setArticleId(article.getId()).setUserId(subscriber.getId());
@@ -100,22 +88,15 @@ public class BookmarkServiceImpl implements BookmarkService {
 
     @Override
     public List<SubscriberDTO> getAllSubscribers(String slug) {
-        Article article = this.articleRepo.findBySlug(slug);
-
-        if (article == null) {
-            throw new ArticleNotFoundException(slug);
-        }
+        Article article = this.articleRepo.findBySlug(slug).orElseThrow(() -> new ArticleNotFoundException(slug));
 
         return this.bookmarkRepo.findAllSubscribersOfArticle(article.getId());
     }
 
     @Override
     public Page<ArticleDTO> getAllClippedArticlesOfUser(String username, int page, int size, String[] sort, String keyword) {
-        User user = this.userRepo.findByUsername(username);
-
-        if (user == null) {
-            throw new MyUsernameNotFoundException(username);
-        }
+        User user = this.userRepo.findByUsername(username)
+                .orElseThrow(() -> new MyUsernameNotFoundException(username));
 
         Sort sortObj = SortAndPaginationUtil.processSort(sort);
 

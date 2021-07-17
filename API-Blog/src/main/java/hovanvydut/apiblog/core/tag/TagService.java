@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.core.tag.service;
+package hovanvydut.apiblog.core.tag;
 
 import hovanvydut.apiblog.core.tag.dto.CreateTagDTO;
 import hovanvydut.apiblog.core.tag.dto.TagDTO;

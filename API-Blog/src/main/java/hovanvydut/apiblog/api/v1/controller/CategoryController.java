@@ -1,10 +1,10 @@
 package hovanvydut.apiblog.api.v1.controller;
 
+import hovanvydut.apiblog.api.v1.request.CategoryPaginationParams;
 import hovanvydut.apiblog.api.v1.request.CreateCategoryReq;
 import hovanvydut.apiblog.api.v1.request.UpdateCategoryReq;
 import hovanvydut.apiblog.api.v1.response.CategoryPageResp;
 import hovanvydut.apiblog.api.v1.response.CategoryResp;
-import hovanvydut.apiblog.common.constant.PagingConstant;
 import hovanvydut.apiblog.core.category.CategoryService;
 import hovanvydut.apiblog.core.category.dto.CategoryDTO;
 import hovanvydut.apiblog.core.category.dto.CreateCategoryDTO;
@@ -16,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
 /**
  * @author hovanvydut
@@ -41,13 +40,10 @@ public class CategoryController {
     }
 
     @GetMapping("")
-    public ResponseEntity<CategoryPageResp> getAllCategories(@RequestParam(required = false) Optional<String> keyword,
-                                                             @RequestParam(required = false) Optional<Integer> page,
-                                                             @RequestParam(required = false) Optional<Integer> size,
-                                                             @RequestParam(required = false, defaultValue = "id,asc") String[] sort) {
+    public ResponseEntity<CategoryPageResp> getAllCategories(@Valid CategoryPaginationParams req) {
 
-        Page<CategoryDTO> pageCategoryDTOS = this.categoryService.getCategories(page.orElse(1),
-                size.orElse(PagingConstant.CATEGORIES_PER_PAGE), sort, keyword.orElse(""));
+        Page<CategoryDTO> pageCategoryDTOS = this.categoryService.getCategories(req.getPage(),
+                req.getSize(), req.getSort(), req.getKeyword());
 
         return ResponseEntity.ok(this.modelMapper.map(pageCategoryDTOS, CategoryPageResp.class));
     }

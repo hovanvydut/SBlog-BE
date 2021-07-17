@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.core.tag.service;
+package hovanvydut.apiblog.core.tag;
 
 import hovanvydut.apiblog.common.exception.MyError;
 import hovanvydut.apiblog.common.exception.MyRuntimeException;
@@ -8,7 +8,6 @@ import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.tag.dto.CreateTagDTO;
 import hovanvydut.apiblog.core.tag.dto.TagDTO;
 import hovanvydut.apiblog.core.tag.dto.UpdateTagDTO;
-import hovanvydut.apiblog.core.tag.repository.TagRepository;
 import hovanvydut.apiblog.model.entity.Tag;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -40,15 +39,6 @@ public class TagServiceImpl implements TagService{
     @Override
     public Page<TagDTO> getTags(int page, int size, String[] sort, String searchKeyword) {
 
-        if (page <= 0) {
-            page = 1;
-        }
-
-        if (size <= 0) {
-            // NOTE: use default constant
-            size = 5;
-        }
-
         Sort sortObj = SortAndPaginationUtil.processSort(sort);
         Pageable pageable = PageRequest.of(page - 1, size, sortObj);
 
@@ -77,11 +67,7 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public TagDTO getTag(String slug) {
-        Tag tag = this.tagRepository.findBySlug(slug);
-
-        if (tag == null) {
-            throw new TagNotFoundException(slug);
-        }
+        Tag tag = this.tagRepository.findBySlug(slug).orElseThrow(() -> new TagNotFoundException(slug));
 
         return this.modelMapper.map(tag, TagDTO.class);
     }
@@ -132,30 +118,28 @@ public class TagServiceImpl implements TagService{
     private List<MyError> checkUnique(CreateTagDTO dto) {
         List<MyError> errorList = new ArrayList<>();
 
-        Tag existName = this.tagRepository.findByName(dto.getName());
-        if (existName != null) {
-            errorList.add(new MyError().setSource("name").setMessage("The name has already been taken"));
-        }
+        this.tagRepository.findByName(dto.getName())
+                .ifPresent(tag -> errorList.add(new MyError().setSource("name").setMessage("The name has already been taken")));
 
-        Tag existSlug = this.tagRepository.findBySlug(dto.getSlug());
-        if (existSlug != null) {
-            errorList.add(new MyError().setSource("slug").setMessage("The slug has already been taken"));
-        }
+        this.tagRepository.findBySlug(dto.getSlug())
+                .ifPresent(tag -> errorList.add(new MyError().setSource("slug").setMessage("The slug has already been taken")));
 
         return errorList;
     }
     private List<MyError> checkUnique(long id, UpdateTagDTO dto) {
         List<MyError> errorList = new ArrayList<>();
 
-        Tag existName = this.tagRepository.findByName(dto.getName());
-        if (existName != null && existName.getId() != id) {
-            errorList.add(new MyError().setSource("name").setMessage("The name has already been taken"));
-        }
+        this.tagRepository.findByName(dto.getName()).ifPresent(tag -> {
+            if (tag.getId() != id) {
+                errorList.add(new MyError().setSource("name").setMessage("The name has already been taken"));
+            }
+        });
 
-        Tag existSlug = this.tagRepository.findBySlug(dto.getSlug());
-        if (existSlug != null && existSlug.getId() != id) {
-            errorList.add(new MyError().setSource("slug").setMessage("The slug has already been taken"));
-        }
+        this.tagRepository.findBySlug(dto.getSlug()).ifPresent(tag -> {
+            if (tag.getId() != id) {
+                errorList.add(new MyError().setSource("slug").setMessage("The slug has already been taken"));
+            }
+        });
 
         return errorList;
     }

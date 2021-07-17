@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * @author hovanvydut
  * Created on 7/5/21
@@ -14,6 +16,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CategoryRepository extends PagingAndSortingRepository<Category, Long> {
     Page<Category> findByNameLike(String name, Pageable pageable);
-    Category findByName(String name);
-    Category findBySlug(String slug);
+    Optional<Category> findByName(String name);
+    Optional<Category> findBySlug(String slug);
 }

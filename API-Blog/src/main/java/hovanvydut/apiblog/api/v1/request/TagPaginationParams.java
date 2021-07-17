@@ -2,6 +2,7 @@ package hovanvydut.apiblog.api.v1.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import hovanvydut.apiblog.common.constant.PagingConstant;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,7 +10,7 @@ import lombok.experimental.Accessors;
 
 /**
  * @author hovanvydut
- * Created on 7/15/21
+ * Created on 7/17/21
  */
 
 @Getter
@@ -18,16 +19,11 @@ import lombok.experimental.Accessors;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
-public class PaginationParams {
-    protected int page;
-    protected int size;
-    protected String[] sort;
-    protected String keyword;
+public class TagPaginationParams extends PaginationParams {
 
-    public PaginationParams() {
-        this.page = 1;
-        this.size = 10;
-        this.sort = new String[] {"id,asc"};
-        this.keyword = "";
+    public TagPaginationParams() {
+        super();
+        this.size = PagingConstant.TAGS_PER_PAGE;
     }
+
 }
