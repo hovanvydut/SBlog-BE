@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.model.entity;
 
-import hovanvydut.apiblog.common.constant.ArticleVoteEnum;
+import hovanvydut.apiblog.common.enums.ArticleVoteEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

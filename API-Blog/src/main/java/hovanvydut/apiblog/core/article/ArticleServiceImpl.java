@@ -1,7 +1,7 @@
 package hovanvydut.apiblog.core.article;
 
-import hovanvydut.apiblog.common.constant.ArticleScopeEnum;
-import hovanvydut.apiblog.common.constant.ArticleStatusEnum;
+import hovanvydut.apiblog.common.enums.ArticleScopeEnum;
+import hovanvydut.apiblog.common.enums.ArticleStatusEnum;
 import hovanvydut.apiblog.common.exception.ArticleNotFoundException;
 import hovanvydut.apiblog.common.exception.MyError;
 import hovanvydut.apiblog.common.exception.MyRuntimeException;
@@ -17,6 +17,11 @@ import hovanvydut.apiblog.model.entity.Category;
 import hovanvydut.apiblog.model.entity.Tag;
 import hovanvydut.apiblog.model.entity.User;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -46,6 +51,18 @@ public class ArticleServiceImpl implements ArticleService {
         this.articleRepo = articleRepo;
         this.modelMapper = modelMapper;
         this.userRepo = userRepository;
+    }
+
+    @Override
+    public Page<ArticleDTO> getAllPublishedArticles() {
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<Article> articlePage = this.articleRepo.findByStatus(ArticleStatusEnum.PUBLISHED_GLOBAL, pageable);
+
+        List<Article> articles = articlePage.getContent();
+        List<ArticleDTO> articleDTOs = this.modelMapper.map(articles, new TypeToken<List<ArticleDTO>>() {}.getType());
+
+        return new PageImpl<>(articleDTOs, pageable, articlePage.getTotalElements());
     }
 
     @Override

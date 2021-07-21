@@ -8,6 +8,7 @@ import hovanvydut.apiblog.core.article.dto.CreateArticleDTO;
 import hovanvydut.apiblog.core.article.dto.PublishOption;
 import hovanvydut.apiblog.core.article.dto.UpdateArticleDTO;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +34,9 @@ public class ArticleController {
     }
 
     @GetMapping("/articles")
-    public void getAllPublishedArticles() {
-
+    public Page<ArticleDTO> getAllPublishedArticles() {
+        Page<ArticleDTO> page = this.articleService.getAllPublishedArticles();
+        return page;
     }
 
     /**

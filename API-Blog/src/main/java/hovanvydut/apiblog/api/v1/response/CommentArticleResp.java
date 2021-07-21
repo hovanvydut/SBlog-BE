@@ -2,17 +2,17 @@ package hovanvydut.apiblog.api.v1.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 
 /**
  * @author hovanvydut
- * Created on 7/2/21
+ * Created on 7/20/21
  */
 
 @Getter
@@ -21,11 +21,12 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TagResp {
+@ToString
+public class CommentArticleResp {
     private long id;
-    private String name;
-    private String slug;
-    private String image;
+    private String content;
+    private String imageSlug;
     private LocalDateTime createdAt;
-    private LocalDateTime lastEditedAt;
+    private LocalDateTime updatedAt;
+    private UserResp fromUser;
 }

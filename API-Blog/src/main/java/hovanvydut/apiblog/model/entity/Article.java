@@ -1,7 +1,7 @@
 package hovanvydut.apiblog.model.entity;
 
-import hovanvydut.apiblog.common.constant.ArticleScopeEnum;
-import hovanvydut.apiblog.common.constant.ArticleStatusEnum;
+import hovanvydut.apiblog.common.enums.ArticleScopeEnum;
+import hovanvydut.apiblog.common.enums.ArticleStatusEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -82,7 +82,6 @@ public class Article {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User author;
-
 
 //    @PreUpdate
 //    protected void onUpdate() {

@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.common.constant;
+package hovanvydut.apiblog.common.enums;
 
 /**
  * @author hovanvydut

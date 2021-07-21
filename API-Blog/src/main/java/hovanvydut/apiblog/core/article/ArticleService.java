@@ -4,6 +4,9 @@ import hovanvydut.apiblog.core.article.dto.ArticleDTO;
 import hovanvydut.apiblog.core.article.dto.CreateArticleDTO;
 import hovanvydut.apiblog.core.article.dto.PublishOption;
 import hovanvydut.apiblog.core.article.dto.UpdateArticleDTO;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 /**
  * @author hovanvydut
@@ -11,6 +14,7 @@ import hovanvydut.apiblog.core.article.dto.UpdateArticleDTO;
  */
 
 public interface ArticleService {
+    public Page<ArticleDTO> getAllPublishedArticles();
     public ArticleDTO getArticle(String slug, String usernameViewer);
     public ArticleDTO createNewArticle(CreateArticleDTO dto, PublishOption publishOption, String authorUsername);
     public void approveArticle(String slug);

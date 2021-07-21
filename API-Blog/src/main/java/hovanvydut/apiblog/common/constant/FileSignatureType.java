@@ -1,5 +1,7 @@
 package hovanvydut.apiblog.common.constant;
 
+import hovanvydut.apiblog.common.enums.FileExtensionType;
+
 import java.util.HashMap;
 import java.util.Map;
 

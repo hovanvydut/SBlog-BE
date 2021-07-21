@@ -2,7 +2,7 @@ package hovanvydut.apiblog.api.v1.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import hovanvydut.apiblog.common.constant.GenderEnum;
+import hovanvydut.apiblog.common.enums.GenderEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

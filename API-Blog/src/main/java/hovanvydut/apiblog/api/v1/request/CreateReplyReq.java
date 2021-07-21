@@ -2,7 +2,6 @@ package hovanvydut.apiblog.api.v1.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import hovanvydut.apiblog.common.enums.GenderEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,11 +9,11 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
-import java.time.LocalDate;
+import javax.validation.constraints.AssertTrue;
 
 /**
  * @author hovanvydut
- * Created on 7/11/21
+ * Created on 7/20/21
  */
 
 @Getter
@@ -24,16 +23,19 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
-public class UpdateUserReq {
+public class CreateReplyReq {
 
-    //FIXME: Add validator for vietnamese character and at least 1 character, not blank
-    @Length(min = 1, max = 32)
-    private String fullName;
 
-    private LocalDate birthday;
 
-    private GenderEnum gender;
+    @Length(min = 0, max = 5000)
+    private String content;
 
-    private String biography;
+    @Length(min = 0, max = 255)
+    private String imageSlug;
+
+    @AssertTrue(message = "content or imageSlug is required")
+    private boolean isContentOrImageSlugNotNull() {
+        return this.content != null || this.imageSlug != null;
+    }
 
 }
