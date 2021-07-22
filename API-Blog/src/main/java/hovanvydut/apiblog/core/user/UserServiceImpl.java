@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,6 +104,7 @@ public class UserServiceImpl implements UserService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
+    @Transactional
     public UserDTO createUser(@Valid CreateUserDTO dto, boolean needHashPassword) {
         // check username, email is unique on both User table and UserRegistration table
         List<MyError> errorList = this.checkUnique(dto.getEmail(), dto.getUsername());
@@ -120,6 +122,59 @@ public class UserServiceImpl implements UserService {
         this.userRepository.save(user);
 
         return this.modelMapper.map(user, UserDTO.class);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    @Transactional
+    public UserDTO updateUser(String username, UpdateUserDTO dto) {
+        User user = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new MyUsernameNotFoundException(username));
+
+        this.modelMapper.map(dto, user);
+
+        User savedUser = this.userRepository.save(user);
+
+        return this.modelMapper.map(savedUser, UserDTO.class);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    @Transactional
+    public void deleteUser(String username) {
+        User user = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new MyUsernameNotFoundException(username));
+
+        this.userRepository.delete(user);
+    }
+
+    @Override
+    @Transactional
+    public void followingUser(String fromUsername, String toUsername) {
+        User fromUser = this.userRepository.findByUsername(fromUsername).orElseThrow(() -> new MyUsernameNotFoundException(fromUsername));
+        User toUser = this.userRepository.findByUsername(toUsername).orElseThrow(() -> new MyUsernameNotFoundException(toUsername));
+
+        FollowerId followerId = new FollowerId().setFromUserId(fromUser.getId()).setToUserId(toUser.getId());
+
+        Follower follower = new Follower().setId(followerId).setFromUser(fromUser).setToUser(toUser);
+
+        this.followerRepository.save(follower);
+    }
+
+    @Override
+    @Transactional
+    public void unFollowingUser(String fromUsername, String toUsername) {
+        User fromUser = this.userRepository.findByUsername(fromUsername).orElseThrow(() -> new MyUsernameNotFoundException(fromUsername));
+        User toUser = this.userRepository.findByUsername(toUsername).orElseThrow(() -> new MyUsernameNotFoundException(toUsername));
+
+        String msgError = "User with username = " + fromUsername + " is not following User with username = " + toUsername;
+
+        FollowerId followerId = new FollowerId().setFromUserId(fromUser.getId()).setToUserId(toUser.getId());
+
+        Follower follower = this.followerRepository.findById(followerId)
+                .orElseThrow(() -> new MyRuntimeException(List.of(new MyError().setMessage(msgError))));
+
+        this.followerRepository.delete(follower);
     }
 
     @Override
@@ -146,55 +201,6 @@ public class UserServiceImpl implements UserService {
         }
 
         return errorList;
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @Override
-    public UserDTO updateUser(String username, UpdateUserDTO dto) {
-        User user = this.userRepository.findByUsername(username)
-                .orElseThrow(() -> new MyUsernameNotFoundException(username));
-
-        this.modelMapper.map(dto, user);
-
-        User savedUser = this.userRepository.save(user);
-
-        return this.modelMapper.map(savedUser, UserDTO.class);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @Override
-    public void deleteUser(String username) {
-        User user = this.userRepository.findByUsername(username)
-                .orElseThrow(() -> new MyUsernameNotFoundException(username));
-
-        this.userRepository.delete(user);
-    }
-
-    @Override
-    public void followingUser(String fromUsername, String toUsername) {
-        User fromUser = this.userRepository.findByUsername(fromUsername).orElseThrow(() -> new MyUsernameNotFoundException(fromUsername));
-        User toUser = this.userRepository.findByUsername(toUsername).orElseThrow(() -> new MyUsernameNotFoundException(toUsername));
-
-        FollowerId followerId = new FollowerId().setFromUserId(fromUser.getId()).setToUserId(toUser.getId());
-
-        Follower follower = new Follower().setId(followerId).setFromUser(fromUser).setToUser(toUser);
-
-        this.followerRepository.save(follower);
-    }
-
-    @Override
-    public void unFollowingUser(String fromUsername, String toUsername) {
-        User fromUser = this.userRepository.findByUsername(fromUsername).orElseThrow(() -> new MyUsernameNotFoundException(fromUsername));
-        User toUser = this.userRepository.findByUsername(toUsername).orElseThrow(() -> new MyUsernameNotFoundException(toUsername));
-
-        String msgError = "User with username = " + fromUsername + " is not following User with username = " + toUsername;
-
-        FollowerId followerId = new FollowerId().setFromUserId(fromUser.getId()).setToUserId(toUser.getId());
-
-        Follower follower = this.followerRepository.findById(followerId)
-                .orElseThrow(() -> new MyRuntimeException(List.of(new MyError().setMessage(msgError))));
-
-        this.followerRepository.delete(follower);
     }
 
 }

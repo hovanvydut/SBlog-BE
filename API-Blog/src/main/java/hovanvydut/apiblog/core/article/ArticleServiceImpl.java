@@ -26,6 +26,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -91,6 +92,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Transactional
     public ArticleDTO createNewArticle(CreateArticleDTO dto, PublishOption publishOption, String authorUsername) {
         if (publishOption == null) {
             throw new MyRuntimeException(List.of(new MyError().setMessage("Publish Option must be not null")));
@@ -142,6 +144,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Transactional
     public void approveArticle(String slug) {
         Article article = this.articleRepo.findBySlug(slug)
                 .orElseThrow(() -> new ArticleNotFoundException(slug));
@@ -162,6 +165,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Transactional
     public void markArticleSpam(String slug) {
         Article article = this.articleRepo.findBySlug(slug)
                 .orElseThrow(() -> new ArticleNotFoundException(slug));
@@ -173,6 +177,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Transactional
     public ArticleDTO updateArticle(String slug, UpdateArticleDTO dto, PublishOption publishOption, String authorUsername) {
         Article article = this.articleRepo.findBySlug(slug)
                 .orElseThrow(() -> new ArticleNotFoundException(slug));

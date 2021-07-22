@@ -21,20 +21,6 @@ import java.util.List;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TagPageResp {
+public class TagPageResp extends PaginationResponse<TagResp> {
 
-    @ApiModelProperty(notes = "List of all Tags")
-    private List<TagResp> content;
-
-    @ApiModelProperty(notes = "Total items of all pages")
-    private int totalElements;
-
-    @ApiModelProperty(notes = "Total number of pages")
-    private int totalPages;
-
-    @ApiModelProperty(notes = "Number of items of each page")
-    private int size;
-
-    @ApiModelProperty(notes = "Zero based index of the current page")
-    private int number;
 }

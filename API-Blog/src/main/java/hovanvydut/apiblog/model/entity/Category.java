@@ -38,6 +38,4 @@ public class Category {
     @Column(name = "image", nullable = true, length = 255)
     private String image;
 
-    @OneToMany(mappedBy = "category")
-    private Set<Article> articles;
 }

@@ -15,6 +15,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +74,7 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
+    @Transactional
     public TagDTO createTag(@Valid CreateTagDTO dto) {
         List<MyError> errors = checkUnique(dto);
         if (errors.size() > 0) {
@@ -90,6 +92,7 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
+    @Transactional
     public TagDTO updateTag(long tagId, UpdateTagDTO dto) {
         List<MyError> errors = checkUnique(tagId, dto);
         if (errors.size() > 0) {
@@ -110,6 +113,7 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
+    @Transactional
     public void deleteTag(long tagId) {
         Tag tag = this.tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
         this.tagRepository.delete(tag);
@@ -126,6 +130,7 @@ public class TagServiceImpl implements TagService{
 
         return errorList;
     }
+
     private List<MyError> checkUnique(long id, UpdateTagDTO dto) {
         List<MyError> errorList = new ArrayList<>();
 

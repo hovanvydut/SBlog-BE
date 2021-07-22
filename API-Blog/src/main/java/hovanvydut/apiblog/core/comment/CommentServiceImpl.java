@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -51,15 +52,17 @@ public class CommentServiceImpl implements CommentService {
         Long articleId = this.articleRepo.getArticleIdBySlug(articleSlug)
                 .orElseThrow(() -> new RuntimeException("Article ID not found"));
 
-        Page<Comment> commentPage = this.commentRepo.findByArticleId(articleId, pageable);
-
-        List<Comment> comments = commentPage.getContent();
-        List<CommentDTO> commentDTOList = this.modelMapper.map(comments, new TypeToken<List<Comment>>() {}.getType());
-
-        return new PageImpl<>(commentDTOList, pageable, commentPage.getTotalElements());
+        return this.commentRepo.findByArticleId(articleId, pageable);
+//        Page<Comment> commentPage = this.commentRepo.findByArticleId(articleId, pageable);
+//
+//        List<Comment> comments = commentPage.getContent();
+//        List<CommentDTO> commentDTOList = this.modelMapper.map(comments, new TypeToken<List<Comment>>() {}.getType());
+//
+//        return new PageImpl<>(commentDTOList, pageable, commentPage.getTotalElements());
     }
 
     @Override
+    @Transactional
     public void commentArticle(String articleSlug, CreateCommentDTO commentDTO, String fromUsername) {
         Long fromUserId = this.userRepo.getUserIdByUsername(fromUsername)
                 .orElseThrow(() -> new MyUsernameNotFoundException(fromUsername));
@@ -76,6 +79,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public void deleteComment(long commentId, String ownerUsername) {
         Comment comment = this.commentRepo.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));

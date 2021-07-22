@@ -87,6 +87,12 @@ public class AuthController {
         return this.userRegistrationService.createUserRegistration(dto);
     }
 
+    @PostMapping("/register/resend-confirmation-email")
+    public void resendConfirmationRegistrationEmail(@RequestBody String email) {
+        // get userRegistration by email
+        // resend email
+    }
+
     @GetMapping("/register/activation/{token}/accept")
     public void confirmEmailAddress(@PathVariable("token") String token) {
         this.userRegistrationService.acceptRegistration(token);

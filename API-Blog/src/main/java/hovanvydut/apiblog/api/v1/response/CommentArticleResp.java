@@ -2,10 +2,7 @@ package hovanvydut.apiblog.api.v1.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
@@ -28,5 +25,17 @@ public class CommentArticleResp {
     private String imageSlug;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private UserResp fromUser;
+    private UserCommentResp fromUser;
 }
+
+@Getter
+@Setter
+@NoArgsConstructor
+@Accessors(chain = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+class UserCommentResp {
+    private String username;
+    private String fullName;
+}
+

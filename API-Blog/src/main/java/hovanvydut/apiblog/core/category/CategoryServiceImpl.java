@@ -16,6 +16,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +65,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryDTO createCategory(@Valid CreateCategoryDTO dto) {
         // check name and slug is unique
         List<MyError> errors = checkUnique(dto);
@@ -82,6 +84,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryDTO updateCategory(Long id, UpdateCategoryDTO dto) {
 
         // check name and slug is unique
@@ -103,6 +106,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteCategory(long id) {
         Category category = this.categoryRepo.findById(id).orElseThrow(() -> new CategoryNotFoundException(id));
 
@@ -120,6 +124,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         return errorList;
     }
+
     private List<MyError> checkUnique(Long id, UpdateCategoryDTO dto) {
         List<MyError> errorList = new ArrayList<>();
 

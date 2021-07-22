@@ -9,6 +9,7 @@ import hovanvydut.apiblog.core.comment.CommentService;
 import hovanvydut.apiblog.core.comment.dto.CommentDTO;
 import hovanvydut.apiblog.core.comment.dto.CreateCommentDTO;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,6 +48,12 @@ public class CommentController {
     public void comment(@PathVariable String articleSlug, @Valid @RequestBody CreateCommentReq req, Principal principal) {
         CreateCommentDTO commentDTO = this.modelMapper.map(req, CreateCommentDTO.class);
         this.commentService.commentArticle(articleSlug, commentDTO, principal.getName());
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/comments/{commentId}/reply")
+    public void replyComment() {
+
     }
 
     @PreAuthorize("isAuthenticated()")

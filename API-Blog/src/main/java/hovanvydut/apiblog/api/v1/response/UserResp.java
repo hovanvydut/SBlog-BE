@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserResp {
     private Long id;
+    private String username;
     private String fullName;
     private String email;
     private LocalDateTime createdAt;

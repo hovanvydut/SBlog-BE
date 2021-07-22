@@ -6,6 +6,7 @@ import hovanvydut.apiblog.common.exception.UserRegistrationNotFoundException;
 import hovanvydut.apiblog.common.exception.UserRegistrationTokenNotFoundException;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.auth.dto.UserRegistrationDTO;
+import hovanvydut.apiblog.core.mail.EmailService;
 import hovanvydut.apiblog.core.user.UserRepository;
 import hovanvydut.apiblog.core.user.UserService;
 import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
@@ -16,12 +17,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author hovanvydut
@@ -37,17 +37,20 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     public UserRegistrationServiceImpl(UserRegistrationRepository userRegistrationRepo,
                                        ModelMapper modelMapper,
                                        UserService userService,
                                        PasswordEncoder passwordEncoder,
-                                       UserRepository userRepository) {
+                                       UserRepository userRepository,
+                                       EmailService emailService) {
         this.userRegistrationRepo = userRegistrationRepo;
         this.modelMapper = modelMapper;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -104,7 +107,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
                 .setPassword(this.passwordEncoder.encode(userRegistration.getPassword()));
 
         UserRegistration saved = this.userRegistrationRepo.save(userRegistration);
-
+        sendRegisterEmail(saved, token);
         return this.modelMapper.map(saved, UserRegistrationDTO.class);
     }
 
@@ -157,5 +160,16 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         return errorList;
     }
 
+    private void sendRegisterEmail(UserRegistration userRegistration, String token) {
+        Map<String, Object> templateModel = new HashMap<>();
+        templateModel.put("recipientName", userRegistration.getFullName());
+        templateModel.put("text", "Link kích hoạt tài khoản: <a href='http://localhost:3000/api/v1/auth/register/activation/"+ token +"/accept'>link</a>");
+        templateModel.put("senderName", "Blog");
 
+        try {
+            this.emailService.sendMessageUsingThymeleafTemplate("hovanvydut@gmail.com", "Check Healthy", templateModel);
+        } catch (MessagingException | IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
