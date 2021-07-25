@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.api.v1.request;
+package hovanvydut.apiblog.core.comment.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,9 +23,7 @@ import javax.validation.constraints.AssertTrue;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
-public class CreateReplyReq {
-
-
+public class CreateReplytDTO {
 
     @Length(min = 0, max = 5000)
     private String content;

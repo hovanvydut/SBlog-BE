@@ -61,6 +61,9 @@ public class AwsUploadService implements UploadService {
         UserImage userImage = new UserImage()
                 .setSlug(dirAndFileName)
                 .setUser(new User().setId(userDTO.getId()));
+
+        // FIXME: Should seperate userImageRepo to another service,
+        //  should use single reposibility for each class, this class should use upload
         UserImage savedUserImage = this.userImageRepo.save(userImage);
 
         UserImageDTO userImageDTO = this.modelMapper.map(savedUserImage, UserImageDTO.class);

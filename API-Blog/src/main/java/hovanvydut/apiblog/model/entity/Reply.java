@@ -1,5 +1,6 @@
 package hovanvydut.apiblog.model.entity;
 
+import hovanvydut.apiblog.common.enums.ReplyTypeEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,8 +22,8 @@ import java.time.LocalDateTime;
 @ToString
 @Accessors(chain = true)
 @Entity
-@Table(name = "reply")
-@Check(constraints = "content IS NOT NULL OR image_slug IS NOT NULL")
+@Table(name = "reply", indexes = @Index(columnList = "reply_type"))
+@Check(constraints = "(content IS NOT NULL OR image_slug IS NOT NULL) AND (reply_type <> 1 OR parent_reply_id IS NOT NULL)")
 public class Reply {
 
     @Id
@@ -43,9 +44,12 @@ public class Reply {
     @JoinColumn(name = "from_user_id", nullable = false)
     private User fromUser;
 
-    @ManyToOne
-    @JoinColumn(name = "to_user_id", nullable = false)
-    private User toUser;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_reply_id", nullable = true)
+    private Reply parentReply;
+
+    @Column(name = "reply_type", nullable = false)
+    private ReplyTypeEnum replyType = ReplyTypeEnum.COMMENT;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
