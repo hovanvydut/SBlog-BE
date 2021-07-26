@@ -9,7 +9,6 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -27,13 +26,17 @@ import javax.validation.constraints.Pattern;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
 public class RegistrationReq {
+
+    // TODO: strictly validate fullname
     @NotBlank
     private String fullName;
 
+//    @ValidEmail
     @NotNull
-    @Email
+    @NotBlank
     private String email;
 
+    // TODO: Create custom annotation for username
     @NotNull
     @Pattern(regexp = "^[a-zA-Z0-9]+([a-zA-Z0-9]{2,}|_[a-zA-Z0-9]+|-[a-zA-Z0-9]+|\\.[a-zA-Z0-9]+)+$")
     @Length(min = 3, max = 32)
@@ -42,4 +45,5 @@ public class RegistrationReq {
     @NotBlank
     @Length(min = 8, max = 32)
     private String password;
+
 }

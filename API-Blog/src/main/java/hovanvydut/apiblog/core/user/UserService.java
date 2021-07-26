@@ -1,6 +1,7 @@
 package hovanvydut.apiblog.core.user;
 
 import hovanvydut.apiblog.common.exception.MyError;
+import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UpdateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UserDTO;
@@ -15,14 +16,20 @@ import java.util.List;
  */
 
 public interface UserService {
-    public Page<UserDTO> getUsers(int page, int size, String[] sort, String searchKeyword);
-    public UserDTO getUserByEmailOrUsername(String email, String username);
-    public UserDTO getUserByEmail(String email);
-    public UserDTO getUserByUsername(String username);
-    public UserDTO createUser(@Valid CreateUserDTO dto, boolean needHashPassword);
-    public List<MyError> checkUnique(String email, String username);
-    public UserDTO updateUser(String username, UpdateUserDTO dto);
-    public void deleteUser(String username);
-    public void followingUser(String fromUsername, String toUsername);
-    public void unFollowingUser(String fromUsername, String toUsername);
+    Page<UserDTO> getUsers(int page, int size, String[] sort, String searchKeyword);
+    UserDTO getUserByEmailOrUsername(String email, String username);
+    UserDTO getUserByEmail(String email);
+    UserDTO getUserByUsername(String username);
+    UserDTO createUser(@Valid CreateUserDTO dto, boolean needHashPassword);
+    UserDTO updateUser(String username, UpdateUserDTO dto);
+    void deleteUser(String username);
+    void followingUser(String fromUsername, String toUsername);
+    void unFollowingUser(String fromUsername, String toUsername);
+    boolean isEmailExist(String email);
+    boolean isUsernameExist(String username);
+    String registerNewUser(CreateUserRegistrationDTO dto);
+    void confirmRegistration(String token);
+    void declineRegistration(String token);
+    void sendConfirmationEmail(String email);
+    List<MyError> checkUnique(String email, String username);
 }

@@ -1,0 +1,6 @@
+[] Explicit relation fetch type for each entity
+[] Check bookmark TODO, FIXME to resolve
+
+[] CronJob delete all expired token
+[] resend token
+[] login --> show notify resend email if user is not enabled, if token expire -->

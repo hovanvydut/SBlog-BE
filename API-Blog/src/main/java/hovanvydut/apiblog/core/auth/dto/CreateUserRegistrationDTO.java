@@ -26,6 +26,7 @@ public class CreateUserRegistrationDTO {
     @NotBlank
     private String fullName;
 
+    // TODO: consistent with RegistrationReq class
     @NotNull
     @Email
     private String email;

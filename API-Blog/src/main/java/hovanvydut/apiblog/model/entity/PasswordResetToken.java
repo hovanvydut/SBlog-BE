@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 /**
  * @author hovanvydut
- * Created on 7/4/21
+ * Created on 7/26/21
  */
 
 @Getter
@@ -18,30 +18,32 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Accessors(chain = true)
 @Entity
-@Table(name = "user_registration")
-public class UserRegistration {
+@Table(name = "password_reset_token")
+public class PasswordResetToken {
+
+    // calculate by minutes
+    private static final int EXPIRATION = 1 * (24 * 60);
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fullname", nullable = false, length = 32)
-    private String fullName;
+    @Column(name = "token", nullable = false, length = 255)
+    private String token;
 
-    @Column(name = "email", unique = true, nullable = false, length = 255)
-    private String email;
-
-    @Column(name = "username", unique = true, nullable = false, length = 32)
-    private String username;
-
-    @Column(name = "password", nullable = false, length = 255)
-    private String password;
-
-    @Column(name = "registration_token", nullable = false, unique = true)
-    private String registrationToken;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "expire_at", nullable = false)
     private LocalDateTime expireAt;
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.expireAt = this.createdAt.plusMinutes(EXPIRATION);
+    }
+
 }

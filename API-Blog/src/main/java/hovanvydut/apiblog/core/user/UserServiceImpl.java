@@ -1,20 +1,20 @@
 package hovanvydut.apiblog.core.user;
 
-import hovanvydut.apiblog.common.exception.MyError;
-import hovanvydut.apiblog.common.exception.MyRuntimeException;
-import hovanvydut.apiblog.common.exception.MyUsernameNotFoundException;
-import hovanvydut.apiblog.common.exception.UserNotFoundException;
+import hovanvydut.apiblog.common.exception.*;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
-import hovanvydut.apiblog.core.auth.UserRegistrationRepository;
+import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
+import hovanvydut.apiblog.core.listeners.registration.OnConfirmRegistrationEmailEvent;
+import hovanvydut.apiblog.core.listeners.registration.OnRegistrationCompleteEvent;
 import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UpdateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UserDTO;
 import hovanvydut.apiblog.model.entity.Follower;
 import hovanvydut.apiblog.model.entity.FollowerId;
 import hovanvydut.apiblog.model.entity.User;
-import hovanvydut.apiblog.model.entity.UserRegistration;
+import hovanvydut.apiblog.model.entity.VerificationToken;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,9 +22,10 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author hovanvydut
@@ -34,22 +35,26 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepository userRepo;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
-    private final UserRegistrationRepository userRegistrationRepo;
-    private final FollowerRepository followerRepository;
+    private final FollowerRepository followerRepo;
+    private final VerificationTokenRepository verifyTokenRepo;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public UserServiceImpl(UserRepository userRepository,
+
+    public UserServiceImpl(UserRepository userRepo,
                            ModelMapper modelMapper,
                            PasswordEncoder passwordEncoder,
-                           UserRegistrationRepository userRegistrationRepo,
-                           FollowerRepository followerRepository) {
-        this.userRepository = userRepository;
+                           FollowerRepository followerRepo,
+                           VerificationTokenRepository verifyTokenRepo,
+                           ApplicationEventPublisher eventPublisher) {
+        this.userRepo = userRepo;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
-        this.userRegistrationRepo = userRegistrationRepo;
-        this.followerRepository = followerRepository;
+        this.followerRepo = followerRepo;
+        this.verifyTokenRepo = verifyTokenRepo;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -69,9 +74,9 @@ public class UserServiceImpl implements UserService {
         Page<User> pageUser;
 
         if (searchKeyword == null || searchKeyword.isBlank()) {
-            pageUser = this.userRepository.findAll(pageable);
+            pageUser = this.userRepo.findAll(pageable);
         } else {
-            pageUser = this.userRepository.search(searchKeyword, pageable);
+            pageUser = this.userRepo.search(searchKeyword, pageable);
         }
 
         // mapping Tag list --> TagDTO list
@@ -88,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserByEmail(String email) {
-        User user = this.userRepository.findByEmail(email)
+        User user = this.userRepo.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Could not found user with email = '" + email + "'"));
 
         return this.modelMapper.map(user, UserDTO.class);
@@ -96,7 +101,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserByUsername(String username) {
-        User user = this.userRepository.findByUsername(username)
+        User user = this.userRepo.findByUsername(username)
                 .orElseThrow(() ->new MyUsernameNotFoundException(username));
 
         return this.modelMapper.map(user, UserDTO.class);
@@ -119,7 +124,7 @@ public class UserServiceImpl implements UserService {
             user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         }
 
-        this.userRepository.save(user);
+        this.userRepo.save(user);
 
         return this.modelMapper.map(user, UserDTO.class);
     }
@@ -128,12 +133,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO updateUser(String username, UpdateUserDTO dto) {
-        User user = this.userRepository.findByUsername(username)
+        User user = this.userRepo.findByUsername(username)
                 .orElseThrow(() -> new MyUsernameNotFoundException(username));
 
         this.modelMapper.map(dto, user);
 
-        User savedUser = this.userRepository.save(user);
+        User savedUser = this.userRepo.save(user);
 
         return this.modelMapper.map(savedUser, UserDTO.class);
     }
@@ -142,65 +147,140 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(String username) {
-        User user = this.userRepository.findByUsername(username)
+        User user = this.userRepo.findByUsername(username)
                 .orElseThrow(() -> new MyUsernameNotFoundException(username));
 
-        this.userRepository.delete(user);
+        this.userRepo.delete(user);
     }
 
     @Override
     @Transactional
     public void followingUser(String fromUsername, String toUsername) {
-        User fromUser = this.userRepository.findByUsername(fromUsername).orElseThrow(() -> new MyUsernameNotFoundException(fromUsername));
-        User toUser = this.userRepository.findByUsername(toUsername).orElseThrow(() -> new MyUsernameNotFoundException(toUsername));
+        User fromUser = this.userRepo.findByUsername(fromUsername).orElseThrow(() -> new MyUsernameNotFoundException(fromUsername));
+        User toUser = this.userRepo.findByUsername(toUsername).orElseThrow(() -> new MyUsernameNotFoundException(toUsername));
 
         FollowerId followerId = new FollowerId().setFromUserId(fromUser.getId()).setToUserId(toUser.getId());
 
         Follower follower = new Follower().setId(followerId).setFromUser(fromUser).setToUser(toUser);
 
-        this.followerRepository.save(follower);
+        this.followerRepo.save(follower);
     }
 
     @Override
     @Transactional
     public void unFollowingUser(String fromUsername, String toUsername) {
-        User fromUser = this.userRepository.findByUsername(fromUsername).orElseThrow(() -> new MyUsernameNotFoundException(fromUsername));
-        User toUser = this.userRepository.findByUsername(toUsername).orElseThrow(() -> new MyUsernameNotFoundException(toUsername));
+        User fromUser = this.userRepo.findByUsername(fromUsername).orElseThrow(() -> new MyUsernameNotFoundException(fromUsername));
+        User toUser = this.userRepo.findByUsername(toUsername).orElseThrow(() -> new MyUsernameNotFoundException(toUsername));
 
         String msgError = "User with username = " + fromUsername + " is not following User with username = " + toUsername;
 
         FollowerId followerId = new FollowerId().setFromUserId(fromUser.getId()).setToUserId(toUser.getId());
 
-        Follower follower = this.followerRepository.findById(followerId)
+        Follower follower = this.followerRepo.findById(followerId)
                 .orElseThrow(() -> new MyRuntimeException(List.of(new MyError().setMessage(msgError))));
 
-        this.followerRepository.delete(follower);
+        this.followerRepo.delete(follower);
+    }
+
+    @Override
+    public boolean isEmailExist(String email) {
+        return this.userRepo.getUserIdByEmail(email).isPresent();
+    }
+
+    @Override
+    public boolean isUsernameExist(String username) {
+        return this.userRepo.getUserIdByUsername(username).isPresent();
+    }
+
+    @Override
+    @Transactional
+    public String registerNewUser(CreateUserRegistrationDTO dto) {
+        List<MyError> errors = this.checkUnique(dto.getEmail(), dto.getUsername());
+
+        if (errors.size() > 0) {
+            throw new MyRuntimeException(errors);
+        }
+
+        User user = this.modelMapper.map(dto, User.class);
+        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+        User savedUser = this.userRepo.save(user);
+
+        VerificationToken verifyToken = new VerificationToken().setToken(generateToken()).setUser(savedUser);
+        VerificationToken savedVerifyToken = this.verifyTokenRepo.save(verifyToken);
+
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(savedUser, savedVerifyToken));
+
+        return verifyToken.getToken();
+    }
+
+    // TODO: should use @Transactional here ???
+    @Override
+    public void confirmRegistration(String token) {
+        VerificationToken verifyToken = this.verifyTokenRepo.findByToken(token)
+                .orElseThrow(() -> new VerifyTokenNotFoundException(token));
+
+        if (verifyToken.isExpire()) {
+//            throw new VerifyTokenExpireException();
+            throw new RuntimeException("Token is expired");
+        }
+
+        User user = verifyToken.getUser();
+        user.setEnabled(true);
+
+        this.userRepo.save(user);
+        this.verifyTokenRepo.delete(verifyToken);
+
+        eventPublisher.publishEvent(new OnConfirmRegistrationEmailEvent());
+    }
+
+    @Override
+    public void declineRegistration(String token) {
+        VerificationToken verifyToken = this.verifyTokenRepo.findByToken(token)
+                .orElseThrow(() -> new VerifyTokenNotFoundException(token));
+
+        this.verifyTokenRepo.delete(verifyToken);
+    }
+
+    @Override
+    public void sendConfirmationEmail(String email) {
+        User user = this.userRepo.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Couldn't find User with email = '" + email + "'"));
+
+        if (user.isEnabled()) {
+            // do nothing
+        } else {
+            VerificationToken token = this.verifyTokenRepo.findById(user.getId())
+                    .orElseThrow(() -> new VerifyTokenNotFoundException(user.getId()));
+
+            if (token.isExpire()) {
+                token.setToken(generateToken())
+                        .setCreatedAt(LocalDateTime.now());
+                token = this.verifyTokenRepo.save(token);
+            }
+
+            eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, token));
+        }
     }
 
     @Override
     public List<MyError> checkUnique(String email, String username) {
-        // check email, username unique in two table: user and userregistration
         List<MyError> errorList = new ArrayList<>();
 
-        Optional<UserRegistration> existEmailRegistration = this.userRegistrationRepo.findByEmail(email);
-        if (existEmailRegistration.isEmpty()) {
-            this.userRepository.findByEmail(email).ifPresent(user -> {
-                errorList.add(new MyError().setSource("email").setMessage("The email has already been taken"));
-            });
-        } else {
+        final boolean isEmailExisting = this.isEmailExist(email);
+        final boolean isUsernameExisting = this.isUsernameExist(username);
+
+        if (isEmailExisting) {
             errorList.add(new MyError().setSource("email").setMessage("The email has already been taken"));
         }
 
-        Optional<UserRegistration> existUsernameRegistration = this.userRegistrationRepo.findByUsername(username);
-        if (existUsernameRegistration.isEmpty()) {
-            this.userRepository.findByUsername(username).ifPresent(user -> {
-                errorList.add(new MyError().setSource("username").setMessage("The username has already been taken"));
-            });
-        } else {
+        if (isUsernameExisting) {
             errorList.add(new MyError().setSource("username").setMessage("The username has already been taken"));
         }
 
         return errorList;
     }
 
+    private String generateToken() {
+        return UUID.randomUUID().toString();
+    }
 }
