@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.mail.MessagingException;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -86,6 +87,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     }
 
     @Override
+    @Transactional
     public UserRegistrationDTO createUserRegistration(@Valid CreateUserRegistrationDTO dto) {
 
         // check username, email is unique on both User table and UserRegistration table
@@ -107,11 +109,14 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
                 .setPassword(this.passwordEncoder.encode(userRegistration.getPassword()));
 
         UserRegistration saved = this.userRegistrationRepo.save(userRegistration);
+
+        // send email registration
         sendRegisterEmail(saved, token);
         return this.modelMapper.map(saved, UserRegistrationDTO.class);
     }
 
     @Override
+    @Transactional
     public void acceptRegistration(String token) {
         UserRegistration userRegistration = this.userRegistrationRepo.findByRegistrationToken(token)
                 .orElseThrow(() -> new UserRegistrationTokenNotFoundException(token));
@@ -128,6 +133,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     }
 
     @Override
+    @Transactional
     public void declineRegistration(String token) {
         UserRegistration userRegistration = this.userRegistrationRepo.findByRegistrationToken(token)
                 .orElseThrow(() -> new UserRegistrationTokenNotFoundException(token));

@@ -6,8 +6,6 @@ import hovanvydut.apiblog.core.article.dto.PublishOption;
 import hovanvydut.apiblog.core.article.dto.UpdateArticleDTO;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 /**
  * @author hovanvydut
  * Created on 7/12/21

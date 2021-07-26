@@ -15,16 +15,13 @@ import hovanvydut.apiblog.model.entity.Comment;
 import hovanvydut.apiblog.model.entity.Reply;
 import hovanvydut.apiblog.model.entity.User;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 /**
  * @author hovanvydut

@@ -28,12 +28,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Controllers related authenticate operations (login, register, active account, ...)
+ *
  * @author hovanvydut
  * Created on 7/4/21
  */
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -58,7 +60,12 @@ public class AuthController {
         this.uploadService = uploadService;
     }
 
-    @PostMapping("/login")
+    /**
+     * Login endpoint
+     * @param req
+     * @return token - a string token contains info that helps authenticate user
+     */
+    @PostMapping("/auth/login")
     public ResponseEntity<String> login(@RequestBody LoginReq req) {
         String username = req.getUsername();
         String password = req.getPassword();
@@ -81,39 +88,55 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/register")
+    /**
+     * Register new user endpoint
+     * @param req
+     * @return
+     */
+    @PostMapping("/auth/register")
     public UserRegistrationDTO register(@Valid @RequestBody RegistrationReq req) {
         CreateUserRegistrationDTO dto = this.modelMapper.map(req,CreateUserRegistrationDTO.class);
         return this.userRegistrationService.createUserRegistration(dto);
     }
 
-    @PostMapping("/register/resend-confirmation-email")
+    /**
+     * Resend a confirmation email
+     * @param email - example@gmail.com
+     */
+    @PostMapping("/auth/register/resend-confirmation-email")
     public void resendConfirmationRegistrationEmail(@RequestBody String email) {
         // get userRegistration by email
         // resend email
     }
 
-    @GetMapping("/register/activation/{token}/accept")
+    /**
+     *
+     * @param token
+     */
+    @GetMapping("/auth/register/activation/{token}/accept")
     public void confirmEmailAddress(@PathVariable("token") String token) {
         this.userRegistrationService.acceptRegistration(token);
     }
 
-    @GetMapping("/register/activation/{token}/decline")
+    /**
+     *
+     * @param token
+     */
+    @GetMapping("/auth/register/activation/{token}/decline")
     public void cancelEmailConfirmation(@PathVariable("token") String token) {
         this.userRegistrationService.declineRegistration(token);
     }
 
-    @PreAuthorize("hasRole('Admin')")
-    @GetMapping("/admin-site")
-    public String testAuthen() {
-        return "abc";
-    }
-
-    @GetMapping("/check-healthy")
+    @GetMapping("/auth/check-healthy")
     public String checkHealthy() {
         this.emailService.sendSimpleMessage("hovanvydut@gmail.com", "Check Healthy", "Tes mail ne");
         return "Fine!";
     }
+
+    /**
+     * This below sections are examples
+     *
+     */
 
     @GetMapping("/check-healthy/freemarker")
     public String freemarker() throws TemplateException, MessagingException, IOException {

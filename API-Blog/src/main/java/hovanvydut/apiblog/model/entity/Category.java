@@ -7,7 +7,6 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.util.Set;
 
 /**
  * @author hovanvydut
