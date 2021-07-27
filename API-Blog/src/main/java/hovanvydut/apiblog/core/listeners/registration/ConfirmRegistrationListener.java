@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class ConfirmRegistrationListener implements ApplicationListener<OnConfirmRegistrationEmailEvent> {
+public class ConfirmRegistrationListener implements ApplicationListener<ConfirmRegistrationEmailEvent> {
 
     @Override
-    public void onApplicationEvent(OnConfirmRegistrationEmailEvent onConfirmRegistrationEmailEvent) {
+    public void onApplicationEvent(ConfirmRegistrationEmailEvent confirmRegistrationEmailEvent) {
         System.out.println("Sent email thank you!!");
     }
 

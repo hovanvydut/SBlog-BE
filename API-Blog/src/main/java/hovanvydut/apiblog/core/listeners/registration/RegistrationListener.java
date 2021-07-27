@@ -18,7 +18,7 @@ import java.util.Map;
  */
 
 @Component
-public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
+public class RegistrationListener implements ApplicationListener<RegistrationCompleteEvent> {
 
     private final EmailService emailService;
 
@@ -27,9 +27,9 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
     }
 
     @Override
-    public void onApplicationEvent(OnRegistrationCompleteEvent onRegistrationCompleteEvent) {
-        User user = onRegistrationCompleteEvent.getUser();
-        VerificationToken token = onRegistrationCompleteEvent.getVerifyToken();
+    public void onApplicationEvent(RegistrationCompleteEvent registrationCompleteEvent) {
+        User user = registrationCompleteEvent.getUser();
+        VerificationToken token = registrationCompleteEvent.getVerifyToken();
 
         sendRegisterEmail(user.getEmail(), user.getFullName(), token.getToken());
     }
@@ -42,7 +42,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
         templateModel.put("senderName", "Blog");
 
         try {
-            this.emailService.sendMessageUsingFreemarkerTemplate(email, "Confirm your registration", templateModel);
+            this.emailService.sendFreemarkerMail(email, "Confirm your registration", templateModel);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (TemplateException e) {

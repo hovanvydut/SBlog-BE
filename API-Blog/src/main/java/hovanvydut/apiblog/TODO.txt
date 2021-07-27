@@ -2,5 +2,6 @@
 [] Check bookmark TODO, FIXME to resolve
 
 [] CronJob delete all expired token
-[] resend token
-[] login --> show notify resend email if user is not enabled, if token expire -->
+[] Allow upload avatar
+[x] Reset your password
+[] Create model params for freemarker template

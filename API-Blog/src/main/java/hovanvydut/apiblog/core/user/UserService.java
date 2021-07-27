@@ -3,6 +3,7 @@ package hovanvydut.apiblog.core.user;
 import hovanvydut.apiblog.common.exception.MyError;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
+import hovanvydut.apiblog.core.user.dto.ResetPasswordDto;
 import hovanvydut.apiblog.core.user.dto.UpdateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UserDTO;
 import org.springframework.data.domain.Page;
@@ -32,4 +33,5 @@ public interface UserService {
     void declineRegistration(String token);
     void sendConfirmationEmail(String email);
     List<MyError> checkUnique(String email, String username);
+    void changePassword(ResetPasswordDto dto, String username);
 }

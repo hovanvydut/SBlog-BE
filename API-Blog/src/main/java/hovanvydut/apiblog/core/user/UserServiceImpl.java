@@ -3,9 +3,11 @@ package hovanvydut.apiblog.core.user;
 import hovanvydut.apiblog.common.exception.*;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
-import hovanvydut.apiblog.core.listeners.registration.OnConfirmRegistrationEmailEvent;
-import hovanvydut.apiblog.core.listeners.registration.OnRegistrationCompleteEvent;
+import hovanvydut.apiblog.core.listeners.ChangePasswordEvent;
+import hovanvydut.apiblog.core.listeners.registration.ConfirmRegistrationEmailEvent;
+import hovanvydut.apiblog.core.listeners.registration.RegistrationCompleteEvent;
 import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
+import hovanvydut.apiblog.core.user.dto.ResetPasswordDto;
 import hovanvydut.apiblog.core.user.dto.UpdateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UserDTO;
 import hovanvydut.apiblog.model.entity.Follower;
@@ -121,7 +123,7 @@ public class UserServiceImpl implements UserService {
         User user = this.modelMapper.map(dto, User.class);
 
         if (needHashPassword) {
-            user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+            user.setPassword(hashPassword(user.getPassword()));
         }
 
         this.userRepo.save(user);
@@ -202,13 +204,13 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = this.modelMapper.map(dto, User.class);
-        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+        user.setPassword(hashPassword(user.getPassword()));
         User savedUser = this.userRepo.save(user);
 
         VerificationToken verifyToken = new VerificationToken().setToken(generateToken()).setUser(savedUser);
         VerificationToken savedVerifyToken = this.verifyTokenRepo.save(verifyToken);
 
-        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(savedUser, savedVerifyToken));
+        eventPublisher.publishEvent(new RegistrationCompleteEvent(savedUser, savedVerifyToken));
 
         return verifyToken.getToken();
     }
@@ -221,6 +223,7 @@ public class UserServiceImpl implements UserService {
 
         if (verifyToken.isExpire()) {
 //            throw new VerifyTokenExpireException();
+            // TODO: create custom exception here
             throw new RuntimeException("Token is expired");
         }
 
@@ -230,7 +233,7 @@ public class UserServiceImpl implements UserService {
         this.userRepo.save(user);
         this.verifyTokenRepo.delete(verifyToken);
 
-        eventPublisher.publishEvent(new OnConfirmRegistrationEmailEvent());
+        eventPublisher.publishEvent(new ConfirmRegistrationEmailEvent());
     }
 
     @Override
@@ -258,7 +261,7 @@ public class UserServiceImpl implements UserService {
                 token = this.verifyTokenRepo.save(token);
             }
 
-            eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, token));
+            eventPublisher.publishEvent(new RegistrationCompleteEvent(user, token));
         }
     }
 
@@ -280,7 +283,28 @@ public class UserServiceImpl implements UserService {
         return errorList;
     }
 
+    @Override
+    public void changePassword(ResetPasswordDto dto, String username) {
+        User user = this.userRepo.findByUsername(username)
+                .orElseThrow(() -> new MyUsernameNotFoundException(username));
+
+        final boolean matchPassword = this.passwordEncoder.matches(dto.getOldPassword(), user.getPassword());
+
+        if (matchPassword) {
+            user.setPassword(hashPassword(dto.getNewPassword()));
+            this.userRepo.save(user);
+
+            this.eventPublisher.publishEvent(new ChangePasswordEvent(user));
+        } else {
+            throw new RuntimeException("Your old password is wrong");
+        }
+    }
+
     private String generateToken() {
         return UUID.randomUUID().toString();
+    }
+
+    private String hashPassword(String plainTextPassword) {
+        return this.passwordEncoder.encode(plainTextPassword);
     }
 }

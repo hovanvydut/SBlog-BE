@@ -2,6 +2,7 @@ package hovanvydut.apiblog.core.mail;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import hovanvydut.apiblog.common.enums.FreeMarkerTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.MailException;
@@ -92,7 +93,7 @@ public class EmailServiceImpl implements EmailService{
     }
 
     @Override
-    public void sendMessageUsingThymeleafTemplate(String to, String subject, Map<String, Object> templateModel)
+    public void sendThymeleafMail(String to, String subject, Map<String, Object> templateModel)
             throws IOException, MessagingException {
         Context thymeleafContext = new Context();
         thymeleafContext.setVariables(templateModel);
@@ -103,10 +104,19 @@ public class EmailServiceImpl implements EmailService{
     }
 
     @Override
-    public void sendMessageUsingFreemarkerTemplate(String to, String subject, Map<String, Object> templateModel)
+    public void sendFreemarkerMail(String to, String subject, Map<String, Object> templateModel)
             throws IOException, TemplateException, MessagingException {
 
         Template freemarkerTemplate = this.freeMarkerConfigurer.getConfiguration().getTemplate("template-freemarker.ftl");
+        String htmlBody = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerTemplate, templateModel);
+
+        sendHtmlMessage(to, subject, htmlBody);
+    }
+
+    @Override
+    public void sendFreemarkerMail(String to, String subject, Map<String, Object> templateModel, FreeMarkerTemplate template)
+            throws IOException, TemplateException, MessagingException {
+        Template freemarkerTemplate = this.freeMarkerConfigurer.getConfiguration().getTemplate(template.get());
         String htmlBody = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerTemplate, templateModel);
 
         sendHtmlMessage(to, subject, htmlBody);
