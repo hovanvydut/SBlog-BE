@@ -152,4 +152,14 @@ public class UserController {
         this.userService.changePassword(dto, username);
     }
 
+    @PostMapping("/users/forgot-password")
+    public void forgotPassword(@RequestBody ForgotPasswordReq req) {
+        this.userService.forgotPassword(req.getEmail());
+    }
+
+    @PostMapping("/users/forgot-password/reset")
+    public void resetForgotPassword(@Valid @RequestBody ResetForgotPassword req) {
+        this.userService.resetForgotPassword(req.getToken(), req.getNewPassword());
+    }
+
 }

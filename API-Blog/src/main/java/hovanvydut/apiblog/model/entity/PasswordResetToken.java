@@ -22,17 +22,19 @@ import java.time.LocalDateTime;
 public class PasswordResetToken {
 
     // calculate by minutes
+    // TODO: Define consant in constant package
     private static final int EXPIRATION = 1 * (24 * 60);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "token", nullable = false, length = 255)
+    @Column(name = "token", unique = true, nullable = false, length = 255)
     private String token;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
+    @MapsId
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(name = "created_at", nullable = false)
@@ -41,8 +43,17 @@ public class PasswordResetToken {
     @Column(name = "expire_at", nullable = false)
     private LocalDateTime expireAt;
 
-    @PreUpdate
-    protected void onUpdate() {
+    @PrePersist
+    protected void onPersist() {
+        this.expireAt = this.createdAt.plusMinutes(EXPIRATION);
+    }
+
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(this.expireAt);
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
         this.expireAt = this.createdAt.plusMinutes(EXPIRATION);
     }
 

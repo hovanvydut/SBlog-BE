@@ -4,4 +4,6 @@
 [] CronJob delete all expired token
 [] Allow upload avatar
 [x] Reset your password
+[x] Forgot password
 [] Create model params for freemarker template
+[] Define hostname, port const for email template, upload image url, ...

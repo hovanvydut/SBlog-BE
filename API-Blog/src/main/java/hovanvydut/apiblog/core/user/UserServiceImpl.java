@@ -4,16 +4,14 @@ import hovanvydut.apiblog.common.exception.*;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.listeners.ChangePasswordEvent;
+import hovanvydut.apiblog.core.listeners.ForgotPasswordEvent;
 import hovanvydut.apiblog.core.listeners.registration.ConfirmRegistrationEmailEvent;
 import hovanvydut.apiblog.core.listeners.registration.RegistrationCompleteEvent;
 import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
 import hovanvydut.apiblog.core.user.dto.ResetPasswordDto;
 import hovanvydut.apiblog.core.user.dto.UpdateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UserDTO;
-import hovanvydut.apiblog.model.entity.Follower;
-import hovanvydut.apiblog.model.entity.FollowerId;
-import hovanvydut.apiblog.model.entity.User;
-import hovanvydut.apiblog.model.entity.VerificationToken;
+import hovanvydut.apiblog.model.entity.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.context.ApplicationEventPublisher;
@@ -27,6 +25,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -43,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final FollowerRepository followerRepo;
     private final VerificationTokenRepository verifyTokenRepo;
     private final ApplicationEventPublisher eventPublisher;
+    private final PasswordResetTokenRepository pwdResetTokenRepo;
 
 
     public UserServiceImpl(UserRepository userRepo,
@@ -50,13 +50,15 @@ public class UserServiceImpl implements UserService {
                            PasswordEncoder passwordEncoder,
                            FollowerRepository followerRepo,
                            VerificationTokenRepository verifyTokenRepo,
-                           ApplicationEventPublisher eventPublisher) {
+                           ApplicationEventPublisher eventPublisher,
+                           PasswordResetTokenRepository pwdResetTokenRepo) {
         this.userRepo = userRepo;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
         this.followerRepo = followerRepo;
         this.verifyTokenRepo = verifyTokenRepo;
         this.eventPublisher = eventPublisher;
+        this.pwdResetTokenRepo = pwdResetTokenRepo;
     }
 
     @Override
@@ -297,6 +299,49 @@ public class UserServiceImpl implements UserService {
             this.eventPublisher.publishEvent(new ChangePasswordEvent(user));
         } else {
             throw new RuntimeException("Your old password is wrong");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void forgotPassword(String email) {
+        // TODO: Use custom exception
+        User user = this.userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Couldn't find User with email = '" + email + "'"));
+
+        // check if existing token
+        PasswordResetToken resetToken;
+        Optional<PasswordResetToken> savedResetPwdTokenOpt = this.pwdResetTokenRepo.findById(user.getId());
+
+        if (savedResetPwdTokenOpt.isPresent()) {
+            resetToken = savedResetPwdTokenOpt.get();
+
+            if (resetToken.isExpired()) {
+                resetToken.setToken(generateToken()).setCreatedAt(LocalDateTime.now());
+            }
+        } else {
+            resetToken = new PasswordResetToken().setUser(user).setToken(generateToken());
+        }
+
+        this.pwdResetTokenRepo.save(resetToken);
+        this.eventPublisher.publishEvent(new ForgotPasswordEvent(user, resetToken));
+    }
+
+    @Override
+    public void resetForgotPassword(String token, String newPassword) {
+        // TODO: use custom exception
+        PasswordResetToken resetToken = this.pwdResetTokenRepo.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Your token not found"));
+
+        if (resetToken.isExpired()) {
+            throw new RuntimeException("Token is expired");
+        } else {
+            User user = resetToken.getUser();
+            user.setPassword(hashPassword(newPassword));
+            this.userRepo.save(user);
+            this.pwdResetTokenRepo.delete(resetToken);
+
+            this.eventPublisher.publishEvent(new ChangePasswordEvent(user));
         }
     }
 

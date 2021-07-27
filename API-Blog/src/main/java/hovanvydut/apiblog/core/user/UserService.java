@@ -34,4 +34,6 @@ public interface UserService {
     void sendConfirmationEmail(String email);
     List<MyError> checkUnique(String email, String username);
     void changePassword(ResetPasswordDto dto, String username);
+    void forgotPassword(String email);
+    void resetForgotPassword(String token, String newPassword);
 }
