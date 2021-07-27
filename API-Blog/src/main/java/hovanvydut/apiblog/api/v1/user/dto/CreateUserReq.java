@@ -2,6 +2,7 @@ package hovanvydut.apiblog.api.v1.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import hovanvydut.apiblog.common.annotations.ValidEmail;
 import hovanvydut.apiblog.common.enums.GenderEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,13 +31,11 @@ import java.time.LocalDate;
 @ToString
 public class CreateUserReq {
 
-    //FIXME: Remove multiple space with one space
     @NotBlank
     private String fullName;
 
-    //FIXME: Validate email seriously
-    @NotNull
-    @Email
+    @NotBlank
+    @ValidEmail
     private String email;
 
     @NotNull
@@ -53,4 +52,9 @@ public class CreateUserReq {
     private GenderEnum gender;
 
     private String biography;
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName.replaceAll("\\s{2, }", " ").trim();
+    }
+
 }

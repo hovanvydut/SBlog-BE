@@ -1,5 +1,7 @@
 package hovanvydut.apiblog.common.exception;
 
+import hovanvydut.apiblog.common.exception.base.UnsupportedException;
+
 /**
  * @author hovanvydut
  * Created on 7/9/21

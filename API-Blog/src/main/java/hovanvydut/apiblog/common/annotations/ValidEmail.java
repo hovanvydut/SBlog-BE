@@ -1,7 +1,5 @@
 package hovanvydut.apiblog.common.annotations;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
-
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.Documented;
@@ -18,10 +16,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({TYPE, FIELD, ANNOTATION_TYPE})
 @Retention(RUNTIME)
-@Constraint(validatedBy = EmailValidator.class)
+@Constraint(validatedBy = MyEmailValidator.class)
 @Documented
 public @interface ValidEmail {
     String message() default "Invalid email";
-    Class<?>[] group() default {};
+    Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

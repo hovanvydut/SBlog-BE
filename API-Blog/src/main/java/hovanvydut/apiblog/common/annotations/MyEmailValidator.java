@@ -10,11 +10,13 @@ import java.util.regex.Pattern;
  * Created on 7/26/21
  */
 
-public class EmailValidator implements ConstraintValidator<ValidEmail, String> {
+public class MyEmailValidator implements ConstraintValidator<ValidEmail, String> {
 
     private Pattern pattern;
     private Matcher matcher;
-    private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-+]+(.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(.[A-Za-z0-9]+)*(.[A-Za-z]{2,})$";
+    private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+            + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
 
     @Override
     public void initialize(ValidEmail constraintAnnotation) {
@@ -27,7 +29,7 @@ public class EmailValidator implements ConstraintValidator<ValidEmail, String> {
     }
 
     private boolean validateEmail(String email) {
-        pattern = Pattern.compile(EMAIL_PATTERN);
+        pattern = Pattern.compile(EMAIL_PATTERN, Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(email);
         return matcher.matches();
     }

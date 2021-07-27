@@ -2,6 +2,7 @@ package hovanvydut.apiblog.api.v1.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import hovanvydut.apiblog.common.annotations.ValidEmail;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,13 +28,11 @@ import javax.validation.constraints.Pattern;
 @ToString
 public class RegistrationReq {
 
-    // TODO: strictly validate fullname
     @NotBlank
     private String fullName;
 
-//    @ValidEmail
-    @NotNull
     @NotBlank
+    @ValidEmail
     private String email;
 
     // TODO: Create custom annotation for username

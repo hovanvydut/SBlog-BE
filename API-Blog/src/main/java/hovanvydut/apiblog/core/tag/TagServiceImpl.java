@@ -1,7 +1,7 @@
 package hovanvydut.apiblog.core.tag;
 
-import hovanvydut.apiblog.common.exception.MyError;
-import hovanvydut.apiblog.common.exception.MyRuntimeException;
+import hovanvydut.apiblog.common.exception.base.MyError;
+import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.exception.TagNotFoundException;
 import hovanvydut.apiblog.common.util.SlugUtil;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;

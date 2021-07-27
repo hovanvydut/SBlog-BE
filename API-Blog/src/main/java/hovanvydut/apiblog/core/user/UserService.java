@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.core.user;
 
-import hovanvydut.apiblog.common.exception.MyError;
+import hovanvydut.apiblog.common.exception.base.MyError;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
 import hovanvydut.apiblog.core.user.dto.ResetPasswordDto;

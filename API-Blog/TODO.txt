@@ -8,3 +8,6 @@
 [x] Create model params for freemarker template
 [] Define hostname, port const for email template, upload image url, ...
 [] Define custom exception instead using RuntimeException
+[] Create annotation to validate email
+
+[] How to make all token of user is invalid

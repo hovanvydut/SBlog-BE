@@ -19,13 +19,11 @@ import java.util.Date;
 
 @Component
 public class JwtTokenUtil {
-    // TODO: not enough length to HASH 256
     private final String jwtSecret = "hovanvyduthovanvyduthovanvydutfdasfasfdasfdsadfasfdas";
     private final String jwtIssuer = "hovanvydut";
 
     public String generateAccessToken(UserDetails userDetails) {
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(this.jwtSecret));
-//        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setIssuer(this.jwtIssuer)

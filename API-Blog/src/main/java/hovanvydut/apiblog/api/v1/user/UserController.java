@@ -153,7 +153,7 @@ public class UserController {
     }
 
     @PostMapping("/users/forgot-password")
-    public void forgotPassword(@RequestBody ForgotPasswordReq req) {
+    public void forgotPassword(@Valid @RequestBody ForgotPasswordReq req) {
         this.userService.forgotPassword(req.getEmail());
     }
 

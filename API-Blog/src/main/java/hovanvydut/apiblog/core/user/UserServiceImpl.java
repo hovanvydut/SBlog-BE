@@ -1,6 +1,8 @@
 package hovanvydut.apiblog.core.user;
 
 import hovanvydut.apiblog.common.exception.*;
+import hovanvydut.apiblog.common.exception.base.MyError;
+import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.listeners.event.ChangePasswordEvent;
@@ -224,9 +226,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new VerifyTokenNotFoundException(token));
 
         if (verifyToken.isExpire()) {
-//            throw new VerifyTokenExpireException();
-            // TODO: create custom exception here
-            throw new RuntimeException("Token is expired");
+            throw new ExpiredTokenException();
         }
 
         User user = verifyToken.getUser();
@@ -305,9 +305,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void forgotPassword(String email) {
-        // TODO: Use custom exception
         User user = this.userRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Couldn't find User with email = '" + email + "'"));
+                .orElseThrow(() -> new EmailNotFoundException(email));
 
         // check if existing token
         PasswordResetToken resetToken;
@@ -329,9 +328,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void resetForgotPassword(String token, String newPassword) {
-        // TODO: use custom exception
         PasswordResetToken resetToken = this.pwdResetTokenRepo.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Your token not found"));
+                .orElseThrow(() -> new TokenNotFoundException());
 
         if (resetToken.isExpired()) {
             throw new RuntimeException("Token is expired");

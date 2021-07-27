@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.common.exception;
+package hovanvydut.apiblog.common.exception.base;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

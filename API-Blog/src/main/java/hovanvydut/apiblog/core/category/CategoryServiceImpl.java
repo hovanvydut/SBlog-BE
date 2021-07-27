@@ -1,8 +1,8 @@
 package hovanvydut.apiblog.core.category;
 
 import hovanvydut.apiblog.common.exception.CategoryNotFoundException;
-import hovanvydut.apiblog.common.exception.MyError;
-import hovanvydut.apiblog.common.exception.MyRuntimeException;
+import hovanvydut.apiblog.common.exception.base.MyError;
+import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.util.SlugUtil;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.category.dto.CategoryDTO;

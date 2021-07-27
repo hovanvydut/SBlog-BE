@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.common.exception;
+package hovanvydut.apiblog.common.exception.base;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

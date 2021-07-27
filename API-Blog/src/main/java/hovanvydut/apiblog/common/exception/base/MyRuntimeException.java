@@ -1,13 +1,18 @@
-package hovanvydut.apiblog.common.exception;
+package hovanvydut.apiblog.common.exception.base;
+
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 /**
  * @author hovanvydut
  * Created on 7/4/21
  */
 
+@ResponseStatus(BAD_REQUEST)
 public class MyRuntimeException extends RuntimeException{
     private final List<MyError> errors;
 

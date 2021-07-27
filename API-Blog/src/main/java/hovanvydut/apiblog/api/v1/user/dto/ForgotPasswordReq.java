@@ -2,6 +2,7 @@ package hovanvydut.apiblog.api.v1.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import hovanvydut.apiblog.common.annotations.ValidEmail;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -25,9 +27,8 @@ import javax.validation.constraints.NotNull;
 @ToString
 public class ForgotPasswordReq {
 
-    // TODO: strictly validate email here
-    @NotNull
-    @Email
+    @NotBlank
+    @ValidEmail
     private String email;
 
 }
