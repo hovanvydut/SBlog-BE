@@ -1,9 +1,10 @@
 [] Explicit relation fetch type for each entity
 [] Check bookmark TODO, FIXME to resolve
 
-[] CronJob delete all expired token (VerificationToken and PasswordResetToken)
-[] Allow upload avatar
+[x] CronJob delete all expired token (VerificationToken and PasswordResetToken)
 [x] Reset your password
 [x] Forgot password
-[] Create model params for freemarker template
+[] Allow upload avatar
+[x] Create model params for freemarker template
 [] Define hostname, port const for email template, upload image url, ...
+[] Define custom exception instead using RuntimeException

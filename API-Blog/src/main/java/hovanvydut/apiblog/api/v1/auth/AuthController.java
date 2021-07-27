@@ -137,18 +137,6 @@ public class AuthController {
      *
      */
 
-    @GetMapping("/check-healthy/freemarker")
-    public String freemarker() throws TemplateException, MessagingException, IOException {
-        Map<String, Object> templateModel = new HashMap<>();
-        templateModel.put("recipientName", "Hồ Văn Vy");
-        templateModel.put("text", "Link kích hoạt tài khoản: <a href='https://google.com'>link</a>");
-        templateModel.put("senderName", "Blog");
-
-        this.emailService.sendFreemarkerMail("hovanvydut@gmail.com", "Check Healthy", templateModel);
-
-        return "Fine!";
-    }
-
     @GetMapping("/check-healthy/thymeleaf")
     public String thymeleaf() throws TemplateException, MessagingException, IOException {
         Map<String, Object> templateModel = new HashMap<>();

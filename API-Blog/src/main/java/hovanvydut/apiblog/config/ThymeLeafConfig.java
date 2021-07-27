@@ -52,4 +52,5 @@ public class ThymeLeafConfig {
         templateResolver.setCharacterEncoding("UTF-8");
         return templateResolver;
     }
+
 }

@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.core.listeners;
+package hovanvydut.apiblog.core.listeners.event;
 
 import hovanvydut.apiblog.model.entity.PasswordResetToken;
 import hovanvydut.apiblog.model.entity.User;

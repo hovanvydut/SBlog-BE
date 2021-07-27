@@ -1,5 +1,6 @@
 package hovanvydut.apiblog.model.entity;
 
+import hovanvydut.apiblog.common.constant.ExpirationTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,9 +22,7 @@ import java.time.LocalDateTime;
 @Table(name = "password_reset_token")
 public class PasswordResetToken {
 
-    // calculate by minutes
-    // TODO: Define consant in constant package
-    private static final int EXPIRATION = 1 * (24 * 60);
+    private static final int EXPIRATION = ExpirationTime.PASSWORD_RESET_TOKEN;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

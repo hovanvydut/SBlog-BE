@@ -1,5 +1,6 @@
 package hovanvydut.apiblog.model.entity;
 
+import hovanvydut.apiblog.common.constant.ExpirationTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,8 +22,7 @@ import java.time.LocalDateTime;
 @Table(name = "verification_token")
 public class VerificationToken {
 
-    // calculate by minutes
-    private static final int EXPIRATION = 1 * (24 * 60);
+    private static final int EXPIRATION = ExpirationTime.VERIFICATION_TOKEN;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

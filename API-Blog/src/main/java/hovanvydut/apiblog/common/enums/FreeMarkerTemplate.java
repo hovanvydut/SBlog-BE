@@ -6,7 +6,7 @@ package hovanvydut.apiblog.common.enums;
  */
 
 public enum FreeMarkerTemplate {
-    REGISTRATION("template-freemarker.ftl"),
+    REGISTRATION("registration-email-template.ftl"),
     CHANGE_PASSWORD("change-password-email-template.ftl"),
     FORGOT_PASSWORD("forgot-password-email-template.ftl");
 

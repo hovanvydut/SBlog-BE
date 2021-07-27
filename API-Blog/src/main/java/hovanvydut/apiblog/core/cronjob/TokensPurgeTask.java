@@ -2,7 +2,6 @@ package hovanvydut.apiblog.core.cronjob;
 
 import hovanvydut.apiblog.core.user.PasswordResetTokenRepository;
 import hovanvydut.apiblog.core.user.VerificationTokenRepository;
-import hovanvydut.apiblog.model.entity.PasswordResetToken;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.core.listeners.registration;
+package hovanvydut.apiblog.core.listeners.event;
 
 import lombok.Getter;
 import lombok.Setter;

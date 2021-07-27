@@ -1,5 +1,6 @@
-package hovanvydut.apiblog.core.listeners.registration;
+package hovanvydut.apiblog.core.listeners;
 
+import hovanvydut.apiblog.core.listeners.event.ConfirmRegistrationEmailEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 

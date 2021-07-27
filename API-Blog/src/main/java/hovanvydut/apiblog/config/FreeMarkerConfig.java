@@ -12,13 +12,6 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 @Configuration
 public class FreeMarkerConfig {
 
-//    @Bean
-//    public FreeMarkerConfigurer myFreemarkerConfig() {
-//        FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
-//        freeMarkerConfigurer.setTemplateLoaderPath("resources/templates/");
-//        return freeMarkerConfigurer;
-//    }
-
     @Bean
     public FreeMarkerViewResolver freemarkerViewResolver() {
         FreeMarkerViewResolver resolver = new FreeMarkerViewResolver();
@@ -27,4 +20,5 @@ public class FreeMarkerConfig {
         resolver.setSuffix(".ftl");
         return resolver;
     }
+
 }

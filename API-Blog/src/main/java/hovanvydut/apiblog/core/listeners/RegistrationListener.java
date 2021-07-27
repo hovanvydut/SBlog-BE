@@ -1,6 +1,9 @@
-package hovanvydut.apiblog.core.listeners.registration;
+package hovanvydut.apiblog.core.listeners;
 
 import freemarker.template.TemplateException;
+import hovanvydut.apiblog.common.enums.FreeMarkerTemplate;
+import hovanvydut.apiblog.common.freemarker.RegistrationModel;
+import hovanvydut.apiblog.core.listeners.event.RegistrationCompleteEvent;
 import hovanvydut.apiblog.core.mail.EmailService;
 import hovanvydut.apiblog.model.entity.User;
 import hovanvydut.apiblog.model.entity.VerificationToken;
@@ -9,8 +12,6 @@ import org.springframework.stereotype.Component;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author hovanvydut
@@ -35,19 +36,13 @@ public class RegistrationListener implements ApplicationListener<RegistrationCom
     }
 
     private void sendRegisterEmail(String email, String fullName, String token) {
-        // TODO: create templateModel for each email type
-        Map<String, Object> templateModel = new HashMap<>();
-        templateModel.put("recipientName", fullName);
-        templateModel.put("text", "Link kích hoạt tài khoản: <a href='http://localhost:3000/api/v1/auth/register/activation/"+ token +"/accept'>link</a>");
-        templateModel.put("senderName", "Blog");
+        RegistrationModel templateModel = new RegistrationModel().setRecipientName(fullName)
+                .setText("Link kích hoạt tài khoản: <a href='http://localhost:3000/api/v1/auth/register/activation/"+ token +"/accept'>link</a>")
+                .setSenderName("Blog 12345");
 
         try {
-            this.emailService.sendFreemarkerMail(email, "Confirm your registration", templateModel);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TemplateException e) {
-            e.printStackTrace();
-        } catch (MessagingException e) {
+            this.emailService.sendFreemarkerMail(email, RegistrationModel.mailTitle, templateModel, FreeMarkerTemplate.REGISTRATION);
+        } catch (IOException | TemplateException | MessagingException e) {
             e.printStackTrace();
         }
     }

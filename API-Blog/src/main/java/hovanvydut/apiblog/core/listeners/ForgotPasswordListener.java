@@ -2,6 +2,8 @@ package hovanvydut.apiblog.core.listeners;
 
 import freemarker.template.TemplateException;
 import hovanvydut.apiblog.common.enums.FreeMarkerTemplate;
+import hovanvydut.apiblog.common.freemarker.ForgotPasswordModel;
+import hovanvydut.apiblog.core.listeners.event.ForgotPasswordEvent;
 import hovanvydut.apiblog.core.mail.EmailService;
 import hovanvydut.apiblog.model.entity.PasswordResetToken;
 import hovanvydut.apiblog.model.entity.User;
@@ -10,8 +12,6 @@ import org.springframework.stereotype.Component;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author hovanvydut
@@ -32,24 +32,18 @@ public class ForgotPasswordListener implements ApplicationListener<ForgotPasswor
         User user = forgotPasswordEvent.getUser();
         PasswordResetToken resetToken = forgotPasswordEvent.getResetPasswordToken();
 
-        sendChanageForgotPasswordEmail(user.getEmail(), user.getFullName(), resetToken.getToken());
+        sendChangeForgotPasswordEmail(user.getEmail(), user.getFullName(), resetToken.getToken());
     }
 
-    private void sendChanageForgotPasswordEmail(String email, String fullName, String token) {
-        // TODO: create templateModel for each email type
-        Map<String, Object> templateModel = new HashMap<>();
-        templateModel.put("recipientName", fullName);
-        templateModel.put("token", token);
-        templateModel.put("senderName", "SBlog");
+    private void sendChangeForgotPasswordEmail(String email, String fullName, String token) {
+        ForgotPasswordModel templateModel = new ForgotPasswordModel()
+                .setRecipientName(fullName)
+                .setToken(token)
+                .setSenderName("SBlog 1234");
 
-        // TODO: define constant variable title email, ... to another class
         try {
-            this.emailService.sendFreemarkerMail(email, "Forgot Password" , templateModel, FreeMarkerTemplate.FORGOT_PASSWORD);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TemplateException e) {
-            e.printStackTrace();
-        } catch (MessagingException e) {
+            this.emailService.sendFreemarkerMail(email, ForgotPasswordModel.mailTitle , templateModel, FreeMarkerTemplate.FORGOT_PASSWORD);
+        } catch (IOException | TemplateException | MessagingException e) {
             e.printStackTrace();
         }
     }
