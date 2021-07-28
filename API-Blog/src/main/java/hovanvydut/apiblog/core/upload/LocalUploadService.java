@@ -1,17 +1,13 @@
 package hovanvydut.apiblog.core.upload;
 
+import hovanvydut.apiblog.common.ExpectedSizeImage;
 import hovanvydut.apiblog.common.util.FileUploadUtil;
-import hovanvydut.apiblog.core.upload.dto.UserImageDTO;
 import hovanvydut.apiblog.core.user.UserService;
-import hovanvydut.apiblog.core.user.dto.UserDTO;
-import hovanvydut.apiblog.model.entity.User;
-import hovanvydut.apiblog.model.entity.UserImage;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -44,16 +40,15 @@ public class LocalUploadService implements UploadService {
         this.modelMapper = modelMapper;
     }
 
-    public UserImageDTO save(MultipartFile multipartFile, String uploadDir, String ownerUsername) throws IOException {
-        UserDTO userDTO = this.userService.getUserByUsername(ownerUsername);
+    public String save(MultipartFile multipartFile, String uploadDir, boolean isGenThumbnail,
+                       ExpectedSizeImage size, ExpectedSizeImage thumbnailExpectSize) throws IOException {
 
+        // FIXME: generate thumbnail via thumbnailExpectSize
         FileUploadUtil.verifyFileSize(multipartFile);
         FileUploadUtil.verifyFileExtension(multipartFile);
         FileUploadUtil.verifyMIMEtype(multipartFile);
         FileUploadUtil.verifySignatureFile(multipartFile);
 
-        String originFileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-        String extensionFile = originFileName.substring(originFileName.lastIndexOf(".") + 1);
         String fileName = FileUploadUtil.generateFileName(multipartFile);
 
         Path imageUploadPath = Paths.get("src/main/resources/static/uploaded/images/" + uploadDir);
@@ -75,45 +70,31 @@ public class LocalUploadService implements UploadService {
             Files.copy(new ByteArrayInputStream(bytes), imagePath, StandardCopyOption.REPLACE_EXISTING);
 
             // generate thumbnail and save
-            Path thumbnailPath = Paths.get( "src/main/resources/static/uploaded/images/thumbnails/" + uploadDir);
-            String thumbnailPathString = thumbnailPath + File.separator + fileName;
+            if (isGenThumbnail) {
+                Path thumbnailPath = Paths.get( "src/main/resources/static/uploaded/images/thumbnails/" + uploadDir);
+                String thumbnailPathString = thumbnailPath + File.separator + fileName;
 
-            if (!Files.exists(thumbnailPath)) {
-                Files.createDirectories(thumbnailPath);
+                if (!Files.exists(thumbnailPath)) {
+                    Files.createDirectories(thumbnailPath);
+                }
+
+                Thumbnails.of(ImageIO.read(new BufferedInputStream(new ByteArrayInputStream(bytes))))
+                        .width(200)
+                        .toFile(new File(thumbnailPathString));
             }
-
-            Thumbnails.of(ImageIO.read(new BufferedInputStream(new ByteArrayInputStream(bytes))))
-                    .width(200)
-                    .toFile(new File(thumbnailPathString));
 
             String slug = uploadDir + "/" + fileName;
 
-            UserImage userImage = new UserImage()
-                    .setSlug(slug)
-                    .setUser(new User().setId(userDTO.getId()));
-            UserImage savedUserImage = this.userImageRepo.save(userImage);
-
-            UserImageDTO userImageDTO = this.modelMapper.map(savedUserImage, UserImageDTO.class);
-            userImageDTO.setSlug(this.endpointUrl + "/" + userImageDTO.getSlug());
-            return userImageDTO;
+            return slug;
         } catch (IOException ex) {
             throw new IOException("Could not save image file: " + fileName, ex);
         }
     }
 
     @Override
-    public void deleteImageById(long imageId, String ownerUsername) throws IOException {
-        UserDTO userDTO = this.userService.getUserByUsername(ownerUsername);
-
-        UserImage userImage = this.userImageRepo.findById(imageId)
-                .orElseThrow(() -> new RuntimeException("Image not found"));
-
-        if (userDTO.getId() != userImage.getUser().getId()) {
-            throw new RuntimeException("Not owning this image");
-        }
-
-        Path imagePath = Paths.get("src/main/resources/static/uploaded/images/" + userImage.getSlug());
-        Path thumbnailPath = Paths.get("src/main/resources/static/uploaded/images/thumbnails/" + userImage.getSlug());
+    public void deleteImageByDirAndFileName(String dirAndFileName, boolean isDeleteThumbnail) throws IOException {
+        Path imagePath = Paths.get("src/main/resources/static/uploaded/images/" + dirAndFileName);
+        Path thumbnailPath = Paths.get("src/main/resources/static/uploaded/images/thumbnails/" + dirAndFileName);
 
         if (Files.exists(imagePath)) {
             Files.delete(imagePath);

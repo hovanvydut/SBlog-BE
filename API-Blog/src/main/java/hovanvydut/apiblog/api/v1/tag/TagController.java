@@ -14,8 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @RestController
-@RequestMapping("/api/v1/tags")
+@RequestMapping("/api/v1")
 @Api(tags = "Hash Tag", value = "HashTag")
 public class TagController {
 
@@ -39,9 +41,8 @@ public class TagController {
     }
 
     @ApiOperation(value = "Get all tags", produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping("")
+    @GetMapping("/tags")
     public ResponseEntity<TagPageResp> getAllTags(@Valid TagPaginationParams req) {
-
         Page<TagDTO> pageTags = this.tagService.getTags(req.getPage(),
                 req.getSize(), req.getSort(), req.getKeyword());
 
@@ -49,9 +50,8 @@ public class TagController {
     }
 
     @ApiOperation(value = "Get Tag by id")
-    @GetMapping("/{id}")
+    @GetMapping("/tags/{id}")
     public ResponseEntity<TagResp> getTag(@PathVariable("id") Long tagId) {
-
         if (this.redisTemplate.opsForValue().get("lastUser" + tagId) != null) {
             TagDTO oldTag = (TagDTO) this.redisTemplate.opsForValue().get("lastUser");
             return ResponseEntity.ok(this.modelMapper.map(oldTag, TagResp.class));
@@ -65,8 +65,8 @@ public class TagController {
     }
 
     @ApiOperation(value = "Create a new tag")
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    @PostMapping("")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/tags")
     public ResponseEntity<TagResp> createTag(@Valid @RequestBody CreateTagReq req) {
         CreateTagDTO dto = this.modelMapper.map(req, CreateTagDTO.class);
         TagDTO tagDTO = this.tagService.createTag(dto);
@@ -74,9 +74,17 @@ public class TagController {
         return ResponseEntity.ok(this.modelMapper.map(tagDTO, TagResp.class));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/tags/{id}/upload-image")
+    public ResponseEntity<TagResp> uploadImage(@RequestParam("image") MultipartFile multipartFile,
+                                               @PathVariable("id") long tagId) throws IOException {
+        TagDTO dto = this.tagService.uploadImage(tagId, multipartFile);
+        return ResponseEntity.ok(this.modelMapper.map(dto, TagResp.class));
+    }
+
     @ApiOperation(value = "Update tag by id")
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/{id}")
+    @PatchMapping("/tags/{id}")
     public ResponseEntity<TagResp> updateTag(@PathVariable("id") Long tagId, @Valid @RequestBody UpdateTagReq req) {
         UpdateTagDTO dto = this.modelMapper.map(req, UpdateTagDTO.class);
         TagDTO tagDTO = this.tagService.updateTag(tagId, dto);
@@ -86,7 +94,7 @@ public class TagController {
 
     @ApiOperation(value = "Delete tag by id")
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/tags/{id}")
     public void deleteTag(@PathVariable("id") Long tagId) {
         this.tagService.deleteTag(tagId);
     }

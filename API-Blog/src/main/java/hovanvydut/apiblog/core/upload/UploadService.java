@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.core.upload;
 
-import hovanvydut.apiblog.core.upload.dto.UserImageDTO;
+import hovanvydut.apiblog.common.ExpectedSizeImage;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -11,8 +11,6 @@ import java.io.IOException;
  */
 
 public interface UploadService {
-
-    public UserImageDTO save(MultipartFile multipartFile, String uploadDir, String ownerUsername) throws IOException;
-
-    public void deleteImageById(long imageId, String ownerUsername) throws IOException;
+    String save(MultipartFile multipartFile, String uploadDir, boolean isGenThumbnail, ExpectedSizeImage size, ExpectedSizeImage thumbnailExpectSize) throws IOException;
+    void deleteImageByDirAndFileName(String dirAndFileName, boolean isDeleteThumbnail) throws IOException;
 }

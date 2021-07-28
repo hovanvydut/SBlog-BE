@@ -1,5 +1,6 @@
 package hovanvydut.apiblog.core.user;
 
+import hovanvydut.apiblog.common.ExpectedSizeImage;
 import hovanvydut.apiblog.common.exception.*;
 import hovanvydut.apiblog.common.exception.base.MyError;
 import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
@@ -9,6 +10,9 @@ import hovanvydut.apiblog.core.listeners.event.ChangePasswordEvent;
 import hovanvydut.apiblog.core.listeners.event.ConfirmRegistrationEmailEvent;
 import hovanvydut.apiblog.core.listeners.event.ForgotPasswordEvent;
 import hovanvydut.apiblog.core.listeners.event.RegistrationCompleteEvent;
+import hovanvydut.apiblog.core.upload.UploadService;
+import hovanvydut.apiblog.core.upload.UserImageRepository;
+import hovanvydut.apiblog.core.upload.dto.UserImageDTO;
 import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
 import hovanvydut.apiblog.core.user.dto.ResetPasswordDto;
 import hovanvydut.apiblog.core.user.dto.UpdateUserDTO;
@@ -16,14 +20,17 @@ import hovanvydut.apiblog.core.user.dto.UserDTO;
 import hovanvydut.apiblog.model.entity.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +52,11 @@ public class UserServiceImpl implements UserService {
     private final VerificationTokenRepository verifyTokenRepo;
     private final ApplicationEventPublisher eventPublisher;
     private final PasswordResetTokenRepository pwdResetTokenRepo;
+    private final UploadService uploadService;
+    private final UserImageRepository userImageRepo;
 
+    @Value("${endpointImageUrl}")
+    private String endpointUrl;
 
     public UserServiceImpl(UserRepository userRepo,
                            ModelMapper modelMapper,
@@ -53,7 +64,9 @@ public class UserServiceImpl implements UserService {
                            FollowerRepository followerRepo,
                            VerificationTokenRepository verifyTokenRepo,
                            ApplicationEventPublisher eventPublisher,
-                           PasswordResetTokenRepository pwdResetTokenRepo) {
+                           PasswordResetTokenRepository pwdResetTokenRepo,
+                           UploadService uploadService,
+                           UserImageRepository userImageRepo) {
         this.userRepo = userRepo;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
@@ -61,6 +74,8 @@ public class UserServiceImpl implements UserService {
         this.verifyTokenRepo = verifyTokenRepo;
         this.eventPublisher = eventPublisher;
         this.pwdResetTokenRepo = pwdResetTokenRepo;
+        this.uploadService = uploadService;
+        this.userImageRepo = userImageRepo;
     }
 
     @Override
@@ -239,6 +254,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void declineRegistration(String token) {
         VerificationToken verifyToken = this.verifyTokenRepo.findByToken(token)
                 .orElseThrow(() -> new VerifyTokenNotFoundException(token));
@@ -286,6 +302,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void changePassword(ResetPasswordDto dto, String username) {
         User user = this.userRepo.findByUsername(username)
                 .orElseThrow(() -> new MyUsernameNotFoundException(username));
@@ -327,6 +344,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void resetForgotPassword(String token, String newPassword) {
         PasswordResetToken resetToken = this.pwdResetTokenRepo.findByToken(token)
                 .orElseThrow(() -> new TokenNotFoundException());
@@ -343,11 +361,75 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    @Transactional
+    public UserImageDTO uploadImageGallery(MultipartFile multipartFile, String uploadDir, String ownerUsername) throws IOException {
+        // TODO: use custom exception
+        Long userId = this.userRepo.getUserIdByUsername(ownerUsername)
+                .orElseThrow(() -> new RuntimeException("Username not found"));
+
+        String dirAndFileName = this.uploadService.save(multipartFile, uploadDir, true, null, null);
+
+        UserImage userImage = new UserImage()
+                .setSlug(dirAndFileName)
+                .setUser(new User().setId(userId));
+
+        UserImage savedUserImage = this.userImageRepo.save(userImage);
+
+        UserImageDTO userImageDTO = this.modelMapper.map(savedUserImage, UserImageDTO.class);
+        userImageDTO.setSlug(genUploadImageUrl(userImageDTO.getSlug()));
+        userImageDTO.setThumbnail(genUploadThumbnailImageUrl(userImageDTO.getSlug()));
+
+        return userImageDTO;
+    }
+
+    @Override
+    @Transactional
+    public void deleteImageGallery(long imageId, String ownerUsername) throws IOException {
+        Long userId = this.userRepo.getUserIdByUsername(ownerUsername)
+                .orElseThrow(() -> new RuntimeException("Username not found"));
+
+        UserImage userImage = this.userImageRepo.findById(imageId)
+                .orElseThrow(() -> new RuntimeException("Image not found"));
+
+        if (userId != userImage.getUser().getId()) {
+            throw new RuntimeException("Not owning this image");
+        }
+
+        this.userImageRepo.deleteById(userImage.getId());
+        this.uploadService.deleteImageByDirAndFileName(userImage.getSlug(), true);
+    }
+
+    @Override
+    @Transactional
+    public String uploadAvatar(MultipartFile multipartFile, String ownerUsername) throws IOException {
+        // TODO: use custom exception
+        Long userId = this.userRepo.getUserIdByUsername(ownerUsername)
+                .orElseThrow(() -> new RuntimeException("Username not found"));
+
+        String uploadDir = "avatar/users/" + userId;
+        ExpectedSizeImage sizeImage = new ExpectedSizeImage(200, 200);
+        ExpectedSizeImage sizeImageThumbnail = new ExpectedSizeImage(50, 50);
+        String dirAndFileName = this.uploadService.save(multipartFile, uploadDir, true, sizeImage, sizeImageThumbnail);
+
+        this.userRepo.updateAvatar(userId, uploadDir);
+
+        return genUploadImageUrl(dirAndFileName);
+    }
+
     private String generateToken() {
         return UUID.randomUUID().toString();
     }
 
     private String hashPassword(String plainTextPassword) {
         return this.passwordEncoder.encode(plainTextPassword);
+    }
+
+    private String genUploadImageUrl(String dirAndFileName) {
+        return this.endpointUrl + "/" + dirAndFileName;
+    }
+
+    private String genUploadThumbnailImageUrl(String dirAndFileName) {
+        return this.endpointUrl + "/thumbnails/" + dirAndFileName;
     }
 }

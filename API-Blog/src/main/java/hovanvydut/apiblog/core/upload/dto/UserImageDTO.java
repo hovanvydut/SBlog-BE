@@ -23,4 +23,5 @@ import lombok.experimental.Accessors;
 public class UserImageDTO {
     private Long id;
     private String slug;
+    private String thumbnail;
 }

@@ -1,13 +1,20 @@
-[] Explicit relation fetch type for each entity
-[] Check bookmark TODO, FIXME to resolve
-
 [x] CronJob delete all expired token (VerificationToken and PasswordResetToken)
 [x] Reset your password
 [x] Forgot password
-[] Allow upload avatar
 [x] Create model params for freemarker template
-[] Define hostname, port const for email template, upload image url, ...
-[] Define custom exception instead using RuntimeException
-[] Create annotation to validate email
+[x] Define custom exception instead using RuntimeException
+[x] Create annotation to validate email
+[x] Upload image for tag
+[x] Allow upload avatar
 
+[] Define hostname, port const for email template, upload image url, ...
 [] How to make all token of user is invalid
+[] Check bookmark TODO, FIXME to resolve
+[] Explicit relation fetch type for each entity
+[] Remove or 'throws IOException in controller and service class (using try cach and throw exception to client)'
+
+Review modules
+[] Tag
+[] Category
+[] Comment
+[] Reply

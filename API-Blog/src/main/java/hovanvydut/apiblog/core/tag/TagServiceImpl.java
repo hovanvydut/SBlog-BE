@@ -1,22 +1,27 @@
 package hovanvydut.apiblog.core.tag;
 
+import hovanvydut.apiblog.common.ExpectedSizeImage;
+import hovanvydut.apiblog.common.exception.TagNotFoundException;
 import hovanvydut.apiblog.common.exception.base.MyError;
 import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
-import hovanvydut.apiblog.common.exception.TagNotFoundException;
 import hovanvydut.apiblog.common.util.SlugUtil;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.tag.dto.CreateTagDTO;
 import hovanvydut.apiblog.core.tag.dto.TagDTO;
 import hovanvydut.apiblog.core.tag.dto.UpdateTagDTO;
+import hovanvydut.apiblog.core.upload.UploadService;
 import hovanvydut.apiblog.model.entity.Tag;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,15 +36,19 @@ public class TagServiceImpl implements TagService{
 
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
+    private final UploadService uploadService;
 
-    public TagServiceImpl(TagRepository tagRepository, ModelMapper modelMapper) {
+    @Value("${endpointImageUrl}")
+    private String hostUploadUrl;
+
+    public TagServiceImpl(TagRepository tagRepository, ModelMapper modelMapper, UploadService uploadService) {
         this.tagRepository = tagRepository;
         this.modelMapper = modelMapper;
+        this.uploadService = uploadService;
     }
 
     @Override
     public Page<TagDTO> getTags(int page, int size, String[] sort, String searchKeyword) {
-
         Sort sortObj = SortAndPaginationUtil.processSort(sort);
         Pageable pageable = PageRequest.of(page - 1, size, sortObj);
 
@@ -117,6 +126,24 @@ public class TagServiceImpl implements TagService{
     public void deleteTag(long tagId) {
         Tag tag = this.tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
         this.tagRepository.delete(tag);
+    }
+
+    @Override
+    public TagDTO uploadImage(long tagId, MultipartFile multipartFile) throws IOException {
+        Tag tag = this.tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
+
+        if (!tag.getSlug().isBlank()) {
+            this.uploadService.deleteImageByDirAndFileName(tag.getSlug(), true);
+        }
+
+        ExpectedSizeImage sizeImage = new ExpectedSizeImage(200, 200);
+        String dirAndFileName = this.uploadService.save(multipartFile, "tags/" + tagId, false, sizeImage, null);
+        tag.setSlug(dirAndFileName);
+
+        Tag savedTag = this.tagRepository.save(tag);
+        savedTag.setSlug(hostUploadUrl + "/" + savedTag.getSlug());
+
+        return this.modelMapper.map(savedTag, TagDTO.class);
     }
 
     private List<MyError> checkUnique(CreateTagDTO dto) {

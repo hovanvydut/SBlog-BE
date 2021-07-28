@@ -2,13 +2,16 @@ package hovanvydut.apiblog.core.user;
 
 import hovanvydut.apiblog.common.exception.base.MyError;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
+import hovanvydut.apiblog.core.upload.dto.UserImageDTO;
 import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
 import hovanvydut.apiblog.core.user.dto.ResetPasswordDto;
 import hovanvydut.apiblog.core.user.dto.UpdateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UserDTO;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -36,4 +39,7 @@ public interface UserService {
     void changePassword(ResetPasswordDto dto, String username);
     void forgotPassword(String email);
     void resetForgotPassword(String token, String newPassword);
+    UserImageDTO uploadImageGallery(MultipartFile multipartFile, String uploadDir, String ownerUsername) throws IOException;
+    void deleteImageGallery(long imageId, String ownerUsername) throws IOException;
+    String uploadAvatar(MultipartFile multipartFile, String ownerUsername) throws IOException;
 }

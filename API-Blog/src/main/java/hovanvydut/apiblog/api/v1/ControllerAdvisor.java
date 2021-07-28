@@ -1,6 +1,5 @@
 package hovanvydut.apiblog.api.v1;
 
-import hovanvydut.apiblog.common.exception.InvalidEmailException;
 import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

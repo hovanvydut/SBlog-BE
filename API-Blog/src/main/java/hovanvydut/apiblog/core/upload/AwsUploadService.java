@@ -1,11 +1,7 @@
 package hovanvydut.apiblog.core.upload;
 
+import hovanvydut.apiblog.common.ExpectedSizeImage;
 import hovanvydut.apiblog.common.util.FileUploadUtil;
-import hovanvydut.apiblog.core.upload.dto.UserImageDTO;
-import hovanvydut.apiblog.core.user.UserService;
-import hovanvydut.apiblog.core.user.dto.UserDTO;
-import hovanvydut.apiblog.model.entity.User;
-import hovanvydut.apiblog.model.entity.UserImage;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
@@ -24,7 +20,6 @@ import java.io.IOException;
 public class AwsUploadService implements UploadService {
 
     private final UserImageRepository userImageRepo;
-    private final UserService userService;
     private final ModelMapper modelMapper;
     private final AmazonClientService amazonClientService;
 
@@ -32,19 +27,17 @@ public class AwsUploadService implements UploadService {
     private String endpointUrl;
 
     public AwsUploadService(UserImageRepository userImageRepo,
-                            UserService userService,
                             ModelMapper modelMapper,
                             AmazonClientService amazonClientService) {
         this.userImageRepo = userImageRepo;
-        this.userService = userService;
         this.modelMapper = modelMapper;
         this.amazonClientService = amazonClientService;
     }
 
     @Override
-    public UserImageDTO save(MultipartFile multipartFile, String uploadDir, String ownerUsername) throws IOException {
-        UserDTO userDTO = this.userService.getUserByUsername(ownerUsername);
-
+    public String save(MultipartFile multipartFile, String uploadDir, boolean isGenThumbnail,
+                       ExpectedSizeImage size, ExpectedSizeImage thumbnailExpectSize)
+            throws IOException {
         FileUploadUtil.verifyFileSize(multipartFile);
         FileUploadUtil.verifyFileExtension(multipartFile);
         FileUploadUtil.verifyMIMEtype(multipartFile);
@@ -54,37 +47,18 @@ public class AwsUploadService implements UploadService {
         uploadDir = "images/" + uploadDir;
         String dirAndFileName = uploadDir + "/" + FileUploadUtil.generateFileName(multipartFile);
 
-        String url = this.amazonClientService.uploadFile(multipartFile, dirAndFileName);
-        System.out.println(url);
+        this.amazonClientService.uploadFile(multipartFile, dirAndFileName, isGenThumbnail, size, thumbnailExpectSize);
 
-        // persistent on DB
-        UserImage userImage = new UserImage()
-                .setSlug(dirAndFileName)
-                .setUser(new User().setId(userDTO.getId()));
-
-        // FIXME: Should seperate userImageRepo to another service,
-        //  should use single reposibility for each class, this class should use upload
-        UserImage savedUserImage = this.userImageRepo.save(userImage);
-
-        UserImageDTO userImageDTO = this.modelMapper.map(savedUserImage, UserImageDTO.class);
-        userImageDTO.setSlug(this.endpointUrl + "/" + userImageDTO.getSlug());
-        return userImageDTO;
+        return dirAndFileName;
     }
 
     @Override
-    public void deleteImageById(long imageId, String ownerUsername) {
-        UserDTO userDTO = this.userService.getUserByUsername(ownerUsername);
+    public void deleteImageByDirAndFileName(String dirAndFileName, boolean isDeleteThumbnail) {
+        this.amazonClientService.deleteFileFromS3Bucket(dirAndFileName);
 
-        UserImage userImage = this.userImageRepo.findById(imageId)
-                .orElseThrow(() -> new RuntimeException("Image not found"));
-
-        if (userDTO.getId() != userImage.getUser().getId()) {
-            throw new RuntimeException("Not owning this image");
+        if (isDeleteThumbnail) {
+            this.amazonClientService.deleteFileFromS3Bucket("thumbnails/" + dirAndFileName);
         }
-
-        this.userImageRepo.deleteById(userImage.getId());
-        this.amazonClientService.deleteFileFromS3Bucket(userImage.getSlug());
-        this.amazonClientService.deleteFileFromS3Bucket("thumbnails/" + userImage.getSlug());
     }
 
 }
