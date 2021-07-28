@@ -7,6 +7,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Min;
+
 /**
  * @author hovanvydut
  * Created on 7/15/21
@@ -19,6 +21,7 @@ import lombok.experimental.Accessors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
 public class PaginationParams {
+
     protected int page;
     protected int size;
     protected String[] sort;
@@ -27,7 +30,7 @@ public class PaginationParams {
     public PaginationParams() {
         this.page = 1;
         this.size = 10;
-        this.sort = new String[] {"id,asc"};
+        this.sort = null;
         this.keyword = "";
     }
 }

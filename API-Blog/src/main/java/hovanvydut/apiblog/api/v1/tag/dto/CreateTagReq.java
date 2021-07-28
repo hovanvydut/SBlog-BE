@@ -3,6 +3,7 @@ package hovanvydut.apiblog.api.v1.tag.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import hovanvydut.apiblog.common.regex.TagRegex;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,17 +27,14 @@ import java.time.LocalDateTime;
 public class CreateTagReq {
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9]+(?:\\s[a-zA-Z0-9]+)*$", message = "Only include character a-z,A-Z,0-9 and space between words")
+    @Pattern(regexp = TagRegex.name.pattern, message = TagRegex.name.message)
     private String name;
 
     private String description;
 
-    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$", message = "Only include character a-z,0-9 and - between words")
+    @Pattern(regexp = TagRegex.slug.pattern, message = TagRegex.slug.message)
     private String slug;
 
     private String image;
-
-    @JsonIgnore
-    private LocalDateTime createdAt = LocalDateTime.now();
 
 }

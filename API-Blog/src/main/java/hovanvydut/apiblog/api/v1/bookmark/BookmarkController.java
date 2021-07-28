@@ -32,10 +32,6 @@ public class BookmarkController {
         this.modelMapper = modelMapper;
     }
 
-    /**
-     * ?sort=published_at|clipped_at&page=X&size=X (pagination)
-     * User can see marked articles (only published_global and published_link article)
-     */
     @GetMapping("/users/{username}/clipped-articles")
     public ResponseEntity<ArticlePageResp> getClippedArticlesOfUser(@PathVariable String username,
                                                                     @Valid BookmarkPaginationParams req) {
@@ -52,11 +48,6 @@ public class BookmarkController {
         return ResponseEntity.ok(subscriberDTOs);
     }
 
-    /**
-     *  Author can't clipped owning articles
-     * @param articleSlug
-     * @param principal
-     */
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/me/subscriptions/articles/{article-slug}")
     public void clipArticle(@PathVariable("article-slug") String articleSlug,

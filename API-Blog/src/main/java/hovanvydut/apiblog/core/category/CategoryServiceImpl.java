@@ -40,8 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Page<CategoryDTO> getCategories(int page, int size, String[] sort, String searchKeyword) {
-        Sort sortObj = SortAndPaginationUtil.processSort(sort);
-        Pageable pageable = PageRequest.of(page - 1, size, sortObj);
+        Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
 
         Page<Category> pageCategories;
 
@@ -85,7 +84,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDTO updateCategory(Long id, UpdateCategoryDTO dto) {
+    public CategoryDTO updateCategory(Long id, @Valid UpdateCategoryDTO dto) {
 
         // check name and slug is unique
         List<MyError> errors = checkUnique(id, dto);

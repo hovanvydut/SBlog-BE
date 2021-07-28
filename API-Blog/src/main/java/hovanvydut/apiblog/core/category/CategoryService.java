@@ -16,6 +16,6 @@ public interface CategoryService {
     Page<CategoryDTO> getCategories(int page, int size, String[] sort, String searchKeyword);
     CategoryDTO getCategory(Long id);
     CategoryDTO createCategory(@Valid CreateCategoryDTO dto);
-    CategoryDTO updateCategory(Long id, UpdateCategoryDTO dto);
+    CategoryDTO updateCategory(Long id, @Valid UpdateCategoryDTO dto);
     void deleteCategory(long id);
 }

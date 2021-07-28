@@ -2,6 +2,7 @@ package hovanvydut.apiblog.api.v1.category.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import hovanvydut.apiblog.common.regex.CategoryRegex;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,17 +28,17 @@ import javax.validation.constraints.Pattern;
 @ToString
 public class CreateCategoryReq {
 
-    // FIXME: Remove multiple space with 1 space
     @NotBlank
     @Length(min = 1, max = 255)
     private String name;
 
     private String description;
 
-    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$")
+    @Pattern(regexp = CategoryRegex.slug.pattern,message = CategoryRegex.slug.message)
     private String slug;
 
-    @URL
-    private String image;
+    public void setName(String name) {
+        this.name = name.replaceAll("\\s{2,}", " ").trim();
+    }
 
 }

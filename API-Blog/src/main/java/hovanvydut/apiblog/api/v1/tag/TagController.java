@@ -52,14 +52,14 @@ public class TagController {
     @ApiOperation(value = "Get Tag by id")
     @GetMapping("/tags/{id}")
     public ResponseEntity<TagResp> getTag(@PathVariable("id") Long tagId) {
-        if (this.redisTemplate.opsForValue().get("lastUser" + tagId) != null) {
-            TagDTO oldTag = (TagDTO) this.redisTemplate.opsForValue().get("lastUser");
-            return ResponseEntity.ok(this.modelMapper.map(oldTag, TagResp.class));
-        }
+//        if (this.redisTemplate.opsForValue().get("lastUser" + tagId) != null) {
+//            TagDTO oldTag = (TagDTO) this.redisTemplate.opsForValue().get("lastUser");
+//            return ResponseEntity.ok(this.modelMapper.map(oldTag, TagResp.class));
+//        }
 
         TagDTO tagDTO = this.tagService.getTag(tagId);
 
-        this.redisTemplate.opsForValue().set("lastUser" + tagId, tagDTO, 60, TimeUnit.SECONDS);
+//        this.redisTemplate.opsForValue().set("lastUser" + tagId, tagDTO, 60, TimeUnit.SECONDS);
 
         return ResponseEntity.ok(this.modelMapper.map(tagDTO, TagResp.class));
     }
@@ -74,6 +74,7 @@ public class TagController {
         return ResponseEntity.ok(this.modelMapper.map(tagDTO, TagResp.class));
     }
 
+    @ApiOperation("Upload image")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/tags/{id}/upload-image")
     public ResponseEntity<TagResp> uploadImage(@RequestParam("image") MultipartFile multipartFile,

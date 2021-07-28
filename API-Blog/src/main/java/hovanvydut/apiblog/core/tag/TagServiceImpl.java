@@ -15,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +25,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author hovanvydut
@@ -49,11 +51,9 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public Page<TagDTO> getTags(int page, int size, String[] sort, String searchKeyword) {
-        Sort sortObj = SortAndPaginationUtil.processSort(sort);
-        Pageable pageable = PageRequest.of(page - 1, size, sortObj);
+        Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
 
         Page<Tag> pageTag;
-
         if (searchKeyword == null || searchKeyword.isBlank()) {
             pageTag = this.tagRepository.findAll(pageable);
         } else {
@@ -104,6 +104,7 @@ public class TagServiceImpl implements TagService{
     @Transactional
     public TagDTO updateTag(long tagId, UpdateTagDTO dto) {
         List<MyError> errors = checkUnique(tagId, dto);
+
         if (errors.size() > 0) {
             throw new MyRuntimeException(errors);
         }
@@ -111,6 +112,7 @@ public class TagServiceImpl implements TagService{
         Tag tag = this.tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
 
         this.modelMapper.map(dto, tag);
+        System.out.println(tag);
 
         if (tag.getSlug() == null) {
             tag.setSlug(SlugUtil.slugify(tag.getName()));
@@ -129,19 +131,20 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
+    @Transactional
     public TagDTO uploadImage(long tagId, MultipartFile multipartFile) throws IOException {
         Tag tag = this.tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
 
-        if (!tag.getSlug().isBlank()) {
-            this.uploadService.deleteImageByDirAndFileName(tag.getSlug(), true);
+        if ((tag.getImage() != null) && (!tag.getImage().isBlank())) {
+            this.uploadService.deleteImageByDirAndFileName(tag.getImage(), true);
         }
 
         ExpectedSizeImage sizeImage = new ExpectedSizeImage(200, 200);
         String dirAndFileName = this.uploadService.save(multipartFile, "tags/" + tagId, false, sizeImage, null);
-        tag.setSlug(dirAndFileName);
+        tag.setImage(dirAndFileName);
 
         Tag savedTag = this.tagRepository.save(tag);
-        savedTag.setSlug(hostUploadUrl + "/" + savedTag.getSlug());
+        savedTag.setImage(hostUploadUrl + "/" + savedTag.getImage());
 
         return this.modelMapper.map(savedTag, TagDTO.class);
     }

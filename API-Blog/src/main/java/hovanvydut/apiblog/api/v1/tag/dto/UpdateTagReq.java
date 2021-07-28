@@ -3,6 +3,7 @@ package hovanvydut.apiblog.api.v1.tag.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import hovanvydut.apiblog.common.regex.TagRegex;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,17 +26,15 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdateTagReq {
 
-    @Pattern(regexp = "^[a-zA-Z0-9]+(?:\\s[a-zA-Z0-9]+)*$")
+    @Pattern(regexp = TagRegex.name.pattern, message = TagRegex.name.message)
     private String name;
 
     private String description;
 
-    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$")
+    @Pattern(regexp = TagRegex.slug.pattern, message = TagRegex.slug.message)
     private String slug;
 
     @URL
     private String image;
 
-    @JsonIgnore
-    private LocalDateTime lastEditedAt = LocalDateTime.now();
 }

@@ -12,9 +12,15 @@
 [] Check bookmark TODO, FIXME to resolve
 [] Explicit relation fetch type for each entity
 [] Remove or 'throws IOException in controller and service class (using try cach and throw exception to client)'
+[] Upload image to cloudinary
+[] Upload image for the category
 
 Review modules
-[] Tag
-[] Category
+[x] Tag
+[x] Category
+[] Article
+[] Follow
+[] Bookmark
+[] User
 [] Comment
 [] Reply

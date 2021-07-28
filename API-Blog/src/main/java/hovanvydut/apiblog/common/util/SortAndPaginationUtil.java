@@ -1,8 +1,11 @@
 package hovanvydut.apiblog.common.util;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +17,21 @@ import java.util.List;
 
 public class SortAndPaginationUtil {
 
+    public static Pageable processSortAndPagination(int page, int size, String[] sort) {
+        Sort sortObj = SortAndPaginationUtil.processSort(sort);
+
+        Pageable pageable;
+        if (sortObj != null)
+            pageable = PageRequest.of(page - 1, size, sortObj);
+        else
+            pageable = PageRequest.of(page - 1, size);
+
+        return pageable;
+    }
+
     public static Sort processSort(String[] sorts) {
+        if (sorts == null || sorts.length == 0) return null;
+
         List<Order> orders = new ArrayList<>();
 
         if (sorts[0].contains(",")) {
