@@ -53,7 +53,7 @@ public class JwtTokenUtil {
         }
     }
 
-    public String getEmail(String token) {
+    public String getUsername(String token) {
         Jws<Claims> jws;
 
         try {

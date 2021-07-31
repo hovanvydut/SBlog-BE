@@ -17,6 +17,7 @@ import hovanvydut.apiblog.model.entity.Category;
 import hovanvydut.apiblog.model.entity.Tag;
 import hovanvydut.apiblog.model.entity.User;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -99,7 +100,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         // get author and validate username
-        User author = this.userRepo.findByUsername(authorUsername)
+        Long authorId = this.userRepo.getUserIdByUsername(authorUsername)
                 .orElseThrow(() -> new MyUsernameNotFoundException(authorUsername));
 
         // mapping dto --> entity
@@ -118,25 +119,10 @@ public class ArticleServiceImpl implements ArticleService {
             article.getTags().add(new Tag().setId(tagId));
         }
 
-        article.setAuthor(author);
+        article.setAuthor(new User().setId(authorId));
 
         // switch case with PublishOption to set scope and status article
-        switch (publishOption) {
-            case GLOBAL_PUBLISH:
-                article.setScope(ArticleScopeEnum.GLOBAL);
-                article.setStatus(ArticleStatusEnum.PENDING);
-                break;
-            case PRIVATE_LINK_PUBLISH:
-                article.setScope(ArticleScopeEnum.ONLY_WHO_HAS_LINK);
-                article.setStatus(ArticleStatusEnum.PENDING);
-                break;
-            case DRAFT:
-                article.setScope(ArticleScopeEnum.GLOBAL);
-                article.setStatus(ArticleStatusEnum.DRAFT);
-                break;
-            default:
-                throw new RuntimeException("PublishOption does not match");
-        }
+        assignProperlyPublishOption(article, publishOption);
 
         Article savedArticle = this.articleRepo.save(article);
 
@@ -179,23 +165,68 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional
     public ArticleDTO updateArticle(String slug, UpdateArticleDTO dto, PublishOption publishOption, String authorUsername) {
-        Article article = this.articleRepo.findBySlug(slug)
+        Article article = this.articleRepo.findBySlugAndAuthorUsername(slug, authorUsername)
                 .orElseThrow(() -> new ArticleNotFoundException(slug));
 
-        if (!article.getAuthor().getUsername().equals(authorUsername)) {
-            throw new RuntimeException("User with username = '" + authorUsername + "' is not owning this article");
-        }
-
+        // TODO : configure model mapper here
+        // Mapping dto -> entity
         this.modelMapper.map(dto, article);
+        article.setTransliterated(SlugUtil.slugify(article.getTitle()));
+        article.setCategory(new Category().setId(dto.getCategory()));
 
-        Set<Tag> newTags = new HashSet<>();
-        for (long tagId : dto.getTagIds()) {
-            newTags.add(new Tag().setId(tagId));
+        if (dto.getTags() != null) {
+            Set<Tag> newTags = new HashSet<>();
+
+            for (long tagId : dto.getTags()) {
+                newTags.add(new Tag().setId(tagId));
+            }
+
+            article.setTags(newTags);
         }
+// TODO: model mapper (using Propery Mapping)
 
-        article.setLastUpdatedAt(LocalDateTime.now());
+//        this.modelMapper.typeMap(UpdateArticleDTO.class, Article.class)
+//                .addMappings(mapper -> {
+//                    mapper.map(UpdateArticleDTO::getTitle, Article::setTitle);
+//
+//                    mapper.<String>map(UpdateArticleDTO::getTitle, (newArticle, title) -> {
+//                        newArticle.setTransliterated(SlugUtil.slugify(title));
+//                    });
+//
+//                    mapper.<Set<Long>>map(UpdateArticleDTO::getTags, (newArticle, tags) -> {
+//                        Set<Tag> newTags = new HashSet<>();
+//
+//                        for (long tagId : tags) {
+//                            newTags.add(new Tag().setId(tagId));
+//                        }
+//
+//                        newArticle.setTags(newTags);
+//                    });
+//
+//                    mapper.<Long>map(UpdateArticleDTO::getCategory, (newArticle, category) -> {
+//                        newArticle.setCategory(new Category().setId(category));
+//                    });
+//
+//                }).map(dto, article);
+
 
         // switch case with PublishOption to set scope and status article
+        assignProperlyPublishOption(article, publishOption);
+
+        Article savedArticle = this.articleRepo.save(article);
+        return this.modelMapper.map(savedArticle, ArticleDTO.class);
+    }
+
+    @Override
+    @Transactional
+    public void deleteArticle(String slug, String authorUsername) {
+        Article article = this.articleRepo.findBySlugAndAuthorUsername(slug, authorUsername)
+                .orElseThrow(() -> new ArticleNotFoundException(slug));
+
+        this.articleRepo.delete(article);
+    }
+
+    private void assignProperlyPublishOption(Article article, PublishOption publishOption) {
         switch (publishOption) {
             case GLOBAL_PUBLISH:
                 article.setScope(ArticleScopeEnum.GLOBAL);
@@ -210,14 +241,9 @@ public class ArticleServiceImpl implements ArticleService {
                 article.setStatus(ArticleStatusEnum.DRAFT);
                 break;
             default:
+                // TODO: add custom exception
                 throw new RuntimeException("PublishOption does not match");
         }
-
-        article.setTags(newTags);
-
-        Article savedArticle = this.articleRepo.save(article);
-
-        return this.modelMapper.map(savedArticle, ArticleDTO.class);
     }
 
 }

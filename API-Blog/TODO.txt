@@ -14,6 +14,7 @@
 [] Remove or 'throws IOException in controller and service class (using try cach and throw exception to client)'
 [] Upload image to cloudinary
 [] Upload image for the category
+[] Generate UUID with 11 characters
 
 Review modules
 [x] Tag

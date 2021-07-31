@@ -12,10 +12,11 @@ import org.springframework.data.domain.Page;
  */
 
 public interface ArticleService {
-    public Page<ArticleDTO> getAllPublishedArticles();
-    public ArticleDTO getArticle(String slug, String usernameViewer);
-    public ArticleDTO createNewArticle(CreateArticleDTO dto, PublishOption publishOption, String authorUsername);
-    public void approveArticle(String slug);
-    public void markArticleSpam(String slug);
-    public ArticleDTO updateArticle(String slug, UpdateArticleDTO dto, PublishOption publishOption, String authorUsername);
+    Page<ArticleDTO> getAllPublishedArticles();
+    ArticleDTO getArticle(String slug, String usernameViewer);
+    ArticleDTO createNewArticle(CreateArticleDTO dto, PublishOption publishOption, String authorUsername);
+    void approveArticle(String slug);
+    void markArticleSpam(String slug);
+    ArticleDTO updateArticle(String slug, UpdateArticleDTO dto, PublishOption publishOption, String authorUsername);
+    void deleteArticle(String slug, String authorUsername);
 }

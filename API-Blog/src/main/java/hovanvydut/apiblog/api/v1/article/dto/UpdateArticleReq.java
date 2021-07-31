@@ -36,11 +36,11 @@ public class UpdateArticleReq {
 
     @NotNull
     @Size(min = 1, max = 5)
-    private Set<Long> tagIds;
+    private Set<Long> tags;
 
     @NotNull
     @Min(1)
-    private long categoryId;
+    private long category;
 
     @URL
     private String thumbnail;

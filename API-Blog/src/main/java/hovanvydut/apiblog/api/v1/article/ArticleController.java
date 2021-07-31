@@ -7,6 +7,7 @@ import hovanvydut.apiblog.core.article.dto.ArticleDTO;
 import hovanvydut.apiblog.core.article.dto.CreateArticleDTO;
 import hovanvydut.apiblog.core.article.dto.PublishOption;
 import hovanvydut.apiblog.core.article.dto.UpdateArticleDTO;
+import io.swagger.annotations.ApiOperation;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -33,18 +34,20 @@ public class ArticleController {
         this.modelMapper = modelMapper;
     }
 
-    @GetMapping("/articles")
+    @ApiOperation(value = "Get all articles")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
+    public void getAllArticles() {
+
+    }
+
+    @ApiOperation(value = "Get all published articles")
+    @GetMapping("/articles/published")
     public Page<ArticleDTO> getAllPublishedArticles() {
         Page<ArticleDTO> page = this.articleService.getAllPublishedArticles();
         return page;
     }
 
-    /**
-     * Anyone can get Article with status is PUBLISHED_GLOBAL or PUBLISHED_LINK. User logged in can get owning Article
-     * with any status
-     * @param slug
-     * @param principal
-     */
+    @ApiOperation(value = "Get article by slug")
     @GetMapping("/articles/{slug}")
     public ResponseEntity<ArticleDTO> getPublishedArticle(@PathVariable String slug, Principal principal) {
         String usernameViewer = null;
@@ -57,6 +60,7 @@ public class ArticleController {
         return ResponseEntity.ok(articleDTO);
     }
 
+    @ApiOperation(value = "Create new article")
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/articles")
     public ResponseEntity<ArticleDTO> createNewArticle(@Valid @RequestBody CreateArticleReq req,
@@ -71,6 +75,8 @@ public class ArticleController {
         return ResponseEntity.ok(articleDTO);
     }
 
+
+    @ApiOperation(value = "Update article by slug")
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/articles/{slug}")
     public ResponseEntity<ArticleDTO> updateArticle(@Valid @RequestBody UpdateArticleReq req,
@@ -85,16 +91,25 @@ public class ArticleController {
         return ResponseEntity.ok(articleDTO);
     }
 
+    @ApiOperation(value = "Approve a pending article")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     @PatchMapping("/articles/{slug}/approve-publish")
     public void approvePublishArticle(@PathVariable String slug) {
         this.articleService.approveArticle(slug);
     }
 
+    @ApiOperation(value = "Mark a articles as spam")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     @PatchMapping("/articles/{slug}/spam")
     public void markArticleSpam(@PathVariable String slug) {
         this.articleService.markArticleSpam(slug);
+    }
+
+    @ApiOperation(value = "Delete article")
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/articles/{slug}")
+    public void deleteArticle(@PathVariable String slug, Principal principal) {
+        this.articleService.deleteArticle(slug, principal.getName());
     }
 
 }

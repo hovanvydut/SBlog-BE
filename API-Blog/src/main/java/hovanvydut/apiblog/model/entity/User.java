@@ -70,7 +70,7 @@ public class User {
     @Column(name = "biography", nullable = true, length = 255)
     private String biography;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
