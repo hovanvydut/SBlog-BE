@@ -1,9 +1,5 @@
 package hovanvydut.apiblog.common.regex;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * @author hovanvydut
  * Created on 7/28/21

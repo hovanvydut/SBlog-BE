@@ -33,12 +33,12 @@ public class ReplyDTO {
     private UserDTO fromUser;
 
     public ReplyDTO(long id, String content, String imageSlug, LocalDateTime createdAt,
-                    LocalDateTime updatedAt, String fullName, String username) {
+                    LocalDateTime updatedAt, String fullName, String username, String avatar) {
         this.id = id;
         this.content = content;
         this.imageSlug = imageSlug;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.fromUser = new UserDTO().setFullName(fullName).setUsername(username);
+        this.fromUser = new UserDTO().setFullName(fullName).setUsername(username).setAvatar(avatar);
     }
 }

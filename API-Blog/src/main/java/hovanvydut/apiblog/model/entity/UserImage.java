@@ -30,6 +30,9 @@ public class UserImage {
     @Column(name = "slug", nullable = false, unique = true, length = 255)
     private String slug;
 
+    @Column(name = "host", nullable = false, length = 255)
+    private String host;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

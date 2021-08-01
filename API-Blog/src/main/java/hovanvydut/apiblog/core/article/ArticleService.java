@@ -12,7 +12,8 @@ import org.springframework.data.domain.Page;
  */
 
 public interface ArticleService {
-    Page<ArticleDTO> getAllPublishedArticles();
+    Page<ArticleDTO> getAllArticles(int page, int size, String[] sort, String searchKeyword);
+    Page<ArticleDTO> getAllPublishedArticles(int page, int size, String[] sort, String searchKeyword);
     ArticleDTO getArticle(String slug, String usernameViewer);
     ArticleDTO createNewArticle(CreateArticleDTO dto, PublishOption publishOption, String authorUsername);
     void approveArticle(String slug);

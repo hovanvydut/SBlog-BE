@@ -6,6 +6,7 @@ import hovanvydut.apiblog.core.comment.dto.CommentDTO;
 import hovanvydut.apiblog.core.comment.dto.CreateCommentDTO;
 import hovanvydut.apiblog.core.comment.dto.CreateReplytDTO;
 import hovanvydut.apiblog.core.comment.dto.ReplyDTO;
+import io.swagger.annotations.ApiOperation;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,7 @@ public class CommentController {
         this.modelMapper = modelMapper;
     }
 
+    @ApiOperation(value = "Get all comments")
     @GetMapping("/articles/{articleSlug}/comments")
     public ResponseEntity<CommentArticlePageResp> getAllCommentOfArticle(@PathVariable String articleSlug,
                                                                          @Valid CommentArticlePaginationParams req) {
@@ -41,6 +43,7 @@ public class CommentController {
         return ResponseEntity.ok(this.modelMapper.map(commentDTOPage, CommentArticlePageResp.class));
     }
 
+    @ApiOperation(value = "Get all replies of a comment")
     @GetMapping("/articles/comments/{commentId}/replies")
     public ResponseEntity<CommentArticlePageResp> getAllRepliesOfComment(@PathVariable long commentId, @Valid CommentArticlePaginationParams req) {
         Page<ReplyDTO> replyDTOPage = this.commentService
@@ -49,6 +52,7 @@ public class CommentController {
         return ResponseEntity.ok(this.modelMapper.map(replyDTOPage, CommentArticlePageResp.class));
     }
 
+    @ApiOperation(value = "comment the article")
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/articles/{articleSlug}/comments")
     public void comment(@PathVariable String articleSlug, @Valid @RequestBody CreateCommentReq req, Principal principal) {
@@ -56,6 +60,7 @@ public class CommentController {
         this.commentService.commentArticle(articleSlug, commentDTO, principal.getName());
     }
 
+    @ApiOperation(value = "reply a comment")
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/articles/comments/{commentId}/replies")
     public ResponseEntity<ReplyResp> replyComment(@PathVariable long commentId,
@@ -70,6 +75,7 @@ public class CommentController {
         return ResponseEntity.ok(this.modelMapper.map(replyDTO, ReplyResp.class));
     }
 
+    @ApiOperation(value = "Reply of reply")
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/articles/comments/replies/{replyId}")
     public ResponseEntity<ReplyResp> replyOfReply(@PathVariable long replyId,
@@ -83,10 +89,19 @@ public class CommentController {
         return ResponseEntity.ok(this.modelMapper.map(replyDTO, ReplyResp.class));
     }
 
+    @ApiOperation(value = "delete comment")
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/articles/comments/{commentId}")
     public void deleteComment(@PathVariable long commentId, Principal principal) {
         String ownerUsername = principal.getName();
         this.commentService.deleteComment(commentId, ownerUsername);
     }
+
+    @ApiOperation(value = "Delete a reply")
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/articles/comments/replies/{replyId}")
+    public void deleteReply(@PathVariable long replyId, Principal principal) {
+        this.commentService.deleteReply(replyId, principal.getName());
+    }
+
 }

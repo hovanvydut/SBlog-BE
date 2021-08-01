@@ -1,6 +1,5 @@
 package hovanvydut.apiblog.api.v1.tag.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import hovanvydut.apiblog.common.regex.TagRegex;
@@ -11,7 +10,6 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.time.LocalDateTime;
 
 /**
  * @author hovanvydut

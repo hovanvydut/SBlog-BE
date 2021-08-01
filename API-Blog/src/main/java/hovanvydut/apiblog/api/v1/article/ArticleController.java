@@ -1,5 +1,7 @@
 package hovanvydut.apiblog.api.v1.article;
 
+import hovanvydut.apiblog.api.v1.article.dto.ArticlePageResp;
+import hovanvydut.apiblog.api.v1.article.dto.ArticlePaginationParams;
 import hovanvydut.apiblog.api.v1.article.dto.CreateArticleReq;
 import hovanvydut.apiblog.api.v1.article.dto.UpdateArticleReq;
 import hovanvydut.apiblog.core.article.ArticleService;
@@ -36,16 +38,23 @@ public class ArticleController {
 
     @ApiOperation(value = "Get all articles")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
-    public void getAllArticles() {
+    @GetMapping("/articles")
+    public ResponseEntity<ArticlePageResp> getAllArticles(@Valid ArticlePaginationParams req) {
+        Page<ArticleDTO> page = this.articleService.getAllArticles(req.getPage(),
+                req.getSize(), req.getSort(), req.getKeyword());
 
+        return ResponseEntity.ok(this.modelMapper.map(page, ArticlePageResp.class));
     }
 
     @ApiOperation(value = "Get all published articles")
     @GetMapping("/articles/published")
-    public Page<ArticleDTO> getAllPublishedArticles() {
-        Page<ArticleDTO> page = this.articleService.getAllPublishedArticles();
-        return page;
+    public ResponseEntity<ArticlePageResp> getAllPublishedArticles(@Valid ArticlePaginationParams req) {
+        Page<ArticleDTO> page = this.articleService.getAllPublishedArticles(req.getPage(),
+                req.getSize(), req.getSort(), req.getKeyword());
+
+        return ResponseEntity.ok(this.modelMapper.map(page, ArticlePageResp.class));
     }
+
 
     @ApiOperation(value = "Get article by slug")
     @GetMapping("/articles/{slug}")

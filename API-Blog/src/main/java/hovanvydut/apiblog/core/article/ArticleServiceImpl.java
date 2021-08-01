@@ -7,6 +7,7 @@ import hovanvydut.apiblog.common.exception.MyUsernameNotFoundException;
 import hovanvydut.apiblog.common.exception.base.MyError;
 import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.util.SlugUtil;
+import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.article.dto.ArticleDTO;
 import hovanvydut.apiblog.core.article.dto.CreateArticleDTO;
 import hovanvydut.apiblog.core.article.dto.PublishOption;
@@ -17,11 +18,9 @@ import hovanvydut.apiblog.model.entity.Category;
 import hovanvydut.apiblog.model.entity.Tag;
 import hovanvydut.apiblog.model.entity.User;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -56,10 +55,32 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Page<ArticleDTO> getAllPublishedArticles() {
-        Pageable pageable = PageRequest.of(0, 10);
+    public Page<ArticleDTO> getAllArticles(int page, int size, String[] sort, String searchKeyword) {
+        Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
 
-        Page<Article> articlePage = this.articleRepo.findByStatus(ArticleStatusEnum.PUBLISHED_GLOBAL, pageable);
+        Page<Article> articlePage;
+        if (searchKeyword == null || searchKeyword.isBlank()) {
+            articlePage = this.articleRepo.findAll(pageable);
+        } else {
+            articlePage = this.articleRepo.search(searchKeyword, pageable);
+        }
+
+        List<Article> articles = articlePage.getContent();
+        List<ArticleDTO> articleDTOs = this.modelMapper.map(articles, new TypeToken<List<ArticleDTO>>() {}.getType());
+
+        return new PageImpl<>(articleDTOs, pageable, articlePage.getTotalElements());
+    }
+
+    @Override
+    public Page<ArticleDTO> getAllPublishedArticles(int page, int size, String[] sort, String searchKeyword) {
+        Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
+
+        Page<Article> articlePage;
+        if (searchKeyword == null || searchKeyword.isBlank()) {
+            articlePage = this.articleRepo.findByStatus(ArticleStatusEnum.PUBLISHED_GLOBAL, pageable);
+        } else {
+            articlePage = this.articleRepo.searchByStatus(searchKeyword, pageable, ArticleStatusEnum.PUBLISHED_GLOBAL);
+        }
 
         List<Article> articles = articlePage.getContent();
         List<ArticleDTO> articleDTOs = this.modelMapper.map(articles, new TypeToken<List<ArticleDTO>>() {}.getType());
@@ -143,6 +164,7 @@ public class ArticleServiceImpl implements ArticleService {
                 article.setStatus(ArticleStatusEnum.PUBLISHED_LINK);
                 break;
             default:
+                // TODO: another scope is invalid
                 throw new RuntimeException("Article Scope not found");
         }
 

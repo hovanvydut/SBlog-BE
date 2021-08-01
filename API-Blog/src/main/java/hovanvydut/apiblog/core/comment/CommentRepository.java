@@ -19,13 +19,11 @@ import java.util.Optional;
 @Repository
 public interface CommentRepository extends PagingAndSortingRepository<Comment, Long> {
 
-//    @Query("SELECT c FROM Comment c WHERE c.article.id = :articleId")
-//    Page<Comment> findByArticleId(@Param("articleId") Long articleId, Pageable pageable);
-
     @Query("SELECT c.id FROM Comment c WHERE c.id = :commentId")
     Optional<Long> getCommentIdById(@Param("commentId") long commentId);
 
-    @Query("SELECT new hovanvydut.apiblog.core.comment.dto.CommentDTO(c.id, c.content, c.imageSlug, c.createdAt, c.updatedAt, c.fromUser.fullName, c.fromUser.username) FROM Comment c WHERE c.article.id = :articleId")
+    @Query("SELECT new hovanvydut.apiblog.core.comment.dto.CommentDTO(c.id, c.content, c.imageSlug, c.createdAt, " +
+            "c.updatedAt, c.fromUser.fullName, c.fromUser.username, c.fromUser.avatar) FROM Comment c WHERE c.article.id = :articleId")
     Page<CommentDTO> findByArticleId(@Param("articleId") Long articleId, Pageable pageable);
 
 }

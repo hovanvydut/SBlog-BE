@@ -372,7 +372,8 @@ public class UserServiceImpl implements UserService {
 
         UserImage userImage = new UserImage()
                 .setSlug(dirAndFileName)
-                .setUser(new User().setId(userId));
+                .setUser(new User().setId(userId))
+                .setHost(this.endpointUrl);
 
         UserImage savedUserImage = this.userImageRepo.save(userImage);
 
@@ -412,7 +413,7 @@ public class UserServiceImpl implements UserService {
         ExpectedSizeImage sizeImageThumbnail = new ExpectedSizeImage(50, 50);
         String dirAndFileName = this.uploadService.save(multipartFile, uploadDir, true, sizeImage, sizeImageThumbnail);
 
-        this.userRepo.updateAvatar(userId, uploadDir);
+        this.userRepo.updateAvatar(userId, uploadDir, this.endpointUrl);
 
         return genUploadImageUrl(dirAndFileName);
     }

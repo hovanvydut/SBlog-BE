@@ -7,8 +7,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.Min;
-
 /**
  * @author hovanvydut
  * Created on 7/15/21

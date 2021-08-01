@@ -40,5 +40,6 @@ public class CommentArticleResp {
 class UserCommentResp {
     private String username;
     private String fullName;
+    private String avatar;
 }
 
