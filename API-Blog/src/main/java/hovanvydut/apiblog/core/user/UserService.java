@@ -42,4 +42,5 @@ public interface UserService {
     UserImageDTO uploadImageGallery(MultipartFile multipartFile, String uploadDir, String ownerUsername) throws IOException;
     void deleteImageGallery(long imageId, String ownerUsername) throws IOException;
     String uploadAvatar(MultipartFile multipartFile, String ownerUsername) throws IOException;
+    Long getUserIdByUsername(String username);
 }

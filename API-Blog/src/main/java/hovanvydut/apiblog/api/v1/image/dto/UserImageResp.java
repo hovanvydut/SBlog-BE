@@ -23,4 +23,5 @@ import lombok.experimental.Accessors;
 public class UserImageResp {
     private Long id;
     private String slug;
+    private String host;
 }

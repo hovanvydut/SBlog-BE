@@ -12,11 +12,8 @@ import java.util.List;
  */
 
 public interface BookmarkService {
-    public void clipArticle(String articleSlug, String subscriberUsername);
-
-    public void deleteBookmark(String articleSlug, String subscriberUsername);
-
-    public List<SubscriberDTO> getAllSubscribers(String slug);
-
-    public Page<ArticleDTO> getAllClippedArticlesOfUser(String username, int page, int size, String[] sort, String keyword);
+    List<SubscriberDTO> getAllSubscribers(String slug);
+    Page<ArticleDTO> getAllClippedArticlesOfUser(String username, int page, int size, String[] sort, String keyword);
+    void clipArticle(String articleSlug, String subscriberUsername);
+    void deleteBookmark(String articleSlug, String subscriberUsername);
 }

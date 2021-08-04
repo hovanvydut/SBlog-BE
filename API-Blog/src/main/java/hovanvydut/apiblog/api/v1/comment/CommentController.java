@@ -36,18 +36,19 @@ public class CommentController {
     @ApiOperation(value = "Get all comments")
     @GetMapping("/articles/{articleSlug}/comments")
     public ResponseEntity<CommentArticlePageResp> getAllCommentOfArticle(@PathVariable String articleSlug,
-                                                                         @Valid CommentArticlePaginationParams req) {
+                                                                         @Valid CommentArticlePaginationParams params) {
         Page<CommentDTO> commentDTOPage = this.commentService
-                .getAllCommentOfArticle(articleSlug, req.getPage(), req.getSize());
+                .getAllCommentOfArticle(articleSlug, params.getPage(), params.getSize());
 
         return ResponseEntity.ok(this.modelMapper.map(commentDTOPage, CommentArticlePageResp.class));
     }
 
     @ApiOperation(value = "Get all replies of a comment")
     @GetMapping("/articles/comments/{commentId}/replies")
-    public ResponseEntity<CommentArticlePageResp> getAllRepliesOfComment(@PathVariable long commentId, @Valid CommentArticlePaginationParams req) {
+    public ResponseEntity<CommentArticlePageResp> getAllRepliesOfComment(@PathVariable long commentId,
+                                                                         @Valid CommentArticlePaginationParams params) {
         Page<ReplyDTO> replyDTOPage = this.commentService
-                .getAllRepliesOfComment(commentId, req.getPage(), req.getSize());
+                .getAllRepliesOfComment(commentId, params.getPage(), params.getSize());
 
         return ResponseEntity.ok(this.modelMapper.map(replyDTOPage, CommentArticlePageResp.class));
     }

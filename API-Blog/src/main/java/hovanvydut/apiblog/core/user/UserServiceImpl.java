@@ -5,6 +5,7 @@ import hovanvydut.apiblog.common.exception.*;
 import hovanvydut.apiblog.common.exception.base.MyError;
 import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
+import hovanvydut.apiblog.core.article.ArticleService;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.listeners.event.ChangePasswordEvent;
 import hovanvydut.apiblog.core.listeners.event.ConfirmRegistrationEmailEvent;
@@ -22,7 +23,9 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -54,6 +57,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordResetTokenRepository pwdResetTokenRepo;
     private final UploadService uploadService;
     private final UserImageRepository userImageRepo;
+    private final ArticleService articleService;
 
     @Value("${endpointImageUrl}")
     private String endpointUrl;
@@ -66,7 +70,8 @@ public class UserServiceImpl implements UserService {
                            ApplicationEventPublisher eventPublisher,
                            PasswordResetTokenRepository pwdResetTokenRepo,
                            UploadService uploadService,
-                           UserImageRepository userImageRepo) {
+                           UserImageRepository userImageRepo,
+                           ArticleService articleService) {
         this.userRepo = userRepo;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
@@ -76,21 +81,12 @@ public class UserServiceImpl implements UserService {
         this.pwdResetTokenRepo = pwdResetTokenRepo;
         this.uploadService = uploadService;
         this.userImageRepo = userImageRepo;
+        this.articleService = articleService;
     }
 
     @Override
     public Page<UserDTO> getUsers(int page, int size, String[] sort, String searchKeyword) {
-        if (page <= 0) {
-            page = 1;
-        }
-
-        if (size <= 0) {
-            // NOTE: use default constant
-            size = 5;
-        }
-
-        Sort sortObj = SortAndPaginationUtil.processSort(sort);
-        Pageable pageable = PageRequest.of(page - 1, size, sortObj);
+        Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
 
         Page<User> pageUser;
 
@@ -416,6 +412,11 @@ public class UserServiceImpl implements UserService {
         this.userRepo.updateAvatar(userId, uploadDir, this.endpointUrl);
 
         return genUploadImageUrl(dirAndFileName);
+    }
+
+    @Override
+    public Long getUserIdByUsername(String username) {
+        return this.userRepo.getUserIdByUsername(username).orElseThrow(() -> new MyUsernameNotFoundException(username));
     }
 
     private String generateToken() {

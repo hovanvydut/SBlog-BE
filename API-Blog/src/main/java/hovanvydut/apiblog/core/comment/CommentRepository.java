@@ -23,7 +23,8 @@ public interface CommentRepository extends PagingAndSortingRepository<Comment, L
     Optional<Long> getCommentIdById(@Param("commentId") long commentId);
 
     @Query("SELECT new hovanvydut.apiblog.core.comment.dto.CommentDTO(c.id, c.content, c.imageSlug, c.createdAt, " +
-            "c.updatedAt, c.fromUser.fullName, c.fromUser.username, c.fromUser.avatar) FROM Comment c WHERE c.article.id = :articleId")
+            "c.updatedAt, c.fromUser.fullName, c.fromUser.username, c.fromUser.avatar, count(c.id)) FROM Comment c " +
+            "LEFT JOIN Reply r ON r.comment.id = c.id WHERE c.article.id = :articleId GROUP BY c.id")
     Page<CommentDTO> findByArticleId(@Param("articleId") Long articleId, Pageable pageable);
 
 }

@@ -89,6 +89,23 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public Page<ArticleDTO> getAllPublishedArticles(String username, int page, int size, String[] sort, String searchKeyword) {
+        Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
+
+        Page<Article> articlePage;
+        if (searchKeyword == null || searchKeyword.isBlank()) {
+            articlePage = this.articleRepo.findByStatusAndAuthor(username, ArticleStatusEnum.PUBLISHED_GLOBAL, pageable);
+        } else {
+            articlePage = this.articleRepo.searchByStatusAndAuthor(username, searchKeyword, ArticleStatusEnum.PUBLISHED_GLOBAL, pageable);
+        }
+
+        List<Article> articles = articlePage.getContent();
+        List<ArticleDTO> articleDTOs = this.modelMapper.map(articles, new TypeToken<List<ArticleDTO>>() {}.getType());
+
+        return new PageImpl<>(articleDTOs, pageable, articlePage.getTotalElements());
+    }
+
+    @Override
     public ArticleDTO getArticle(String slug, String usernameViewer) {
 
         Article article = this.articleRepo.findBySlug(slug)

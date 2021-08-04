@@ -44,74 +44,69 @@ public class BookmarkServiceImpl implements BookmarkService {
         this.modelMapper = modelMapper;
     }
 
+    @Override
+    public List<SubscriberDTO> getAllSubscribers(String articleSlug) {
+        Long articleId = this.articleRepo.getArticleIdBySlug(articleSlug)
+                .orElseThrow(() -> new ArticleNotFoundException(articleSlug));
+
+        return this.bookmarkRepo.findAllSubscribersOfArticle(articleId);
+    }
+
+    @Override
+    public Page<ArticleDTO> getAllClippedArticlesOfUser(String username, int page, int size, String[] sort, String keyword) {
+        Long userId = this.userRepo.getUserIdByUsername(username)
+                .orElseThrow(() -> new MyUsernameNotFoundException(username));
+
+        Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
+        Page<Article> pageArticles;
+
+        if (keyword == null || keyword.isBlank()) {
+            pageArticles = this.bookmarkRepo.findAllClippedArticlesOfUser(userId, pageable);
+        } else {
+            pageArticles = this.bookmarkRepo.searchByArticleTitle(keyword, userId, pageable);
+        }
+
+        List<Article> articles = pageArticles.getContent();
+        List<ArticleDTO> articleDTOs = this.modelMapper.map(articles, new TypeToken<List<ArticleDTO>>() {}.getType());
+        return new PageImpl<>(articleDTOs, pageable, pageArticles.getTotalElements());
+    }
 
     @Override
     public void clipArticle(String articleSlug, String subscriberUsername) {
-        Article article = this.articleRepo.findBySlug(articleSlug)
+        Long articleId = this.articleRepo.getArticleIdBySlug(articleSlug)
                 .orElseThrow(() -> new ArticleNotFoundException(articleSlug));
 
-        User subscriber = this.userRepo.findByUsername(subscriberUsername)
+        Long subscriberId = this.userRepo.getUserIdByUsername(subscriberUsername)
                 .orElseThrow(() -> new MyUsernameNotFoundException(subscriberUsername));
 
-        BookmarkArticleId bookmarkArticleId = new BookmarkArticleId().setArticleId(article.getId()).setUserId(subscriber.getId());
+        BookmarkArticleId bookmarkArticleId = new BookmarkArticleId().setArticleId(articleId).setUserId(subscriberId);
 
         this.bookmarkRepo.findById(bookmarkArticleId)
                 .ifPresent(bookmarkArticle -> {
                     throw new MyRuntimeException().add("You have clipped this article before");
                 });
 
-        if (article.getAuthor().getId() == subscriber.getId()) {
-            throw new MyRuntimeException().add("Author can't clipped owning articles");
-        }
+        // TODO: Whether authors can bookmark their articles
 
-
-        BookmarkArticle bookmarkArticle = new BookmarkArticle().setId(bookmarkArticleId).setArticle(article).setUser(subscriber);
-
+        BookmarkArticle bookmarkArticle = new BookmarkArticle().setId(bookmarkArticleId)
+                .setArticle(new Article().setId(articleId)).setUser(new User().setId(subscriberId));
         this.bookmarkRepo.save(bookmarkArticle);
     }
 
     @Override
     public void deleteBookmark(String articleSlug, String subscriberUsername) {
-        Article article = this.articleRepo.findBySlug(articleSlug)
+        Long articleId = this.articleRepo.getArticleIdBySlug(articleSlug)
                 .orElseThrow(() -> new ArticleNotFoundException(articleSlug));
 
-        User subscriber = this.userRepo.findByUsername(subscriberUsername)
+        Long subscriberId = this.userRepo.getUserIdByUsername(subscriberUsername)
                 .orElseThrow(() -> new MyUsernameNotFoundException(subscriberUsername));
 
         BookmarkArticleId bookmarkArticleId = new BookmarkArticleId()
-                .setArticleId(article.getId()).setUserId(subscriber.getId());
+                .setArticleId(articleId).setUserId(subscriberId);
         BookmarkArticle bookmarkArticle = this.bookmarkRepo.findById(bookmarkArticleId)
                 .orElseThrow(() -> new ArticleNotFoundException(articleSlug));
 
         this.bookmarkRepo.delete(bookmarkArticle);
     }
 
-    @Override
-    public List<SubscriberDTO> getAllSubscribers(String slug) {
-        Article article = this.articleRepo.findBySlug(slug).orElseThrow(() -> new ArticleNotFoundException(slug));
-
-        return this.bookmarkRepo.findAllSubscribersOfArticle(article.getId());
-    }
-
-    @Override
-    public Page<ArticleDTO> getAllClippedArticlesOfUser(String username, int page, int size, String[] sort, String keyword) {
-        User user = this.userRepo.findByUsername(username)
-                .orElseThrow(() -> new MyUsernameNotFoundException(username));
-
-        Sort sortObj = SortAndPaginationUtil.processSort(sort);
-
-        Pageable pageable = PageRequest.of(page - 1, size, sortObj);
-        Page<Article> pageArticles;
-
-        if (keyword == null || keyword.isBlank()) {
-            pageArticles = this.bookmarkRepo.findAllClippedArticlesOfUser(user.getId(), pageable);
-        } else {
-            pageArticles = this.bookmarkRepo.searchByArticleTitle(keyword, user.getId(), pageable);
-        }
-
-        List<Article> articles = pageArticles.getContent();
-        List<ArticleDTO> articleDTOs = this.modelMapper.map(articles, new TypeToken<List<ArticleDTO>>() {}.getType());
-
-        return new PageImpl<>(articleDTOs, pageable, pageArticles.getTotalElements());
-    }
 }

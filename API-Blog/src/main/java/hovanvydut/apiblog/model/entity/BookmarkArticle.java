@@ -39,4 +39,9 @@ public class BookmarkArticle {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @PrePersist
+    protected void onPersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
 }

@@ -26,6 +26,7 @@ public class CommentArticleResp {
     private long id;
     private String content;
     private String imageSlug;
+    private long countReply;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private UserCommentResp fromUser;

@@ -40,9 +40,9 @@ public class CategoryController {
 
     @ApiOperation(value = "Get all categories")
     @GetMapping("/categories")
-    public ResponseEntity<CategoryPageResp> getAllCategories(@Valid CategoryPaginationParams req) {
-        Page<CategoryDTO> pageCategoryDTOS = this.categoryService.getCategories(req.getPage(),
-                req.getSize(), req.getSort(), req.getKeyword());
+    public ResponseEntity<CategoryPageResp> getAllCategories(@Valid CategoryPaginationParams params) {
+        Page<CategoryDTO> pageCategoryDTOS = this.categoryService.getCategories(params.getPage(),
+                params.getSize(), params.getSort(), params.getKeyword());
 
         return ResponseEntity.ok(this.modelMapper.map(pageCategoryDTOS, CategoryPageResp.class));
     }

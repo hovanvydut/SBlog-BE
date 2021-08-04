@@ -27,7 +27,8 @@ public interface ArticleRepository extends PagingAndSortingRepository<Article, L
     @Query("SELECT a FROM Article a INNER JOIN User u ON a.author.id = u.id WHERE a.slug = :slug AND u.username = :authorUsername")
     Optional<Article> findBySlugAndAuthorUsername(@Param("slug") String slug, @Param("authorUsername") String authorUsername);
 
-    @Query(value = "SELECT a FROM Article a INNER JOIN FETCH a.author LEFT JOIN FETCH a.tags LEFT JOIN FETCH a.category WHERE a.status = :status",
+    @Query(value = "SELECT a FROM Article a INNER JOIN FETCH a.author LEFT JOIN FETCH a.tags LEFT JOIN FETCH a.category " +
+            "WHERE a.status = :status",
         countQuery = "SELECT COUNT(a.id) FROM Article a")
     Page<Article> findByStatus(@Param("status") ArticleStatusEnum status, Pageable pageable);
 
@@ -43,4 +44,14 @@ public interface ArticleRepository extends PagingAndSortingRepository<Article, L
     @Query("SELECT a FROM Article a WHERE a.status = :status AND a.title LIKE %:keyword%")
     Page<Article> searchByStatus(@Param("keyword") String searchKeyword, Pageable pageable, @Param("status") ArticleStatusEnum status);
 
+    @Query(value = "SELECT a FROM Article a INNER JOIN FETCH a.author LEFT JOIN FETCH a.tags LEFT JOIN FETCH a.category " +
+            "WHERE a.status = :status AND a.author.username = :username",
+            countQuery = "SELECT COUNT(a.id) FROM Article a WHERE a.status = :status AND a.author.username = :username")
+    Page<Article> findByStatusAndAuthor(@Param("username") String username, @Param("status") ArticleStatusEnum status, Pageable pageable);
+
+    @Query(value = "SELECT a FROM Article a INNER JOIN FETCH a.author LEFT JOIN FETCH a.tags LEFT JOIN FETCH a.category " +
+            "WHERE a.status = :status AND a.author.username = :username AND a.title LIKE %:keyword%",
+            countQuery = "SELECT COUNT(a.id) FROM Article a WHERE a.status = :status AND a.author.username = :username AND a.title LIKE %:keyword%")
+    Page<Article> searchByStatusAndAuthor(@Param("username") String username, @Param("keyword") String keyword,
+                                          @Param("status") ArticleStatusEnum status, Pageable pageable);
 }

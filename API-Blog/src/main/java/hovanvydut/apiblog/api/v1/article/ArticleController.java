@@ -4,6 +4,7 @@ import hovanvydut.apiblog.api.v1.article.dto.ArticlePageResp;
 import hovanvydut.apiblog.api.v1.article.dto.ArticlePaginationParams;
 import hovanvydut.apiblog.api.v1.article.dto.CreateArticleReq;
 import hovanvydut.apiblog.api.v1.article.dto.UpdateArticleReq;
+import hovanvydut.apiblog.api.v1.user.dto.UserPaginationParams;
 import hovanvydut.apiblog.core.article.ArticleService;
 import hovanvydut.apiblog.core.article.dto.ArticleDTO;
 import hovanvydut.apiblog.core.article.dto.CreateArticleDTO;
@@ -39,20 +40,29 @@ public class ArticleController {
     @ApiOperation(value = "Get all articles")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     @GetMapping("/articles")
-    public ResponseEntity<ArticlePageResp> getAllArticles(@Valid ArticlePaginationParams req) {
-        Page<ArticleDTO> page = this.articleService.getAllArticles(req.getPage(),
-                req.getSize(), req.getSort(), req.getKeyword());
+    public ResponseEntity<ArticlePageResp> getAllArticles(@Valid ArticlePaginationParams params) {
+        Page<ArticleDTO> page = this.articleService.getAllArticles(params.getPage(),
+                params.getSize(), params.getSort(), params.getKeyword());
 
         return ResponseEntity.ok(this.modelMapper.map(page, ArticlePageResp.class));
     }
 
     @ApiOperation(value = "Get all published articles")
     @GetMapping("/articles/published")
-    public ResponseEntity<ArticlePageResp> getAllPublishedArticles(@Valid ArticlePaginationParams req) {
-        Page<ArticleDTO> page = this.articleService.getAllPublishedArticles(req.getPage(),
-                req.getSize(), req.getSort(), req.getKeyword());
+    public ResponseEntity<ArticlePageResp> getAllPublishedArticles(@Valid ArticlePaginationParams params) {
+        Page<ArticleDTO> page = this.articleService.getAllPublishedArticles(params.getPage(),
+                params.getSize(), params.getSort(), params.getKeyword());
 
         return ResponseEntity.ok(this.modelMapper.map(page, ArticlePageResp.class));
+    }
+
+    @ApiOperation(value = "Get all published articled of user")
+    @GetMapping("/users/{username}/articles/published")
+    public Page<ArticleDTO> getAllPublishedArticlesOfUser(@PathVariable String username, @Valid UserPaginationParams params) {
+        // get all published article of user
+        Page<ArticleDTO> articleDTOList = this.articleService
+                .getAllPublishedArticles(username, params.getPage(), params.getSize(), params.getSort(), params.getKeyword());
+        return articleDTOList;
     }
 
 

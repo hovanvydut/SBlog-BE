@@ -33,7 +33,7 @@ public class UserImage {
     @Column(name = "host", nullable = false, length = 255)
     private String host;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
