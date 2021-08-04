@@ -1,5 +1,7 @@
 package hovanvydut.apiblog.common.exception;
 
+import hovanvydut.apiblog.common.exception.base.ResourceNotFoundException;
+
 /**
  * @author hovanvydut
  * Created on 7/13/21

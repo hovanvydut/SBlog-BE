@@ -5,7 +5,6 @@ import hovanvydut.apiblog.common.enums.ArticleStatusEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -22,7 +21,6 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @Accessors(chain = true)
-@ToString
 @Entity
 @Table(name = "article", indexes = @Index(columnList = "status"))
 public class Article {
@@ -64,10 +62,10 @@ public class Article {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @OneToMany(mappedBy = "article")
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     private Set<ArticleVote> votes = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "article_tag",
             joinColumns = @JoinColumn(name = "article_id"),
@@ -75,16 +73,42 @@ public class Article {
     )
     private Set<Tag> tags = new HashSet<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User author;
 
-//    @PreUpdate
-//    protected void onUpdate() {
-//        lastUpdatedAt = LocalDateTime.now();
-//    }
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "article_participant",
+            joinColumns = @JoinColumn(name = "article_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> participants = new HashSet<>();
+
+    @PreUpdate
+    protected void onUpdate() {
+        lastUpdatedAt = LocalDateTime.now();
+    }
+
+    @Override
+    public String toString() {
+        return "Article{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", slug='" + slug + '\'' +
+                ", transliterated='" + transliterated + '\'' +
+                ", content='" + content + '\'' +
+                ", thumbnail='" + thumbnail + '\'' +
+                ", scope=" + scope +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
+                ", lastUpdatedAt=" + lastUpdatedAt +
+                ", publishedAt=" + publishedAt +
+                ", deletedAt=" + deletedAt +
+                '}';
+    }
 }

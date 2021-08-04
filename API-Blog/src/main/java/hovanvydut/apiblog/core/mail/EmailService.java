@@ -1,6 +1,8 @@
 package hovanvydut.apiblog.core.mail;
 
 import freemarker.template.TemplateException;
+import hovanvydut.apiblog.common.enums.FreeMarkerTemplate;
+import hovanvydut.apiblog.common.freemarker.FreeMarkerTemplateModel;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
@@ -15,8 +17,8 @@ public interface EmailService {
     public void sendSimpleMessage(String to,  String subject, String text);
     public void sendSimpleMessageUsingTemplate(String to, String subject, String ...templateModel);
     public void sendMessageWithAttachment(String to, String subject, String text, String pathToAttachment);
-    public void sendMessageUsingThymeleafTemplate(String to, String subject, Map<String, Object> templateModel)
+    public void sendThymeleafMail(String to, String subject, Map<String, Object> templateModel)
             throws IOException, MessagingException;
-    public void sendMessageUsingFreemarkerTemplate(String to, String subject, Map<String, Object> templateModel)
+    public void sendFreemarkerMail(String to, String subject, FreeMarkerTemplateModel templateModel, FreeMarkerTemplate template)
             throws IOException, TemplateException, MessagingException;
 }

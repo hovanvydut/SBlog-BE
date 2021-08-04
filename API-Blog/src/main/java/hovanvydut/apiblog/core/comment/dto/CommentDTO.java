@@ -27,16 +27,19 @@ public class CommentDTO {
     private long id;
     private String content;
     private String imageSlug;
+    private long countReply;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private UserDTO fromUser;
 
-    public CommentDTO(long id, String content, String imageSlug, LocalDateTime createdAt, LocalDateTime updatedAt, String fullName, String username) {
+    public CommentDTO(long id, String content, String imageSlug, LocalDateTime createdAt, LocalDateTime updatedAt,
+                      String fullName, String username, String avatar, long countReply) {
         this.id = id;
         this.content = content;
         this.imageSlug = imageSlug;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.fromUser = new UserDTO().setFullName(fullName).setUsername(username);
+        this.countReply = countReply;
+        this.fromUser = new UserDTO().setFullName(fullName).setUsername(username).setAvatar(avatar);
     }
 }

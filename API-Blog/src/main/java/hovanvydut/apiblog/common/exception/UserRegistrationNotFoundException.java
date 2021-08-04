@@ -1,11 +1,13 @@
 package hovanvydut.apiblog.common.exception;
 
+import hovanvydut.apiblog.common.exception.base.ResourceNotFoundException;
+
 /**
  * @author hovanvydut
  * Created on 7/4/21
  */
 
-public class UserRegistrationNotFoundException extends ResourceNotFoundException{
+public class UserRegistrationNotFoundException extends ResourceNotFoundException {
 
     public UserRegistrationNotFoundException() {
         super("Could not find UserRegistration");

@@ -22,6 +22,9 @@ public interface ReplyRepository extends PagingAndSortingRepository<Reply, Long>
     @Query("SELECT c.id FROM Reply r INNER JOIN Comment c ON r.comment.id = c.id WHERE r.id = :replyId")
     Optional<Long> getCommentIdIdById(@Param("replyId") long replyId);
 
-    @Query("SELECT new hovanvydut.apiblog.core.comment.dto.ReplyDTO(r.id, r.content, r.imageSlug, r.createdAt, r.updatedAt, u.fullName, u.username) FROM Reply r INNER JOIN User u ON u.id = r.fromUser.id WHERE r.comment.id = :commentId")
+    @Query("SELECT new hovanvydut.apiblog.core.comment.dto.ReplyDTO(r.id, r.content, r.imageSlug, r.createdAt, r.updatedAt, u.fullName, u.username, u.avatar) FROM Reply r INNER JOIN User u ON u.id = r.fromUser.id WHERE r.comment.id = :commentId")
     Page<ReplyDTO> getAllReplyOfComment(@Param("commentId") long commentId, Pageable pageable);
+
+    @Query("SELECT r FROM Reply r INNER JOIN User u WHERE r.id = ?1 AND u.username = ?2")
+    Optional<Reply> findByIdAndFromUsername(long replyId, String ownerUsername);
 }

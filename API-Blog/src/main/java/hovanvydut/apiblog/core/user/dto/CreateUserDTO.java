@@ -28,9 +28,11 @@ import java.time.LocalDate;
 @ToString
 public class CreateUserDTO {
 
+    // TODO: strictly validate fullName
     @NotBlank
     private String fullName;
 
+    // TODO: strictly validate email
     @NotNull
     @Email
     private String email;

@@ -2,6 +2,7 @@ package hovanvydut.apiblog.core.tag.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import hovanvydut.apiblog.common.regex.TagRegex;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,7 +10,6 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.time.LocalDateTime;
 /**
  * @author hovanvydut
  * Created on 7/1/21
@@ -25,17 +25,14 @@ import java.time.LocalDateTime;
 public class CreateTagDTO {
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9]+(?:\\s[a-zA-Z0-9]+)*$", message = "Only include character a-z,A-Z,0-9 and space between words")
+    @Pattern(regexp = TagRegex.name.pattern, message = TagRegex.name.message)
     private String name;
 
     private String description;
 
-    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$", message = "Only include character a-z,0-9 and - between words")
+    @Pattern(regexp = TagRegex.slug.pattern, message = TagRegex.slug.message)
     private String slug;
 
     private String image;
-
-    @NotNull
-    private LocalDateTime createdAt;
 
 }

@@ -14,8 +14,9 @@ import org.springframework.data.domain.Page;
 public interface CommentService {
     Page<CommentDTO> getAllCommentOfArticle(String articleSlug, int page, int size);
     Page<ReplyDTO> getAllRepliesOfComment(long commentId, int page, int size);
-    public void commentArticle(String articleSlug, CreateCommentDTO commentDTO, String fromUsername);
-    public void deleteComment(long commentId, String ownerUsername);
+    void commentArticle(String articleSlug, CreateCommentDTO commentDTO, String fromUsername);
+    void deleteComment(long commentId, String ownerUsername);
     ReplyDTO replyOfComment(long commentId, CreateReplytDTO createReplytDTO, String commentorUsername);
     ReplyDTO replyOfReply(long replyId, CreateReplytDTO createReplytDTO, String commentorUsername);
+    void deleteReply(long replyId, String ownerUsername);
 }

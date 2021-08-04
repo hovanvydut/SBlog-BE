@@ -2,13 +2,13 @@ package hovanvydut.apiblog.core.category.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import hovanvydut.apiblog.common.regex.CategoryRegex;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -32,9 +32,7 @@ public class UpdateCategoryDTO {
 
     private String description;
 
-    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$")
+    @Pattern(regexp = CategoryRegex.slug.pattern, message = CategoryRegex.slug.message)
     private String slug;
 
-    @URL
-    private String image;
 }

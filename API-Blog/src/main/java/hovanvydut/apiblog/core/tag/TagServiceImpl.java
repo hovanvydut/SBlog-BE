@@ -1,22 +1,29 @@
 package hovanvydut.apiblog.core.tag;
 
-import hovanvydut.apiblog.common.exception.MyError;
-import hovanvydut.apiblog.common.exception.MyRuntimeException;
+import hovanvydut.apiblog.common.ExpectedSizeImage;
 import hovanvydut.apiblog.common.exception.TagNotFoundException;
+import hovanvydut.apiblog.common.exception.base.MyError;
+import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.util.SlugUtil;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.tag.dto.CreateTagDTO;
 import hovanvydut.apiblog.core.tag.dto.TagDTO;
 import hovanvydut.apiblog.core.tag.dto.UpdateTagDTO;
+import hovanvydut.apiblog.core.upload.UploadService;
 import hovanvydut.apiblog.model.entity.Tag;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.data.domain.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,20 +38,22 @@ public class TagServiceImpl implements TagService{
 
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
+    private final UploadService uploadService;
 
-    public TagServiceImpl(TagRepository tagRepository, ModelMapper modelMapper) {
+    @Value("${endpointImageUrl}")
+    private String hostUploadUrl;
+
+    public TagServiceImpl(TagRepository tagRepository, ModelMapper modelMapper, UploadService uploadService) {
         this.tagRepository = tagRepository;
         this.modelMapper = modelMapper;
+        this.uploadService = uploadService;
     }
 
     @Override
     public Page<TagDTO> getTags(int page, int size, String[] sort, String searchKeyword) {
-
-        Sort sortObj = SortAndPaginationUtil.processSort(sort);
-        Pageable pageable = PageRequest.of(page - 1, size, sortObj);
+        Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
 
         Page<Tag> pageTag;
-
         if (searchKeyword == null || searchKeyword.isBlank()) {
             pageTag = this.tagRepository.findAll(pageable);
         } else {
@@ -95,6 +104,7 @@ public class TagServiceImpl implements TagService{
     @Transactional
     public TagDTO updateTag(long tagId, UpdateTagDTO dto) {
         List<MyError> errors = checkUnique(tagId, dto);
+
         if (errors.size() > 0) {
             throw new MyRuntimeException(errors);
         }
@@ -102,6 +112,7 @@ public class TagServiceImpl implements TagService{
         Tag tag = this.tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
 
         this.modelMapper.map(dto, tag);
+        System.out.println(tag);
 
         if (tag.getSlug() == null) {
             tag.setSlug(SlugUtil.slugify(tag.getName()));
@@ -117,6 +128,25 @@ public class TagServiceImpl implements TagService{
     public void deleteTag(long tagId) {
         Tag tag = this.tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
         this.tagRepository.delete(tag);
+    }
+
+    @Override
+    @Transactional
+    public TagDTO uploadImage(long tagId, MultipartFile multipartFile) throws IOException {
+        Tag tag = this.tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
+
+        if ((tag.getImage() != null) && (!tag.getImage().isBlank())) {
+            this.uploadService.deleteImageByDirAndFileName(tag.getImage(), true);
+        }
+
+        ExpectedSizeImage sizeImage = new ExpectedSizeImage(200, 200);
+        String dirAndFileName = this.uploadService.save(multipartFile, "tags/" + tagId, false, sizeImage, null);
+        tag.setImage(dirAndFileName);
+
+        Tag savedTag = this.tagRepository.save(tag);
+        savedTag.setImage(hostUploadUrl + "/" + savedTag.getImage());
+
+        return this.modelMapper.map(savedTag, TagDTO.class);
     }
 
     private List<MyError> checkUnique(CreateTagDTO dto) {

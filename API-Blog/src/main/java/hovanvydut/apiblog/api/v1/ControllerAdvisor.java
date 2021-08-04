@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.api.v1;
 
-import hovanvydut.apiblog.common.exception.MyRuntimeException;
+import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,5 +29,10 @@ public class ControllerAdvisor {
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+//    @ExceptionHandler(InvalidEmailException.class)
+//    public ResponseEntity handle(InvalidEmailException exception, WebRequest req) {
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+//    }
 
 }

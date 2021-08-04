@@ -49,7 +49,19 @@ public class User {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "enabled", nullable = false)
-    private boolean enabled = true;
+    private boolean enabled = false;
+
+    @Column(name = "is_using_2FA", nullable = false)
+    private boolean isUsing2FA = false;
+
+    @Column(name = "secret", nullable = true, length = 255)
+    private String secret;
+
+    @Column(name = "avatar", nullable = false, length = 255)
+    private String avatar = "default avatar url nek";
+
+    @Column(name = "host_avatar", nullable = false, length = 255)
+    private String hostAvatar;
 
     @Column(name = "birthday", nullable = true)
     private LocalDate birthday;
@@ -61,16 +73,13 @@ public class User {
     @Column(name = "biography", nullable = true, length = 255)
     private String biography;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
-
-//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-//    private Set<ArticleVote> votes = new HashSet<>();
 
     @OneToMany(mappedBy = "toUser")
     private Set<Follower> followers;

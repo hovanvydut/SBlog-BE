@@ -1,8 +1,8 @@
 package hovanvydut.apiblog.core.category;
 
 import hovanvydut.apiblog.common.exception.CategoryNotFoundException;
-import hovanvydut.apiblog.common.exception.MyError;
-import hovanvydut.apiblog.common.exception.MyRuntimeException;
+import hovanvydut.apiblog.common.exception.base.MyError;
+import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.util.SlugUtil;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.category.dto.CategoryDTO;
@@ -12,7 +12,9 @@ import hovanvydut.apiblog.model.entity.Category;
 import hovanvydut.apiblog.model.entity.Tag;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -40,8 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Page<CategoryDTO> getCategories(int page, int size, String[] sort, String searchKeyword) {
-        Sort sortObj = SortAndPaginationUtil.processSort(sort);
-        Pageable pageable = PageRequest.of(page - 1, size, sortObj);
+        Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
 
         Page<Category> pageCategories;
 
@@ -85,7 +86,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDTO updateCategory(Long id, UpdateCategoryDTO dto) {
+    public CategoryDTO updateCategory(Long id, @Valid UpdateCategoryDTO dto) {
 
         // check name and slug is unique
         List<MyError> errors = checkUnique(id, dto);

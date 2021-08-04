@@ -47,4 +47,14 @@ public class Tag {
 
     @ManyToMany(mappedBy = "tags")
     private Set<Article> articles;
+
+    @PrePersist
+    protected void onPersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.lastEditedAt = LocalDateTime.now();
+    }
 }

@@ -1,11 +1,13 @@
 package hovanvydut.apiblog.common.exception;
 
+import hovanvydut.apiblog.common.exception.base.ResourceNotFoundException;
+
 /**
  * @author hovanvydut
  * Created on 7/5/21
  */
 
-public class CategoryNotFoundException extends ResourceNotFoundException{
+public class CategoryNotFoundException extends ResourceNotFoundException {
     public CategoryNotFoundException(long id) {
         super("Could not find Category with id = " + id);
     }

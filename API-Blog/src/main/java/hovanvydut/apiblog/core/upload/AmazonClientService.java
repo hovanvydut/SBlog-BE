@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import hovanvydut.apiblog.common.ExpectedSizeImage;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * @author hovanvydut
@@ -53,28 +55,31 @@ public class AmazonClientService {
                 .build();
     }
 
-    public String uploadFile(MultipartFile multipartFile, String dirAndFileName) throws IOException {
-
-        String fileUrl = "";
-
+    public String uploadFile(MultipartFile multipartFile, String dirAndFileName,
+                             boolean isGenThumbnail, ExpectedSizeImage expectedSize, ExpectedSizeImage thumbnailExpectSize)
+            throws IOException {
         File file = convertMultiPartToFile(multipartFile);
+
+        setSizeImage(file, file, expectedSize);
 
         uploadFileTos3bucket(dirAndFileName, file);
 
-        fileUrl = endpointUrl + "/" + dirAndFileName;
+        if (isGenThumbnail) {
+            File thumbnailFile = new File(multipartFile.getOriginalFilename());
 
+            setSizeImage(file, file, thumbnailExpectSize);
 
-        File thumbnailFile = new File(multipartFile.getOriginalFilename());
-        Thumbnails.of(ImageIO.read(file))
-                .width(200)
-                .toFile(thumbnailFile);
-        uploadFileTos3bucket("thumbnails/" + dirAndFileName, thumbnailFile);
+            Thumbnails.of(ImageIO.read(file))
+                    .width(200)
+                    .toFile(thumbnailFile);
+            uploadFileTos3bucket("thumbnails/" + dirAndFileName, thumbnailFile);
+
+            thumbnailFile.delete();
+        }
 
         file.delete();
-        thumbnailFile.delete();
 
-
-        return fileUrl;
+        return dirAndFileName;
     }
 
     public String deleteFileFromS3Bucket(String dirAndFileName) {
@@ -95,6 +100,21 @@ public class AmazonClientService {
     private void uploadFileTos3bucket(String fileName, File file) {
         this.s3.putObject(new PutObjectRequest(bucketName, fileName, file)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
+    }
+
+    private void setSizeImage(File inputFile, File outputFile, ExpectedSizeImage expectedSize) throws IOException {
+        if (!Objects.isNull(expectedSize)) {
+            Thumbnails.Builder thumbBuilder = Thumbnails.of(ImageIO.read(inputFile));
+            if (!Objects.isNull(expectedSize.getWidth())) {
+                thumbBuilder.width(expectedSize.getWidth());
+            }
+
+            if (!Objects.isNull(expectedSize.getHeight())) {
+                thumbBuilder.height(expectedSize.getHeight());
+            }
+
+            thumbBuilder.toFile(outputFile);
+        }
     }
 
 }

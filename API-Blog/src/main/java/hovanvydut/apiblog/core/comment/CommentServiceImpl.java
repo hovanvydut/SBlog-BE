@@ -52,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Page<CommentDTO> getAllCommentOfArticle(String articleSlug, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
 
         Long articleId = this.articleRepo.getArticleIdBySlug(articleSlug)
                 .orElseThrow(() -> new RuntimeException("Article ID not found"));
@@ -62,7 +62,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Page<ReplyDTO> getAllRepliesOfComment(long commentId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         Page<ReplyDTO> pageReplyDTO = this.replyRepo.getAllReplyOfComment(commentId, pageable);
         return pageReplyDTO;
     }
@@ -110,7 +110,7 @@ public class CommentServiceImpl implements CommentService {
         Reply reply = this.modelMapper.map(createReplytDTO, Reply.class);
         reply.setComment(new Comment().setId(commentId));
         reply.setReplyType(ReplyTypeEnum.COMMENT);
-        reply.setFromUser(new User().setId(commentId));
+        reply.setFromUser(new User().setId(commentorId));
 
         Reply savedReply = this.replyRepo.save(reply);
 
@@ -133,6 +133,14 @@ public class CommentServiceImpl implements CommentService {
         Reply savedReply = this.replyRepo.save(reply);
 
         return this.modelMapper.map(savedReply, ReplyDTO.class);
+    }
+
+    @Override
+    public void deleteReply(long replyId, String ownerUsername) {
+        Reply reply = this.replyRepo.findByIdAndFromUsername(replyId, ownerUsername)
+                .orElseThrow(() -> new ReplyNotFoundException(replyId));
+
+        this.replyRepo.delete(reply);
     }
 
 }
