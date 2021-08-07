@@ -28,13 +28,13 @@ public class ArticleVote implements Serializable {
     @EmbeddedId
     private ArticleVoteId id;
 
-    @ManyToOne
-    @MapsId("user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("userId")
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @MapsId("article_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("articleId")
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
@@ -43,9 +43,6 @@ public class ArticleVote implements Serializable {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "last_edited_at")
-    private LocalDateTime lastEditedAt;
 }
 
 

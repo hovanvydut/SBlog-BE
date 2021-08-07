@@ -39,15 +39,18 @@ public class Comment {
     @JoinColumn(name = "from_user_id", nullable = false)
     private User fromUser;
 
+    @ManyToOne
+    @JoinColumn(name = "article_id", nullable = false)
+    private Article article;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "article_id", nullable = false)
-    private Article article;
+    @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean deleted = false;
 
     @PreUpdate
     protected void onUpdate() {

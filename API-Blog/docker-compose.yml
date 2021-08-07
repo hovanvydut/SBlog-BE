@@ -1,7 +1,36 @@
 version: "3.9"
 
 services:
-  redis:
-    image: "redis:6.2.4-alpine"
+  blog:
+    container_name: sblog
+    build: .
+    ports:
+      - 3000:3000
+    restart: always
+    networks:
+      - blognetwork
+    depends_on:
+      - blogredis
+      - blogmysql
+  blogredis:
+    image: redis:6.2.4-alpine
     ports:
       - 6379:6379
+    networks:
+      - blognetwork
+  blogmysql:
+    image: mysql:8.0.25
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=123123
+      - MYSQL_DATABASE=blog
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --lower_case_table_names=1
+    volumes:
+      - ./src/main/resources/dump_mysql:/docker-entrypoint-initdb.d
+    networks:
+        - blognetwork
+networks:
+  blognetwork:
+    driver: bridge

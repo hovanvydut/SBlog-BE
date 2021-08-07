@@ -10,10 +10,7 @@ import hovanvydut.apiblog.core.comment.dto.CreateCommentDTO;
 import hovanvydut.apiblog.core.comment.dto.CreateReplytDTO;
 import hovanvydut.apiblog.core.comment.dto.ReplyDTO;
 import hovanvydut.apiblog.core.user.UserRepository;
-import hovanvydut.apiblog.model.entity.Article;
-import hovanvydut.apiblog.model.entity.Comment;
-import hovanvydut.apiblog.model.entity.Reply;
-import hovanvydut.apiblog.model.entity.User;
+import hovanvydut.apiblog.model.entity.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,17 +34,19 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepo;
     private final ArticleRepository articleRepo;
     private final ReplyRepository replyRepo;
+    private final ParentChildCommentRepository parentChildCommentRepo;
 
     public CommentServiceImpl(CommentRepository commentRepo,
                               ModelMapper modelMapper,
                               UserRepository userRepository,
                               ArticleRepository articleRepository,
-                              ReplyRepository replyRepo) {
+                              ReplyRepository replyRepo, ParentChildCommentRepository parentChildCommentRepo) {
         this.commentRepo = commentRepo;
         this.modelMapper = modelMapper;
         this.userRepo = userRepository;
         this.articleRepo = articleRepository;
         this.replyRepo = replyRepo;
+        this.parentChildCommentRepo = parentChildCommentRepo;
     }
 
     @Override
@@ -78,11 +77,20 @@ public class CommentServiceImpl implements CommentService {
                 () -> new RuntimeException("Article ID not found")
         );
 
-        Comment comment = this.modelMapper.map(commentDTO, Comment.class);
-        comment.setArticle(new Article().setId(articleId))
+        Comment comment = new Comment()
+                .setContent(commentDTO.getContent())
+                .setImageSlug(commentDTO.getImageSlug())
+                .setArticle(new Article().setId(articleId))
                 .setFromUser(new User().setId(fromUserId));
 
-        this.commentRepo.save(comment);
+        Comment savedComment = this.commentRepo.save(comment);
+
+        int result;
+        if (commentDTO.getAncestorId() != null) {
+            this.parentChildCommentRepo.insertNewChildComment(savedComment.getId(), commentDTO.getAncestorId());
+        } else {
+            this.parentChildCommentRepo.insertNewRootComment(savedComment.getId());
+        }
     }
 
     @Override
@@ -92,7 +100,7 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
 
         if (comment.getFromUser().getUsername().equals(ownerUsername)) {
-            this.commentRepo.delete(comment);
+            this.commentRepo.softDelete(commentId);
         } else {
             throw new RuntimeException("You're not owner this comment");
         }

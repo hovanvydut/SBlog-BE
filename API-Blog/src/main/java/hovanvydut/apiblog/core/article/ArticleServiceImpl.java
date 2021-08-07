@@ -207,7 +207,6 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = this.articleRepo.findBySlugAndAuthorUsername(slug, authorUsername)
                 .orElseThrow(() -> new ArticleNotFoundException(slug));
 
-        // TODO : configure model mapper here
         // Mapping dto -> entity
         this.modelMapper.map(dto, article);
         article.setTransliterated(SlugUtil.slugify(article.getTitle()));
@@ -222,32 +221,6 @@ public class ArticleServiceImpl implements ArticleService {
 
             article.setTags(newTags);
         }
-// TODO: model mapper (using Propery Mapping)
-
-//        this.modelMapper.typeMap(UpdateArticleDTO.class, Article.class)
-//                .addMappings(mapper -> {
-//                    mapper.map(UpdateArticleDTO::getTitle, Article::setTitle);
-//
-//                    mapper.<String>map(UpdateArticleDTO::getTitle, (newArticle, title) -> {
-//                        newArticle.setTransliterated(SlugUtil.slugify(title));
-//                    });
-//
-//                    mapper.<Set<Long>>map(UpdateArticleDTO::getTags, (newArticle, tags) -> {
-//                        Set<Tag> newTags = new HashSet<>();
-//
-//                        for (long tagId : tags) {
-//                            newTags.add(new Tag().setId(tagId));
-//                        }
-//
-//                        newArticle.setTags(newTags);
-//                    });
-//
-//                    mapper.<Long>map(UpdateArticleDTO::getCategory, (newArticle, category) -> {
-//                        newArticle.setCategory(new Category().setId(category));
-//                    });
-//
-//                }).map(dto, article);
-
 
         // switch case with PublishOption to set scope and status article
         assignProperlyPublishOption(article, publishOption);
@@ -265,7 +238,13 @@ public class ArticleServiceImpl implements ArticleService {
         this.articleRepo.delete(article);
     }
 
+    @Override
+    public Long getArticleIdBySlug(String slug) {
+        return this.articleRepo.getArticleIdBySlug(slug).orElseThrow(() -> new ArticleNotFoundException(slug));
+    }
+
     private void assignProperlyPublishOption(Article article, PublishOption publishOption) {
+        // NOTE: Violate Open/Close principle
         switch (publishOption) {
             case GLOBAL_PUBLISH:
                 article.setScope(ArticleScopeEnum.GLOBAL);

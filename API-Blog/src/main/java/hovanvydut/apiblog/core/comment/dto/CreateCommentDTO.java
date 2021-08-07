@@ -25,6 +25,8 @@ import javax.validation.constraints.AssertTrue;
 @ToString
 public class CreateCommentDTO {
 
+    private Long ancestorId;
+
     @Length(min = 0, max = 5000)
     private String content;
 

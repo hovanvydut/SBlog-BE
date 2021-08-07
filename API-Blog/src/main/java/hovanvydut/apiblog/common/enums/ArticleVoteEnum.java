@@ -19,4 +19,18 @@ public enum ArticleVoteEnum {
     public int get() {
         return this.vote;
     }
+
+    public static ArticleVoteEnum of(int vote) {
+        switch (vote) {
+            case 1:
+                return ArticleVoteEnum.UP;
+            case -1:
+                return ArticleVoteEnum.DOWN;
+            case 0:
+                return ArticleVoteEnum.CANCEL;
+            default:
+                // TODO: edit message error
+                throw new RuntimeException("Not mapped value ArticleVoteEnum");
+        }
+    }
 }
