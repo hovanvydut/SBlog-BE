@@ -130,13 +130,13 @@ public class CategoryServiceImpl implements CategoryService {
         List<MyError> errorList = new ArrayList<>();
 
         this.categoryRepo.findByName(dto.getName()).ifPresent(category -> {
-            if (category.getId() != id) {
+            if (!category.getId().equals(id)) {
                 errorList.add(new MyError().setSource("name").setMessage("The name has already been taken"));
             }
         });
 
         this.categoryRepo.findBySlug(dto.getSlug()).ifPresent(category -> {
-            if (category.getId() != id) {
+            if (!category.getId().equals(id)) {
                 errorList.add(new MyError().setSource("slug").setMessage("The slug has already been taken"));
             }
         });

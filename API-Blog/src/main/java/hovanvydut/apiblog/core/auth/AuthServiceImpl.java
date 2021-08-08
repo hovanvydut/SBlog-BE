@@ -1,10 +1,7 @@
 package hovanvydut.apiblog.core.auth;
 
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
-import hovanvydut.apiblog.core.mail.EmailService;
 import hovanvydut.apiblog.core.user.UserService;
-import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -20,20 +17,12 @@ import javax.validation.Valid;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private final ModelMapper modelMapper;
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
 
-    public AuthServiceImpl(ModelMapper modelMapper,
-                           UserService userService,
-                           PasswordEncoder passwordEncoder,
-                           EmailService emailService) {
-        this.modelMapper = modelMapper;
+    public AuthServiceImpl(UserService userService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
     }
+
 
     @Override
     @Transactional

@@ -1,13 +1,12 @@
 package hovanvydut.apiblog.core.bookmark;
 
 import hovanvydut.apiblog.common.exception.ArticleNotFoundException;
-import hovanvydut.apiblog.common.exception.MyUsernameNotFoundException;
 import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
-import hovanvydut.apiblog.core.article.ArticleRepository;
+import hovanvydut.apiblog.core.article.ArticleService;
 import hovanvydut.apiblog.core.article.dto.ArticleDTO;
 import hovanvydut.apiblog.core.bookmark.dto.SubscriberDTO;
-import hovanvydut.apiblog.core.user.UserRepository;
+import hovanvydut.apiblog.core.user.UserService;
 import hovanvydut.apiblog.entity.Article;
 import hovanvydut.apiblog.entity.BookmarkArticle;
 import hovanvydut.apiblog.entity.BookmarkArticleId;
@@ -31,34 +30,29 @@ import java.util.List;
 @Service
 public class BookmarkServiceImpl implements BookmarkService {
 
+    private final ArticleService articleService;
+    private final UserService userService;
     private final BookmarkRepository bookmarkRepo;
-    private final ArticleRepository articleRepo;
-    private final UserRepository userRepo;
     private final ModelMapper modelMapper;
 
-    public BookmarkServiceImpl(BookmarkRepository bookmarkRepo,
-                               ArticleRepository articleRepository,
-                               UserRepository userRepository,
+    public BookmarkServiceImpl(ArticleService articleService, UserService userService, BookmarkRepository bookmarkRepo,
                                ModelMapper modelMapper) {
+        this.articleService = articleService;
+        this.userService = userService;
         this.bookmarkRepo = bookmarkRepo;
-        this.articleRepo = articleRepository;
-        this.userRepo = userRepository;
         this.modelMapper = modelMapper;
     }
 
+
     @Override
     public List<SubscriberDTO> getAllSubscribers(String articleSlug) {
-        Long articleId = this.articleRepo.getArticleIdBySlug(articleSlug)
-                .orElseThrow(() -> new ArticleNotFoundException(articleSlug));
-
+        Long articleId = this.articleService.getArticleIdBySlug(articleSlug);
         return this.bookmarkRepo.findAllSubscribersOfArticle(articleId);
     }
 
     @Override
     public Page<ArticleDTO> getAllClippedArticlesOfUser(String username, int page, int size, String[] sort, String keyword) {
-        Long userId = this.userRepo.getUserIdByUsername(username)
-                .orElseThrow(() -> new MyUsernameNotFoundException(username));
-
+        Long userId = this.userService.getUserIdByUsername(username);
         Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
         Page<Article> pageArticles;
 
@@ -75,11 +69,8 @@ public class BookmarkServiceImpl implements BookmarkService {
 
     @Override
     public void clipArticle(String articleSlug, String subscriberUsername) {
-        Long articleId = this.articleRepo.getArticleIdBySlug(articleSlug)
-                .orElseThrow(() -> new ArticleNotFoundException(articleSlug));
-
-        Long subscriberId = this.userRepo.getUserIdByUsername(subscriberUsername)
-                .orElseThrow(() -> new MyUsernameNotFoundException(subscriberUsername));
+        Long articleId = this.articleService.getArticleIdBySlug(articleSlug);
+        Long subscriberId = this.userService.getUserIdByUsername(subscriberUsername);
 
         BookmarkArticleId bookmarkArticleId = new BookmarkArticleId().setArticleId(articleId).setUserId(subscriberId);
 
@@ -97,11 +88,8 @@ public class BookmarkServiceImpl implements BookmarkService {
 
     @Override
     public void deleteBookmark(String articleSlug, String subscriberUsername) {
-        Long articleId = this.articleRepo.getArticleIdBySlug(articleSlug)
-                .orElseThrow(() -> new ArticleNotFoundException(articleSlug));
-
-        Long subscriberId = this.userRepo.getUserIdByUsername(subscriberUsername)
-                .orElseThrow(() -> new MyUsernameNotFoundException(subscriberUsername));
+        Long articleId = this.articleService.getArticleIdBySlug(articleSlug);
+        Long subscriberId = this.userService.getUserIdByUsername(subscriberUsername);
 
         BookmarkArticleId bookmarkArticleId = new BookmarkArticleId()
                 .setArticleId(articleId).setUserId(subscriberId);

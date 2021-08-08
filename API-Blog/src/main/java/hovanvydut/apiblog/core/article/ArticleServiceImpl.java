@@ -3,7 +3,6 @@ package hovanvydut.apiblog.core.article;
 import hovanvydut.apiblog.common.enums.ArticleScopeEnum;
 import hovanvydut.apiblog.common.enums.ArticleStatusEnum;
 import hovanvydut.apiblog.common.exception.ArticleNotFoundException;
-import hovanvydut.apiblog.common.exception.MyUsernameNotFoundException;
 import hovanvydut.apiblog.common.exception.base.MyError;
 import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.util.SlugUtil;
@@ -12,7 +11,7 @@ import hovanvydut.apiblog.core.article.dto.ArticleDTO;
 import hovanvydut.apiblog.core.article.dto.CreateArticleDTO;
 import hovanvydut.apiblog.core.article.dto.PublishOption;
 import hovanvydut.apiblog.core.article.dto.UpdateArticleDTO;
-import hovanvydut.apiblog.core.user.UserRepository;
+import hovanvydut.apiblog.core.user.UserService;
 import hovanvydut.apiblog.entity.Article;
 import hovanvydut.apiblog.entity.Category;
 import hovanvydut.apiblog.entity.Tag;
@@ -22,7 +21,6 @@ import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -42,17 +40,16 @@ import java.util.UUID;
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
+    private final UserService userService;
     private final ArticleRepository articleRepo;
     private final ModelMapper modelMapper;
-    private final UserRepository userRepo;
 
-    public ArticleServiceImpl(ArticleRepository articleRepo,
-                              ModelMapper modelMapper,
-                              UserRepository userRepository) {
+    public ArticleServiceImpl(UserService userService, ArticleRepository articleRepo, ModelMapper modelMapper) {
+        this.userService = userService;
         this.articleRepo = articleRepo;
         this.modelMapper = modelMapper;
-        this.userRepo = userRepository;
     }
+
 
     @Override
     public Page<ArticleDTO> getAllArticles(int page, int size, String[] sort, String searchKeyword) {
@@ -111,23 +108,26 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = this.articleRepo.findBySlug(slug)
                 .orElseThrow(() -> new ArticleNotFoundException(slug));
 
-        if (article.getStatus() != ArticleStatusEnum.PUBLISHED_GLOBAL
-                && article.getStatus() != ArticleStatusEnum.PUBLISHED_LINK) {
+        ArticleStatusEnum articleStatus = article.getStatus();
 
-            if (usernameViewer == null) {
+        if (articleStatus == ArticleStatusEnum.PENDING || articleStatus== ArticleStatusEnum.DRAFT
+                || articleStatus == ArticleStatusEnum.SPAM) {
+
+            if (usernameViewer == null) throw new ArticleNotFoundException(slug);
+
+            Long viewerId = this.userService.getUserIdByUsername(usernameViewer);
+
+            if (!article.getAuthor().getId().equals(viewerId)) {
                 throw new ArticleNotFoundException(slug);
             }
 
-            User user = this.userRepo.findByUsername(usernameViewer)
-                    .orElseThrow(() -> new UsernameNotFoundException(usernameViewer));
-
-            if (article.getAuthor().getId() != user.getId()) {
-                throw new ArticleNotFoundException(slug);
-            }
-
+            return this.modelMapper.map(article, ArticleDTO.class);
+        } else if (articleStatus == ArticleStatusEnum.PUBLISHED_GLOBAL
+                || articleStatus == ArticleStatusEnum.PUBLISHED_LINK) {
+            return this.modelMapper.map(article, ArticleDTO.class);
         }
 
-        return this.modelMapper.map(article, ArticleDTO.class);
+        throw new ArticleNotFoundException(slug);
     }
 
     @Override
@@ -138,8 +138,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         // get author and validate username
-        Long authorId = this.userRepo.getUserIdByUsername(authorUsername)
-                .orElseThrow(() -> new MyUsernameNotFoundException(authorUsername));
+        Long authorId = this.userService.getUserIdByUsername(authorUsername);
 
         // mapping dto --> entity
         Article article = new Article();

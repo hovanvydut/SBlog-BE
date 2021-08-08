@@ -36,17 +36,17 @@ import java.util.List;
 @Service
 public class TagServiceImpl implements TagService{
 
+    private final UploadService uploadService;
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
-    private final UploadService uploadService;
 
     @Value("${endpointImageUrl}")
     private String hostUploadUrl;
 
-    public TagServiceImpl(TagRepository tagRepository, ModelMapper modelMapper, UploadService uploadService) {
+    public TagServiceImpl(UploadService uploadService, TagRepository tagRepository, ModelMapper modelMapper) {
+        this.uploadService = uploadService;
         this.tagRepository = tagRepository;
         this.modelMapper = modelMapper;
-        this.uploadService = uploadService;
     }
 
     @Override
