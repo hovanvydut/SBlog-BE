@@ -1,5 +1,6 @@
-package hovanvydut.apiblog.model.entity;
+package hovanvydut.apiblog.entity;
 
+import hovanvydut.apiblog.common.enums.ArticleVoteEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,11 +8,12 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * @author hovanvydut
- * Created on 7/14/21
+ * Created on 7/10/21
  */
 
 @Setter
@@ -20,28 +22,28 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @ToString
 @Entity
-@Table(name = "bookmark_article")
-public class BookmarkArticle {
+@Table(name = "article_vote")
+public class ArticleVote implements Serializable {
 
     @EmbeddedId
-    private BookmarkArticleId id;
+    private ArticleVoteId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("articleId")
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
-    @Column(name = "created_at")
+    @Column(name = "vote", nullable = false, columnDefinition = "TINYINT DEFAULT 0")
+    private ArticleVoteEnum vote;
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    @PrePersist
-    protected void onPersist() {
-        this.createdAt = LocalDateTime.now();
-    }
-
 }
+
+
+

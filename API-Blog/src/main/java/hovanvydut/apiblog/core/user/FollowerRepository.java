@@ -1,7 +1,7 @@
 package hovanvydut.apiblog.core.user;
 
-import hovanvydut.apiblog.model.entity.Follower;
-import hovanvydut.apiblog.model.entity.FollowerId;
+import hovanvydut.apiblog.entity.Follower;
+import hovanvydut.apiblog.entity.FollowerId;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 

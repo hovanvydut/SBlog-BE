@@ -33,6 +33,11 @@ public class CommentDTO {
     private UserDTO fromUser;
 
     public CommentDTO(long id, String content, String imageSlug, LocalDateTime createdAt, LocalDateTime updatedAt,
+                      String fullName, String username, String avatar) {
+        this(id, content, imageSlug, createdAt, updatedAt, fullName, username, avatar, 0);
+    }
+
+    public CommentDTO(long id, String content, String imageSlug, LocalDateTime createdAt, LocalDateTime updatedAt,
                       String fullName, String username, String avatar, long countReply) {
         this.id = id;
         this.content = content;

@@ -1,7 +1,7 @@
 package hovanvydut.apiblog;
 
 import hovanvydut.apiblog.core.tag.dto.UpdateTagDTO;
-import hovanvydut.apiblog.model.entity.Tag;
+import hovanvydut.apiblog.entity.Tag;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

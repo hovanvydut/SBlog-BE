@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.core.tag;
 
-import hovanvydut.apiblog.model.entity.Tag;
+import hovanvydut.apiblog.entity.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;

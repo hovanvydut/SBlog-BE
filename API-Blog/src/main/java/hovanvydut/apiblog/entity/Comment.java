@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.model.entity;
+package hovanvydut.apiblog.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,8 +49,8 @@ public class Comment {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT 0")
-    private boolean deleted = false;
+    @Column(name = "is_root", columnDefinition = "TINYINT(1) DEFAULT 1")
+    private boolean root = true;
 
     @PreUpdate
     protected void onUpdate() {

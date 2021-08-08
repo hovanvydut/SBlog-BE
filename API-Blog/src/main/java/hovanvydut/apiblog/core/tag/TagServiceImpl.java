@@ -10,7 +10,7 @@ import hovanvydut.apiblog.core.tag.dto.CreateTagDTO;
 import hovanvydut.apiblog.core.tag.dto.TagDTO;
 import hovanvydut.apiblog.core.tag.dto.UpdateTagDTO;
 import hovanvydut.apiblog.core.upload.UploadService;
-import hovanvydut.apiblog.model.entity.Tag;
+import hovanvydut.apiblog.entity.Tag;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Value;

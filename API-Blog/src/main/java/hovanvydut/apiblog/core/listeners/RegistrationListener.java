@@ -5,8 +5,8 @@ import hovanvydut.apiblog.common.enums.FreeMarkerTemplate;
 import hovanvydut.apiblog.common.freemarker.RegistrationModel;
 import hovanvydut.apiblog.core.listeners.event.RegistrationCompleteEvent;
 import hovanvydut.apiblog.core.mail.EmailService;
-import hovanvydut.apiblog.model.entity.User;
-import hovanvydut.apiblog.model.entity.VerificationToken;
+import hovanvydut.apiblog.entity.User;
+import hovanvydut.apiblog.entity.VerificationToken;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 

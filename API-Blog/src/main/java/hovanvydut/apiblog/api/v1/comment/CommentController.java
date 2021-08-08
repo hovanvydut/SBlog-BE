@@ -1,11 +1,11 @@
 package hovanvydut.apiblog.api.v1.comment;
 
-import hovanvydut.apiblog.api.v1.comment.dto.*;
+import hovanvydut.apiblog.api.v1.comment.dto.CommentArticlePageResp;
+import hovanvydut.apiblog.api.v1.comment.dto.CommentArticlePaginationParams;
+import hovanvydut.apiblog.api.v1.comment.dto.CreateCommentReq;
 import hovanvydut.apiblog.core.comment.CommentService;
 import hovanvydut.apiblog.core.comment.dto.CommentDTO;
 import hovanvydut.apiblog.core.comment.dto.CreateCommentDTO;
-import hovanvydut.apiblog.core.comment.dto.CreateReplytDTO;
-import hovanvydut.apiblog.core.comment.dto.ReplyDTO;
 import io.swagger.annotations.ApiOperation;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -47,10 +47,10 @@ public class CommentController {
     @GetMapping("/articles/comments/{commentId}/replies")
     public ResponseEntity<CommentArticlePageResp> getAllRepliesOfComment(@PathVariable long commentId,
                                                                          @Valid CommentArticlePaginationParams params) {
-        Page<ReplyDTO> replyDTOPage = this.commentService
+        Page<CommentDTO> commentDTOPage = this.commentService
                 .getAllRepliesOfComment(commentId, params.getPage(), params.getSize());
 
-        return ResponseEntity.ok(this.modelMapper.map(replyDTOPage, CommentArticlePageResp.class));
+        return ResponseEntity.ok(this.modelMapper.map(commentDTOPage, CommentArticlePageResp.class));
     }
 
     @ApiOperation(value = "comment the article")
@@ -61,34 +61,6 @@ public class CommentController {
         this.commentService.commentArticle(articleSlug, commentDTO, principal.getName());
     }
 
-    @ApiOperation(value = "reply a comment")
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/articles/comments/{commentId}/replies")
-    public ResponseEntity<ReplyResp> replyComment(@PathVariable long commentId,
-                                                  @Valid @RequestBody CreateReplyCommentReq req,
-                                                  Principal principal) {
-
-        CreateReplytDTO replytDTO = this.modelMapper.map(req, CreateReplytDTO.class);
-        String commentorUsername = principal.getName();
-
-        ReplyDTO replyDTO = this.commentService.replyOfComment(commentId, replytDTO, commentorUsername);
-
-        return ResponseEntity.ok(this.modelMapper.map(replyDTO, ReplyResp.class));
-    }
-
-    @ApiOperation(value = "Reply of reply")
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/articles/comments/replies/{replyId}")
-    public ResponseEntity<ReplyResp> replyOfReply(@PathVariable long replyId,
-                                                  @Valid @RequestBody CreateReplyCommentReq req,
-                                                  Principal principal) {
-        CreateReplytDTO replytDTO = this.modelMapper.map(req, CreateReplytDTO.class);
-        String commentorUsername = principal.getName();
-
-        ReplyDTO replyDTO = this.commentService.replyOfReply(replyId, replytDTO, commentorUsername);
-
-        return ResponseEntity.ok(this.modelMapper.map(replyDTO, ReplyResp.class));
-    }
 
     @ApiOperation(value = "delete comment")
     @PreAuthorize("isAuthenticated()")
@@ -96,13 +68,6 @@ public class CommentController {
     public void deleteComment(@PathVariable long commentId, Principal principal) {
         String ownerUsername = principal.getName();
         this.commentService.deleteComment(commentId, ownerUsername);
-    }
-
-    @ApiOperation(value = "Delete a reply")
-    @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/articles/comments/replies/{replyId}")
-    public void deleteReply(@PathVariable long replyId, Principal principal) {
-        this.commentService.deleteReply(replyId, principal.getName());
     }
 
 }

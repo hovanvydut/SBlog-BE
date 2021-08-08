@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.model.entity;
+package hovanvydut.apiblog.entity;
 
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -14,15 +14,17 @@ import java.io.Serializable;
 
 @Setter
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Accessors(chain = true)
 @ToString
 @Embeddable
-public class FollowerId implements Serializable {
-    @Column(name = "from_user_id")
-    private Long fromUserId;
+public class ArticleVoteId implements Serializable {
 
-    @Column(name = "to_user_id")
-    private Long toUserId;
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "article_id")
+    private Long articleId;
 }

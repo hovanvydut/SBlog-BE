@@ -18,7 +18,7 @@ import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
 import hovanvydut.apiblog.core.user.dto.ResetPasswordDto;
 import hovanvydut.apiblog.core.user.dto.UpdateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UserDTO;
-import hovanvydut.apiblog.model.entity.*;
+import hovanvydut.apiblog.entity.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Value;

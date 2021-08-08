@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.model.entity;
+package hovanvydut.apiblog.entity;
 
 import hovanvydut.apiblog.common.enums.ArticleVoteEnum;
 

@@ -1,16 +1,14 @@
 package hovanvydut.apiblog.core.comment;
 
-import hovanvydut.apiblog.common.enums.ReplyTypeEnum;
 import hovanvydut.apiblog.common.exception.CommentNotFoundException;
 import hovanvydut.apiblog.common.exception.MyUsernameNotFoundException;
-import hovanvydut.apiblog.common.exception.ReplyNotFoundException;
 import hovanvydut.apiblog.core.article.ArticleRepository;
 import hovanvydut.apiblog.core.comment.dto.CommentDTO;
 import hovanvydut.apiblog.core.comment.dto.CreateCommentDTO;
-import hovanvydut.apiblog.core.comment.dto.CreateReplytDTO;
-import hovanvydut.apiblog.core.comment.dto.ReplyDTO;
 import hovanvydut.apiblog.core.user.UserRepository;
-import hovanvydut.apiblog.model.entity.*;
+import hovanvydut.apiblog.entity.Article;
+import hovanvydut.apiblog.entity.Comment;
+import hovanvydut.apiblog.entity.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,19 +31,17 @@ public class CommentServiceImpl implements CommentService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepo;
     private final ArticleRepository articleRepo;
-    private final ReplyRepository replyRepo;
     private final ParentChildCommentRepository parentChildCommentRepo;
 
     public CommentServiceImpl(CommentRepository commentRepo,
                               ModelMapper modelMapper,
                               UserRepository userRepository,
                               ArticleRepository articleRepository,
-                              ReplyRepository replyRepo, ParentChildCommentRepository parentChildCommentRepo) {
+                              ParentChildCommentRepository parentChildCommentRepo) {
         this.commentRepo = commentRepo;
         this.modelMapper = modelMapper;
         this.userRepo = userRepository;
         this.articleRepo = articleRepository;
-        this.replyRepo = replyRepo;
         this.parentChildCommentRepo = parentChildCommentRepo;
     }
 
@@ -56,14 +52,14 @@ public class CommentServiceImpl implements CommentService {
         Long articleId = this.articleRepo.getArticleIdBySlug(articleSlug)
                 .orElseThrow(() -> new RuntimeException("Article ID not found"));
 
-        return this.commentRepo.findByArticleId(articleId, pageable);
+        return this.commentRepo.getRootCommentByArticleId(articleId, pageable);
     }
 
     @Override
-    public Page<ReplyDTO> getAllRepliesOfComment(long commentId, int page, int size) {
+    public Page<CommentDTO> getAllRepliesOfComment(long commentId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<ReplyDTO> pageReplyDTO = this.replyRepo.getAllReplyOfComment(commentId, pageable);
-        return pageReplyDTO;
+        Page<CommentDTO> pageCommentDto = this.commentRepo.getAllChildOfComment(commentId, pageable);
+        return pageCommentDto;
     }
 
 
@@ -83,9 +79,17 @@ public class CommentServiceImpl implements CommentService {
                 .setArticle(new Article().setId(articleId))
                 .setFromUser(new User().setId(fromUserId));
 
+        Long ancestorId = commentDTO.getAncestorId();
+        if (ancestorId == null) {
+            comment.setRoot(true);
+        } else {
+            this.commentRepo.getCommentIdById(ancestorId)
+                    .orElseThrow(() -> new CommentNotFoundException(ancestorId));
+            comment.setRoot(false);
+        }
+
         Comment savedComment = this.commentRepo.save(comment);
 
-        int result;
         if (commentDTO.getAncestorId() != null) {
             this.parentChildCommentRepo.insertNewChildComment(savedComment.getId(), commentDTO.getAncestorId());
         } else {
@@ -96,59 +100,14 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void deleteComment(long commentId, String ownerUsername) {
-        Comment comment = this.commentRepo.findById(commentId)
+        String username = this.commentRepo.getOwnerUsernameOfComment(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
-
-        if (comment.getFromUser().getUsername().equals(ownerUsername)) {
-            this.commentRepo.softDelete(commentId);
+        if (ownerUsername.equals(username)) {
+            this.commentRepo.permanentlyDelete(commentId);
         } else {
+            // TODO: add custom exception
             throw new RuntimeException("You're not owner this comment");
         }
-    }
-
-    @Override
-    @Transactional
-    public ReplyDTO  replyOfComment(long commentId, CreateReplytDTO createReplytDTO, String commentorUsername) {
-        this.commentRepo.getCommentIdById(commentId)
-                .orElseThrow(() -> new CommentNotFoundException(commentId));
-
-        Long commentorId = this.userRepo.getUserIdByUsername(commentorUsername)
-                .orElseThrow(() -> new MyUsernameNotFoundException(commentorUsername));
-
-        Reply reply = this.modelMapper.map(createReplytDTO, Reply.class);
-        reply.setComment(new Comment().setId(commentId));
-        reply.setReplyType(ReplyTypeEnum.COMMENT);
-        reply.setFromUser(new User().setId(commentorId));
-
-        Reply savedReply = this.replyRepo.save(reply);
-
-        return this.modelMapper.map(savedReply, ReplyDTO.class);
-    }
-
-    @Override
-    @Transactional
-    public ReplyDTO replyOfReply(long replyId, CreateReplytDTO createReplytDTO, String commentorUsername) {
-        Long commentId = this.replyRepo.getCommentIdIdById(replyId)
-                .orElseThrow(() -> new ReplyNotFoundException(replyId));
-        Long commentorId = this.userRepo.getUserIdByUsername(commentorUsername).orElseThrow(() -> new MyUsernameNotFoundException(commentorUsername));
-
-        Reply reply = this.modelMapper.map(createReplytDTO, Reply.class);
-        reply.setComment(new Comment().setId(commentId));
-        reply.setParentReply(new Reply().setId(replyId));
-        reply.setReplyType(ReplyTypeEnum.REPLY);
-        reply.setFromUser(new User().setId(commentorId));
-
-        Reply savedReply = this.replyRepo.save(reply);
-
-        return this.modelMapper.map(savedReply, ReplyDTO.class);
-    }
-
-    @Override
-    public void deleteReply(long replyId, String ownerUsername) {
-        Reply reply = this.replyRepo.findByIdAndFromUsername(replyId, ownerUsername)
-                .orElseThrow(() -> new ReplyNotFoundException(replyId));
-
-        this.replyRepo.delete(reply);
     }
 
 }

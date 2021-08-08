@@ -5,7 +5,7 @@ import hovanvydut.apiblog.common.enums.FreeMarkerTemplate;
 import hovanvydut.apiblog.common.freemarker.ChangePasswordModel;
 import hovanvydut.apiblog.core.listeners.event.ChangePasswordEvent;
 import hovanvydut.apiblog.core.mail.EmailService;
-import hovanvydut.apiblog.model.entity.User;
+import hovanvydut.apiblog.entity.User;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 

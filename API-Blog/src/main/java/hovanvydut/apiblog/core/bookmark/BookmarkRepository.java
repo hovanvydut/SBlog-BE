@@ -1,9 +1,9 @@
 package hovanvydut.apiblog.core.bookmark;
 
 import hovanvydut.apiblog.core.bookmark.dto.SubscriberDTO;
-import hovanvydut.apiblog.model.entity.Article;
-import hovanvydut.apiblog.model.entity.BookmarkArticle;
-import hovanvydut.apiblog.model.entity.BookmarkArticleId;
+import hovanvydut.apiblog.entity.Article;
+import hovanvydut.apiblog.entity.BookmarkArticle;
+import hovanvydut.apiblog.entity.BookmarkArticleId;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

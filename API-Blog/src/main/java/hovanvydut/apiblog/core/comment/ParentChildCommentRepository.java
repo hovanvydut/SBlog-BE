@@ -1,14 +1,12 @@
 package hovanvydut.apiblog.core.comment;
 
-import hovanvydut.apiblog.model.entity.ParentChildComment;
-import hovanvydut.apiblog.model.entity.ParentChildCommentId;
+import hovanvydut.apiblog.entity.ParentChildComment;
+import hovanvydut.apiblog.entity.ParentChildCommentId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import javax.transaction.Transactional;
 
 /**
  * @author hovanvydut

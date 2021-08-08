@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.model.entity;
+package hovanvydut.apiblog.entity;
 
 import lombok.*;
 import lombok.experimental.Accessors;

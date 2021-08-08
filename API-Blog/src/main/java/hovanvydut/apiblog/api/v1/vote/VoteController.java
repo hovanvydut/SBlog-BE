@@ -3,7 +3,10 @@ package hovanvydut.apiblog.api.v1.vote;
 import hovanvydut.apiblog.api.v1.vote.dto.ArticleVoteReq;
 import hovanvydut.apiblog.core.vote.VoteService;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.security.Principal;

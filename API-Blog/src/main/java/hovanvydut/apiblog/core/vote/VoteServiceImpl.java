@@ -3,10 +3,10 @@ package hovanvydut.apiblog.core.vote;
 import hovanvydut.apiblog.common.enums.ArticleVoteEnum;
 import hovanvydut.apiblog.core.article.ArticleService;
 import hovanvydut.apiblog.core.user.UserService;
-import hovanvydut.apiblog.model.entity.Article;
-import hovanvydut.apiblog.model.entity.ArticleVote;
-import hovanvydut.apiblog.model.entity.ArticleVoteId;
-import hovanvydut.apiblog.model.entity.User;
+import hovanvydut.apiblog.entity.Article;
+import hovanvydut.apiblog.entity.ArticleVote;
+import hovanvydut.apiblog.entity.ArticleVoteId;
+import hovanvydut.apiblog.entity.User;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;

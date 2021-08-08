@@ -1,7 +1,7 @@
 package hovanvydut.apiblog.core.auth;
 
-import hovanvydut.apiblog.model.entity.Role;
-import hovanvydut.apiblog.model.entity.User;
+import hovanvydut.apiblog.entity.Role;
+import hovanvydut.apiblog.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
