@@ -16,6 +16,11 @@ import java.util.List;
 
 public class SortAndPaginationUtil {
 
+    // Explicitly declare private constructor to avoid default public constructor so user can't instant new object
+    private SortAndPaginationUtil() {
+
+    }
+
     public static Pageable processSortAndPagination(int page, int size, String[] sort) {
         Sort sortObj = SortAndPaginationUtil.processSort(sort);
 

@@ -5,7 +5,6 @@ import hovanvydut.apiblog.common.exception.*;
 import hovanvydut.apiblog.common.exception.base.MyError;
 import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
-import hovanvydut.apiblog.core.article.ArticleService;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.listeners.event.ChangePasswordEvent;
 import hovanvydut.apiblog.core.listeners.event.ConfirmRegistrationEmailEvent;
@@ -51,7 +50,6 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UploadService uploadService;
-    private final ArticleService articleService;
     private final UserRepository userRepo;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
@@ -64,12 +62,11 @@ public class UserServiceImpl implements UserService {
     @Value("${endpointImageUrl}")
     private String endpointUrl;
 
-    public UserServiceImpl(UploadService uploadService, ArticleService articleService, UserRepository userRepo,
-                           ModelMapper modelMapper, PasswordEncoder passwordEncoder, FollowerRepository followerRepo,
+    public UserServiceImpl(UploadService uploadService, UserRepository userRepo, ModelMapper modelMapper,
+                           PasswordEncoder passwordEncoder, FollowerRepository followerRepo,
                            VerificationTokenRepository verifyTokenRepo, ApplicationEventPublisher eventPublisher,
                            PasswordResetTokenRepository pwdResetTokenRepo, UserImageRepository userImageRepo) {
         this.uploadService = uploadService;
-        this.articleService = articleService;
         this.userRepo = userRepo;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
@@ -79,7 +76,6 @@ public class UserServiceImpl implements UserService {
         this.pwdResetTokenRepo = pwdResetTokenRepo;
         this.userImageRepo = userImageRepo;
     }
-
 
     @Override
     public Page<UserDTO> getUsers(int page, int size, String[] sort, String searchKeyword) {
