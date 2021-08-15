@@ -1,4 +1,5 @@
-* Image: http://localhost:3000/assets/static/uploaded/images/avt_20210709211905_1203788484.jpg
+# SBlog
+### Set up environments
 
 ```zhs
 # start mysql
@@ -15,4 +16,18 @@ maildev
 ./mvnw spring-boot:run
 ```
 
-* Swagger UI: http://localhost:3000/swagger-ui/index.html
+- Static file:  
+```zhs
+http://localhost:3000/assets/static/uploaded/images/avt_20210709211905_1203788484.jpg
+```
+
+### Migration
+ ```zhs
+mvn flyway:clean -Dflyway.configFiles=flyway.conf flyway:migrate -X
+```
+
+### API Document
+
+```aidl
+http://localhost:3000/swagger-ui/index.html
+```

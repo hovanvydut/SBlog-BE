@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.core.user;
 
-import hovanvydut.apiblog.model.entity.User;
+import hovanvydut.apiblog.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

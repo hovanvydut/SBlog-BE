@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.model.entity;
+package hovanvydut.apiblog.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,15 +39,18 @@ public class Comment {
     @JoinColumn(name = "from_user_id", nullable = false)
     private User fromUser;
 
+    @ManyToOne
+    @JoinColumn(name = "article_id", nullable = false)
+    private Article article;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "article_id", nullable = false)
-    private Article article;
+    @Column(name = "is_root", columnDefinition = "TINYINT(1) DEFAULT 1")
+    private boolean root = true;
 
     @PreUpdate
     protected void onUpdate() {

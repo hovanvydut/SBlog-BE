@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.model.entity;
+package hovanvydut.apiblog.entity;
 
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 /**
  * @author hovanvydut
- * Created on 7/12/21
+ * Created on 7/14/21
  */
 
 @Setter
@@ -19,11 +19,12 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @ToString
 @Embeddable
-public class ArticleVoteId implements Serializable {
+public class BookmarkArticleId  implements Serializable {
 
     @Column(name = "user_id")
-    private Long user_id;
+    private Long userId;
 
     @Column(name = "article_id")
-    private Long article_id;
+    private Long articleId;
+
 }

@@ -5,8 +5,8 @@ import hovanvydut.apiblog.common.enums.FreeMarkerTemplate;
 import hovanvydut.apiblog.common.freemarker.ForgotPasswordModel;
 import hovanvydut.apiblog.core.listeners.event.ForgotPasswordEvent;
 import hovanvydut.apiblog.core.mail.EmailService;
-import hovanvydut.apiblog.model.entity.PasswordResetToken;
-import hovanvydut.apiblog.model.entity.User;
+import hovanvydut.apiblog.entity.PasswordResetToken;
+import hovanvydut.apiblog.entity.User;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 

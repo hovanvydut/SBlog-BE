@@ -9,6 +9,11 @@ import com.github.slugify.Slugify;
 
 public class SlugUtil {
 
+    // Explicitly declare private constructor to avoid default public constructor so user can't instant new object
+    private SlugUtil() {
+
+    }
+
     public static String slugify(String text) {
         Slugify slugify = new Slugify();
         return slugify.slugify(text);

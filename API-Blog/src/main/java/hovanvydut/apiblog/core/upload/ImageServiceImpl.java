@@ -3,7 +3,7 @@ package hovanvydut.apiblog.core.upload;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.upload.dto.UserImageDTO;
 import hovanvydut.apiblog.core.user.UserService;
-import hovanvydut.apiblog.model.entity.UserImage;
+import hovanvydut.apiblog.entity.UserImage;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;

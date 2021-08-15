@@ -21,6 +21,13 @@ import java.util.*;
  */
 
 public class FileUploadUtil {
+
+    // Explicit private constructor to avoid public default constructor
+    // avoid user instants new object
+    private FileUploadUtil() {
+
+    }
+
     public static void verifyFileExtension(MultipartFile multipartFile) {
         String originFileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
         String extensionFile = originFileName.substring(originFileName.lastIndexOf(".") + 1).toLowerCase();

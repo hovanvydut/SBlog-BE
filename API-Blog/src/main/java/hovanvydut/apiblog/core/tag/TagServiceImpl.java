@@ -10,7 +10,7 @@ import hovanvydut.apiblog.core.tag.dto.CreateTagDTO;
 import hovanvydut.apiblog.core.tag.dto.TagDTO;
 import hovanvydut.apiblog.core.tag.dto.UpdateTagDTO;
 import hovanvydut.apiblog.core.upload.UploadService;
-import hovanvydut.apiblog.model.entity.Tag;
+import hovanvydut.apiblog.entity.Tag;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,17 +36,17 @@ import java.util.List;
 @Service
 public class TagServiceImpl implements TagService{
 
+    private final UploadService uploadService;
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
-    private final UploadService uploadService;
 
     @Value("${endpointImageUrl}")
     private String hostUploadUrl;
 
-    public TagServiceImpl(TagRepository tagRepository, ModelMapper modelMapper, UploadService uploadService) {
+    public TagServiceImpl(UploadService uploadService, TagRepository tagRepository, ModelMapper modelMapper) {
+        this.uploadService = uploadService;
         this.tagRepository = tagRepository;
         this.modelMapper = modelMapper;
-        this.uploadService = uploadService;
     }
 
     @Override

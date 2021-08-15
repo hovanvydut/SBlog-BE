@@ -5,7 +5,6 @@ import hovanvydut.apiblog.common.exception.*;
 import hovanvydut.apiblog.common.exception.base.MyError;
 import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
-import hovanvydut.apiblog.core.article.ArticleService;
 import hovanvydut.apiblog.core.auth.dto.CreateUserRegistrationDTO;
 import hovanvydut.apiblog.core.listeners.event.ChangePasswordEvent;
 import hovanvydut.apiblog.core.listeners.event.ConfirmRegistrationEmailEvent;
@@ -18,7 +17,7 @@ import hovanvydut.apiblog.core.user.dto.CreateUserDTO;
 import hovanvydut.apiblog.core.user.dto.ResetPasswordDto;
 import hovanvydut.apiblog.core.user.dto.UpdateUserDTO;
 import hovanvydut.apiblog.core.user.dto.UserDTO;
-import hovanvydut.apiblog.model.entity.*;
+import hovanvydut.apiblog.entity.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
@@ -45,9 +45,11 @@ import java.util.UUID;
  * Created on 7/4/21
  */
 
+@Validated
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final UploadService uploadService;
     private final UserRepository userRepo;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
@@ -55,23 +57,16 @@ public class UserServiceImpl implements UserService {
     private final VerificationTokenRepository verifyTokenRepo;
     private final ApplicationEventPublisher eventPublisher;
     private final PasswordResetTokenRepository pwdResetTokenRepo;
-    private final UploadService uploadService;
     private final UserImageRepository userImageRepo;
-    private final ArticleService articleService;
 
     @Value("${endpointImageUrl}")
     private String endpointUrl;
 
-    public UserServiceImpl(UserRepository userRepo,
-                           ModelMapper modelMapper,
-                           PasswordEncoder passwordEncoder,
-                           FollowerRepository followerRepo,
-                           VerificationTokenRepository verifyTokenRepo,
-                           ApplicationEventPublisher eventPublisher,
-                           PasswordResetTokenRepository pwdResetTokenRepo,
-                           UploadService uploadService,
-                           UserImageRepository userImageRepo,
-                           ArticleService articleService) {
+    public UserServiceImpl(UploadService uploadService, UserRepository userRepo, ModelMapper modelMapper,
+                           PasswordEncoder passwordEncoder, FollowerRepository followerRepo,
+                           VerificationTokenRepository verifyTokenRepo, ApplicationEventPublisher eventPublisher,
+                           PasswordResetTokenRepository pwdResetTokenRepo, UserImageRepository userImageRepo) {
+        this.uploadService = uploadService;
         this.userRepo = userRepo;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
@@ -79,9 +74,7 @@ public class UserServiceImpl implements UserService {
         this.verifyTokenRepo = verifyTokenRepo;
         this.eventPublisher = eventPublisher;
         this.pwdResetTokenRepo = pwdResetTokenRepo;
-        this.uploadService = uploadService;
         this.userImageRepo = userImageRepo;
-        this.articleService = articleService;
     }
 
     @Override
@@ -343,7 +336,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void resetForgotPassword(String token, String newPassword) {
         PasswordResetToken resetToken = this.pwdResetTokenRepo.findByToken(token)
-                .orElseThrow(() -> new TokenNotFoundException());
+                .orElseThrow(TokenNotFoundException::new);
 
         if (resetToken.isExpired()) {
             throw new RuntimeException("Token is expired");
@@ -389,7 +382,7 @@ public class UserServiceImpl implements UserService {
         UserImage userImage = this.userImageRepo.findById(imageId)
                 .orElseThrow(() -> new RuntimeException("Image not found"));
 
-        if (userId != userImage.getUser().getId()) {
+        if (!userId.equals(userImage.getUser().getId())) {
             throw new RuntimeException("Not owning this image");
         }
 

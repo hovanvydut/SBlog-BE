@@ -1,7 +1,8 @@
-package hovanvydut.apiblog.model.entity;
+package hovanvydut.apiblog.entity;
 
 import hovanvydut.apiblog.common.enums.ArticleScopeEnum;
 import hovanvydut.apiblog.common.enums.ArticleStatusEnum;
+import hovanvydut.apiblog.common.enums.ArticleType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -88,6 +89,12 @@ public class Article {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> participants = new HashSet<>();
+
+    @Column(name = "countView")
+    private long countView;
+
+    @Column(name = "type")
+    private ArticleType type;
 
     @PreUpdate
     protected void onUpdate() {

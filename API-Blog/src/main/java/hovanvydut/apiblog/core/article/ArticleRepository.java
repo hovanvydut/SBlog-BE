@@ -1,7 +1,7 @@
 package hovanvydut.apiblog.core.article;
 
 import hovanvydut.apiblog.common.enums.ArticleStatusEnum;
-import hovanvydut.apiblog.model.entity.Article;
+import hovanvydut.apiblog.entity.Article;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;

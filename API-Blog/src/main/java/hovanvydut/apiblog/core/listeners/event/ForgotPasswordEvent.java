@@ -1,7 +1,7 @@
 package hovanvydut.apiblog.core.listeners.event;
 
-import hovanvydut.apiblog.model.entity.PasswordResetToken;
-import hovanvydut.apiblog.model.entity.User;
+import hovanvydut.apiblog.entity.PasswordResetToken;
+import hovanvydut.apiblog.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;

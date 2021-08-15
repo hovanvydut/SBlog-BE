@@ -21,4 +21,5 @@ public interface ArticleService {
     void markArticleSpam(String slug);
     ArticleDTO updateArticle(String slug, UpdateArticleDTO dto, PublishOption publishOption, String authorUsername);
     void deleteArticle(String slug, String authorUsername);
+    Long getArticleIdBySlug(String slug);
 }

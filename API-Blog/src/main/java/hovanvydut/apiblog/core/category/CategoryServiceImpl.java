@@ -8,8 +8,8 @@ import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.category.dto.CategoryDTO;
 import hovanvydut.apiblog.core.category.dto.CreateCategoryDTO;
 import hovanvydut.apiblog.core.category.dto.UpdateCategoryDTO;
-import hovanvydut.apiblog.model.entity.Category;
-import hovanvydut.apiblog.model.entity.Tag;
+import hovanvydut.apiblog.entity.Category;
+import hovanvydut.apiblog.entity.Tag;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
@@ -130,13 +130,13 @@ public class CategoryServiceImpl implements CategoryService {
         List<MyError> errorList = new ArrayList<>();
 
         this.categoryRepo.findByName(dto.getName()).ifPresent(category -> {
-            if (category.getId() != id) {
+            if (!category.getId().equals(id)) {
                 errorList.add(new MyError().setSource("name").setMessage("The name has already been taken"));
             }
         });
 
         this.categoryRepo.findBySlug(dto.getSlug()).ifPresent(category -> {
-            if (category.getId() != id) {
+            if (!category.getId().equals(id)) {
                 errorList.add(new MyError().setSource("slug").setMessage("The slug has already been taken"));
             }
         });

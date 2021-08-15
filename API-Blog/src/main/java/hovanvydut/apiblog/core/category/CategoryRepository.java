@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.core.category;
 
-import hovanvydut.apiblog.model.entity.Category;
+import hovanvydut.apiblog.entity.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
