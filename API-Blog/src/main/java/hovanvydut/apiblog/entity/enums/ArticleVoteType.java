@@ -1,18 +1,16 @@
-package hovanvydut.apiblog.common.enums;
+package hovanvydut.apiblog.entity.enums;
 
 /**
  * @author hovanvydut
  * Created on 7/10/21
  */
 
-public enum ArticleVoteEnum {
+public enum ArticleVoteType {
     UP(1),
-    DOWN(-1),
-    CANCEL(0);
-
+    DOWN(-1);
     private int vote;
 
-    ArticleVoteEnum(int vote) {
+    ArticleVoteType(int vote) {
         this.vote = vote;
     }
 
@@ -20,14 +18,12 @@ public enum ArticleVoteEnum {
         return this.vote;
     }
 
-    public static ArticleVoteEnum of(int vote) {
+    public static ArticleVoteType of(int vote) {
         switch (vote) {
             case 1:
-                return ArticleVoteEnum.UP;
+                return ArticleVoteType.UP;
             case -1:
-                return ArticleVoteEnum.DOWN;
-            case 0:
-                return ArticleVoteEnum.CANCEL;
+                return ArticleVoteType.DOWN;
             default:
                 // TODO: edit message error
                 throw new RuntimeException("Not mapped value ArticleVoteEnum");

@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.core.user.dto;
 
-import hovanvydut.apiblog.common.enums.GenderEnum;
+import hovanvydut.apiblog.entity.enums.GenderEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

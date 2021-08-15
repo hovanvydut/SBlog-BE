@@ -16,3 +16,7 @@
 [x] Create annotation to validate email
 [x] Upload image for tag
 [x] Allow upload avatar
+
+[] Create series
+[] Bookmark article/series
+[] Vote article/series

@@ -1,5 +1,6 @@
 package hovanvydut.apiblog.entity;
 
+import hovanvydut.apiblog.entity.enums.BookmarkType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,6 +39,9 @@ public class BookmarkArticle {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "type", nullable = false, columnDefinition = "TINYINT")
+    private BookmarkType type = BookmarkType.POST;
 
     @PrePersist
     protected void onPersist() {

@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.core.vote;
 
-import hovanvydut.apiblog.common.enums.ArticleVoteEnum;
+import hovanvydut.apiblog.entity.enums.ArticleVoteType;
 import hovanvydut.apiblog.core.article.ArticleService;
 import hovanvydut.apiblog.core.user.UserService;
 import hovanvydut.apiblog.entity.Article;
@@ -31,7 +31,7 @@ public class VoteServiceImpl implements VoteService{
 
     @Override
     @Transactional
-    public void voteArticle(String slug, String username, ArticleVoteEnum vote) {
+    public void voteArticle(String slug, String username, ArticleVoteType vote) {
         Long articleId = this.articleService.getArticleIdBySlug(slug);
         Long userId = this.userService.getUserIdByUsername(username);
 

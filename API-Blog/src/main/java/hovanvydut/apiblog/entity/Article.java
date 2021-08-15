@@ -1,8 +1,8 @@
 package hovanvydut.apiblog.entity;
 
-import hovanvydut.apiblog.common.enums.ArticleScopeEnum;
-import hovanvydut.apiblog.common.enums.ArticleStatusEnum;
-import hovanvydut.apiblog.common.enums.ArticleType;
+import hovanvydut.apiblog.entity.enums.ArticleScopeEnum;
+import hovanvydut.apiblog.entity.enums.ArticleStatusEnum;
+import hovanvydut.apiblog.entity.enums.ArticleType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

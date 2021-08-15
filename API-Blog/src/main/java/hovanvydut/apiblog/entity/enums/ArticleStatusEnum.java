@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.common.enums;
+package hovanvydut.apiblog.entity.enums;
 
 /**
  * @author hovanvydut

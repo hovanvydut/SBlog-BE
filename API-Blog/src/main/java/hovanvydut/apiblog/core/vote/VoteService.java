@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.core.vote;
 
-import hovanvydut.apiblog.common.enums.ArticleVoteEnum;
+import hovanvydut.apiblog.entity.enums.ArticleVoteType;
 
 /**
  * @author hovanvydut
@@ -8,5 +8,5 @@ import hovanvydut.apiblog.common.enums.ArticleVoteEnum;
  */
 
 public interface VoteService {
-    void voteArticle(String slug, String username, ArticleVoteEnum vote);
+    void voteArticle(String slug, String username, ArticleVoteType vote);
 }

@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.entity;
 
-import hovanvydut.apiblog.common.enums.GenderEnum;
+import hovanvydut.apiblog.entity.enums.GenderEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

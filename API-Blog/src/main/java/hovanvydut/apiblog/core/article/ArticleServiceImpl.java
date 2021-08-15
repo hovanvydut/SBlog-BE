@@ -1,7 +1,7 @@
 package hovanvydut.apiblog.core.article;
 
-import hovanvydut.apiblog.common.enums.ArticleScopeEnum;
-import hovanvydut.apiblog.common.enums.ArticleStatusEnum;
+import hovanvydut.apiblog.entity.enums.ArticleScopeEnum;
+import hovanvydut.apiblog.entity.enums.ArticleStatusEnum;
 import hovanvydut.apiblog.common.exception.ArticleNotFoundException;
 import hovanvydut.apiblog.common.exception.base.MyError;
 import hovanvydut.apiblog.common.exception.base.MyRuntimeException;

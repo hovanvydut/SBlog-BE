@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.entity;
 
-import hovanvydut.apiblog.common.enums.ArticleVoteEnum;
+import hovanvydut.apiblog.entity.enums.ArticleVoteType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,7 +8,6 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -23,7 +22,7 @@ import java.time.LocalDateTime;
 @ToString
 @Entity
 @Table(name = "article_vote")
-public class ArticleVote implements Serializable {
+public class ArticleVote {
 
     @EmbeddedId
     private ArticleVoteId id;
@@ -38,8 +37,8 @@ public class ArticleVote implements Serializable {
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
-    @Column(name = "vote", nullable = false, columnDefinition = "TINYINT DEFAULT 0")
-    private ArticleVoteEnum vote;
+    @Column(name = "vote", nullable = false, columnDefinition = "TINYINT")
+    private ArticleVoteType vote = ArticleVoteType.UP;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

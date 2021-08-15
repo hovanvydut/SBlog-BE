@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.common.enums;
+package hovanvydut.apiblog.entity.enums;
 
 /**
  * @author hovanvydut
@@ -14,11 +14,11 @@ public enum ArticleType {
         this.type = type;
     }
 
-    public int get() {
+    public int type() {
         return this.type;
     }
 
-    public ArticleType of(int type) {
+    public static ArticleType of(int type) {
         switch (type) {
             case 0:
                 return POST;

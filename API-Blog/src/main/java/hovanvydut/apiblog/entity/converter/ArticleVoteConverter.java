@@ -1,6 +1,6 @@
 package hovanvydut.apiblog.entity.converter;
 
-import hovanvydut.apiblog.common.enums.ArticleVoteEnum;
+import hovanvydut.apiblog.entity.enums.ArticleVoteType;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
@@ -11,10 +11,10 @@ import javax.persistence.Converter;
  */
 
 @Converter(autoApply = true)
-public class ArticleVoteConverter implements AttributeConverter<ArticleVoteEnum, Integer> {
+public class ArticleVoteConverter implements AttributeConverter<ArticleVoteType, Integer> {
 
     @Override
-    public Integer convertToDatabaseColumn(ArticleVoteEnum attribute) {
+    public Integer convertToDatabaseColumn(ArticleVoteType attribute) {
         if (attribute == null) {
             return 0;
         }
@@ -23,7 +23,7 @@ public class ArticleVoteConverter implements AttributeConverter<ArticleVoteEnum,
     }
 
     @Override
-    public ArticleVoteEnum convertToEntityAttribute(Integer dbData) {
-        return ArticleVoteEnum.of(dbData);
+    public ArticleVoteType convertToEntityAttribute(Integer dbData) {
+        return ArticleVoteType.of(dbData);
     }
 }

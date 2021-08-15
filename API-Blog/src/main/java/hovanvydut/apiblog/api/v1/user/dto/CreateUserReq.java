@@ -3,7 +3,7 @@ package hovanvydut.apiblog.api.v1.user.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import hovanvydut.apiblog.common.annotations.ValidEmail;
-import hovanvydut.apiblog.common.enums.GenderEnum;
+import hovanvydut.apiblog.entity.enums.GenderEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
