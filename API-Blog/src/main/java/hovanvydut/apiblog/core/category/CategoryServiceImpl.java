@@ -4,6 +4,7 @@ import hovanvydut.apiblog.common.exception.CategoryNotFoundException;
 import hovanvydut.apiblog.common.exception.base.MyError;
 import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.util.SlugUtil;
+import hovanvydut.apiblog.common.util.SlugUtilImpl;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.category.dto.CategoryDTO;
 import hovanvydut.apiblog.core.category.dto.CreateCategoryDTO;
@@ -34,6 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepo;
     private final ModelMapper modelMapper;
+    private final SlugUtil slugUtil = new SlugUtilImpl();
 
     public CategoryServiceImpl(CategoryRepository categoryRepo, ModelMapper modelMapper) {
         this.categoryRepo = categoryRepo;
@@ -76,7 +78,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category category = this.modelMapper.map(dto, Category.class);
         if (category.getSlug() == null) {
-            category.setSlug(SlugUtil.slugify(category.getName()));
+            category.setSlug(this.slugUtil.slugify(category.getName()));
         }
 
         Category savedCategory = this.categoryRepo.save(category);
@@ -98,7 +100,7 @@ public class CategoryServiceImpl implements CategoryService {
         this.modelMapper.map(dto, category);
 
         if (category.getSlug() == null) {
-            category.setSlug(SlugUtil.slugify(category.getName()));
+            category.setSlug(this.slugUtil.slugify(category.getName()));
         }
 
         Category savedCategory = this.categoryRepo.save(category);

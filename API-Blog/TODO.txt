@@ -20,3 +20,5 @@
 [] Create series
 [] Bookmark article/series
 [] Vote article/series
+
+[x] Implement Adapter Pattern into slugify util

@@ -1,5 +1,6 @@
 package hovanvydut.apiblog.core.article;
 
+import hovanvydut.apiblog.common.util.SlugUtilImpl;
 import hovanvydut.apiblog.entity.enums.ArticleScopeEnum;
 import hovanvydut.apiblog.entity.enums.ArticleStatusEnum;
 import hovanvydut.apiblog.common.exception.ArticleNotFoundException;
@@ -43,6 +44,7 @@ public class ArticleServiceImpl implements ArticleService {
     private final UserService userService;
     private final ArticleRepository articleRepo;
     private final ModelMapper modelMapper;
+    private final SlugUtil slugUtil = new SlugUtilImpl();
 
     public ArticleServiceImpl(UserService userService, ArticleRepository articleRepo, ModelMapper modelMapper) {
         this.userService = userService;
@@ -145,7 +147,7 @@ public class ArticleServiceImpl implements ArticleService {
         this.modelMapper.map(dto, article);
 
         String slug = UUID.randomUUID().toString();
-        String transliterated = SlugUtil.slugify(article.getTitle());
+        String transliterated = this.slugUtil.slugify(article.getTitle());
 
         article.setId(null);
         article.setSlug(slug);
@@ -208,7 +210,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         // Mapping dto -> entity
         this.modelMapper.map(dto, article);
-        article.setTransliterated(SlugUtil.slugify(article.getTitle()));
+        article.setTransliterated(this.slugUtil.slugify(article.getTitle()));
         article.setCategory(new Category().setId(dto.getCategory()));
 
         if (dto.getTags() != null) {

@@ -5,6 +5,7 @@ import hovanvydut.apiblog.common.exception.TagNotFoundException;
 import hovanvydut.apiblog.common.exception.base.MyError;
 import hovanvydut.apiblog.common.exception.base.MyRuntimeException;
 import hovanvydut.apiblog.common.util.SlugUtil;
+import hovanvydut.apiblog.common.util.SlugUtilImpl;
 import hovanvydut.apiblog.common.util.SortAndPaginationUtil;
 import hovanvydut.apiblog.core.tag.dto.CreateTagDTO;
 import hovanvydut.apiblog.core.tag.dto.TagDTO;
@@ -39,6 +40,7 @@ public class TagServiceImpl implements TagService{
     private final UploadService uploadService;
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
+    private final SlugUtil slugUtil = new SlugUtilImpl();
 
     @Value("${endpointImageUrl}")
     private String hostUploadUrl;
@@ -93,7 +95,7 @@ public class TagServiceImpl implements TagService{
         Tag tag = this.modelMapper.map(dto, Tag.class);
 
         if (tag.getSlug() == null) {
-            tag.setSlug(SlugUtil.slugify(tag.getName()));
+            tag.setSlug(this.slugUtil.slugify(tag.getName()));
         }
 
         Tag savedTag = this.tagRepository.save(tag);
@@ -115,7 +117,7 @@ public class TagServiceImpl implements TagService{
         System.out.println(tag);
 
         if (tag.getSlug() == null) {
-            tag.setSlug(SlugUtil.slugify(tag.getName()));
+            tag.setSlug(this.slugUtil.slugify(tag.getName()));
         }
 
         Tag savedTag = this.tagRepository.save(tag);

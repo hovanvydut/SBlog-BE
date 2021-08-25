@@ -7,16 +7,8 @@ import com.github.slugify.Slugify;
  * Created on 6/30/21
  */
 
-public class SlugUtil {
+public interface SlugUtil {
 
-    // Explicitly declare private constructor to avoid default public constructor so user can't instant new object
-    private SlugUtil() {
-
-    }
-
-    public static String slugify(String text) {
-        Slugify slugify = new Slugify();
-        return slugify.slugify(text);
-    }
+    String slugify(String text);
 
 }
