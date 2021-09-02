@@ -31,3 +31,9 @@ mvn flyway:clean -Dflyway.configFiles=flyway.conf flyway:migrate -X
 ```aidl
 http://localhost:3000/swagger-ui/index.html
 ```
+
+### Technology
+[x] Spring Boot
+[x] Redis
+[x] BlackBlaze Cloud
+[x] Docker
