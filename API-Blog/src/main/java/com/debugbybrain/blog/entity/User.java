@@ -60,7 +60,7 @@ public class User {
     @Column(name = "avatar", nullable = false, length = 255)
     private String avatar = "default avatar url nek";
 
-    @Column(name = "host_avatar", nullable = false, length = 255)
+    @Column(name = "host_avatar", nullable = true, length = 255)
     private String hostAvatar;
 
     @Column(name = "birthday", nullable = true)

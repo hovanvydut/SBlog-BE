@@ -1,6 +1,6 @@
 package com.debugbybrain.blog.entity;
 
-import hovanvydut.apiblog.entity.enums.ArticleVoteType;
+import com.debugbybrain.blog.entity.enums.ArticleVoteType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -2,7 +2,7 @@ package com.debugbybrain.blog.api.v1.vote.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import hovanvydut.apiblog.entity.enums.ArticleVoteType;
+import com.debugbybrain.blog.entity.enums.ArticleVoteType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

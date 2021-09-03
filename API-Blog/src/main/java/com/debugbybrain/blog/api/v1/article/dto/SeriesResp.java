@@ -1,14 +1,14 @@
-package com.debugbybrain.blog.core.article.dto;
+package com.debugbybrain.blog.api.v1.article.dto;
 
-import com.debugbybrain.blog.core.category.dto.CategoryDTO;
-import com.debugbybrain.blog.core.tag.dto.TagDTO;
-import com.debugbybrain.blog.core.user.dto.UserDTO;
+/**
+ * @author hovanvydut
+ * Created on 9/3/21
+ */
+
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ import java.util.Set;
 
 /**
  * @author hovanvydut
- * Created on 7/12/21
+ * Created on 7/2/21
  */
 
 @Getter
@@ -25,16 +25,15 @@ import java.util.Set;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString
-public class ArticleDTO {
+public class SeriesResp {
     private String title;
     private String slug;
     private String transliterated;
     private String content;
     private String thumbnail;
-    private UserDTO author;
-    private Set<TagDTO> tags;
-    private CategoryDTO category;
+    private UserResp author;
+    private Set<TagResp> tags;
+    private CategoryResp category;
     private String lastUpdatedAt;
     private String publishedAt;
     private String deletedAt;

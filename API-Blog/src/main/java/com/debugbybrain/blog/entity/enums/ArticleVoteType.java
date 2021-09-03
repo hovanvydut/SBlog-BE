@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.entity.enums;
+package com.debugbybrain.blog.entity.enums;
 
 /**
  * @author hovanvydut

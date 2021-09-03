@@ -50,4 +50,8 @@ public class CreateArticleReq {
         this.title = title.trim().replaceAll("\\s{2,}", " ");
     }
 
+    public void setContent(String content) {
+        this.content = content.trim();
+    }
+
 }

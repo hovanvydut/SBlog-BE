@@ -1,6 +1,6 @@
 package com.debugbybrain.blog.core.vote;
 
-import hovanvydut.apiblog.entity.enums.ArticleVoteType;
+import com.debugbybrain.blog.entity.enums.ArticleVoteType;
 
 /**
  * @author hovanvydut

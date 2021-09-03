@@ -98,6 +98,8 @@ public class TagServiceImpl implements TagService{
             tag.setSlug(this.slugUtil.slugify(tag.getName()));
         }
 
+        // FIXME: Check if slug is exists
+
         Tag savedTag = this.tagRepository.save(tag);
         return this.modelMapper.map(savedTag, TagDTO.class);
     }

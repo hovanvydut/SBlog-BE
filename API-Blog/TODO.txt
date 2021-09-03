@@ -20,5 +20,7 @@
 [] Create series
 [] Bookmark article/series
 [] Vote article/series
+[] Tag name allow C++, C#
+[] Implement Default Tag, Default Category for article
 
 [x] Implement Adapter Pattern into slugify util

@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -89,6 +90,9 @@ public class Article {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> participants = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "series")
+    private List<SeriesArticle> articles;
 
     @Column(name = "countView")
     private long countView;

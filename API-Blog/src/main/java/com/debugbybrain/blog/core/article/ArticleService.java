@@ -1,10 +1,11 @@
 package com.debugbybrain.blog.core.article;
 
-import com.debugbybrain.blog.core.article.dto.ArticleDTO;
-import com.debugbybrain.blog.core.article.dto.CreateArticleDTO;
-import com.debugbybrain.blog.core.article.dto.PublishOption;
-import com.debugbybrain.blog.core.article.dto.UpdateArticleDTO;
+import com.debugbybrain.blog.core.article.dto.*;
+import com.debugbybrain.blog.entity.enums.ArticleType;
 import org.springframework.data.domain.Page;
+
+import javax.validation.Valid;
+import java.util.Optional;
 
 /**
  * @author hovanvydut
@@ -12,11 +13,12 @@ import org.springframework.data.domain.Page;
  */
 
 public interface ArticleService {
-    Page<ArticleDTO> getAllArticles(int page, int size, String[] sort, String searchKeyword);
-    Page<ArticleDTO> getAllPublishedArticles(int page, int size, String[] sort, String searchKeyword);
-    Page<ArticleDTO> getAllPublishedArticles(String username, int page, int size, String[] sort, String searchKeyword);
+    Page<ArticleDTO> getAllArticlesOrSeries(int page, int size, String[] sort, String searchKeyword, ArticleType type);
+    Page<ArticleDTO> getAllPublishedArticlesOrSeries(Optional<String> username, ArticleType type, int page, int size,
+                                                     String[] sort, String searchKeyword);
     ArticleDTO getArticle(String slug, String usernameViewer);
-    ArticleDTO createNewArticle(CreateArticleDTO dto, PublishOption publishOption, String authorUsername);
+    SeriesDTO getSeries(String slug, String usernameViewer);
+    ArticleDTO createNewArticle(@Valid CreateArticleDTO dto, PublishOption publishOption, String authorUsername, boolean isSeries);
     void approveArticle(String slug);
     void markArticleSpam(String slug);
     ArticleDTO updateArticle(String slug, UpdateArticleDTO dto, PublishOption publishOption, String authorUsername);

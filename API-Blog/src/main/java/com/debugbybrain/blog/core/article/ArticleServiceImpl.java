@@ -1,22 +1,19 @@
 package com.debugbybrain.blog.core.article;
 
 import com.debugbybrain.blog.common.exception.ArticleNotFoundException;
+import com.debugbybrain.blog.common.exception.SeriesNotFoundException;
 import com.debugbybrain.blog.common.exception.base.MyError;
 import com.debugbybrain.blog.common.exception.base.MyRuntimeException;
 import com.debugbybrain.blog.common.util.SlugUtil;
 import com.debugbybrain.blog.common.util.SlugUtilImpl;
 import com.debugbybrain.blog.common.util.SortAndPaginationUtil;
-import com.debugbybrain.blog.core.article.dto.ArticleDTO;
-import com.debugbybrain.blog.core.article.dto.CreateArticleDTO;
-import com.debugbybrain.blog.core.article.dto.PublishOption;
-import com.debugbybrain.blog.core.article.dto.UpdateArticleDTO;
+import com.debugbybrain.blog.core.article.dto.*;
 import com.debugbybrain.blog.core.user.UserService;
-import com.debugbybrain.blog.entity.Article;
-import com.debugbybrain.blog.entity.Category;
-import com.debugbybrain.blog.entity.Tag;
-import com.debugbybrain.blog.entity.User;
+import com.debugbybrain.blog.entity.*;
 import com.debugbybrain.blog.entity.enums.ArticleScopeEnum;
 import com.debugbybrain.blog.entity.enums.ArticleStatusEnum;
+import com.debugbybrain.blog.entity.enums.ArticleType;
+import com.debugbybrain.blog.entity.enums.SeriesArticleStatus;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
@@ -26,11 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author hovanvydut
@@ -43,25 +38,30 @@ public class ArticleServiceImpl implements ArticleService {
 
     private final UserService userService;
     private final ArticleRepository articleRepo;
+    private final SeriesArticleRepository seriesRepo;
     private final ModelMapper modelMapper;
     private final SlugUtil slugUtil = new SlugUtilImpl();
 
-    public ArticleServiceImpl(UserService userService, ArticleRepository articleRepo, ModelMapper modelMapper) {
+    public ArticleServiceImpl(UserService userService, ArticleRepository articleRepo, SeriesArticleRepository seriesRepo,
+                              ModelMapper modelMapper) {
         this.userService = userService;
         this.articleRepo = articleRepo;
+        this.seriesRepo = seriesRepo;
         this.modelMapper = modelMapper;
     }
 
 
     @Override
-    public Page<ArticleDTO> getAllArticles(int page, int size, String[] sort, String searchKeyword) {
+    public Page<ArticleDTO> getAllArticlesOrSeries(int page, int size, String[] sort, String searchKeyword, ArticleType type) {
         Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
+
+        if (type == null) type = ArticleType.POST;
 
         Page<Article> articlePage;
         if (searchKeyword == null || searchKeyword.isBlank()) {
-            articlePage = this.articleRepo.findAll(pageable);
+            articlePage = this.articleRepo.getAll(type, pageable);
         } else {
-            articlePage = this.articleRepo.search(searchKeyword, pageable);
+            articlePage = this.articleRepo.search(type, searchKeyword, pageable);
         }
 
         List<Article> articles = articlePage.getContent();
@@ -70,32 +70,28 @@ public class ArticleServiceImpl implements ArticleService {
         return new PageImpl<>(articleDTOs, pageable, articlePage.getTotalElements());
     }
 
+
     @Override
-    public Page<ArticleDTO> getAllPublishedArticles(int page, int size, String[] sort, String searchKeyword) {
+    public Page<ArticleDTO> getAllPublishedArticlesOrSeries(Optional<String> username, ArticleType type, int page, int size,
+                                                            String[] sort, String searchKeyword) {
         Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
 
         Page<Article> articlePage;
         if (searchKeyword == null || searchKeyword.isBlank()) {
-            articlePage = this.articleRepo.findByStatus(ArticleStatusEnum.PUBLISHED_GLOBAL, pageable);
+            if (username.isEmpty()) {
+                articlePage = this.articleRepo.findByStatus(type, ArticleStatusEnum.PUBLISHED_GLOBAL, pageable);
+            } else {
+                articlePage = this.articleRepo.findByStatusAndAuthor(type, username.get(),
+                        ArticleStatusEnum.PUBLISHED_GLOBAL, pageable);
+            }
         } else {
-            articlePage = this.articleRepo.searchByStatus(searchKeyword, pageable, ArticleStatusEnum.PUBLISHED_GLOBAL);
-        }
-
-        List<Article> articles = articlePage.getContent();
-        List<ArticleDTO> articleDTOs = this.modelMapper.map(articles, new TypeToken<List<ArticleDTO>>() {}.getType());
-
-        return new PageImpl<>(articleDTOs, pageable, articlePage.getTotalElements());
-    }
-
-    @Override
-    public Page<ArticleDTO> getAllPublishedArticles(String username, int page, int size, String[] sort, String searchKeyword) {
-        Pageable pageable = SortAndPaginationUtil.processSortAndPagination(page, size, sort);
-
-        Page<Article> articlePage;
-        if (searchKeyword == null || searchKeyword.isBlank()) {
-            articlePage = this.articleRepo.findByStatusAndAuthor(username, ArticleStatusEnum.PUBLISHED_GLOBAL, pageable);
-        } else {
-            articlePage = this.articleRepo.searchByStatusAndAuthor(username, searchKeyword, ArticleStatusEnum.PUBLISHED_GLOBAL, pageable);
+            if (username.isEmpty()) {
+                articlePage = this.articleRepo.searchByStatus(type, searchKeyword, pageable,
+                        ArticleStatusEnum.PUBLISHED_GLOBAL);
+            } else {
+                articlePage = this.articleRepo.searchByStatusAndAuthor(type, username.get(), searchKeyword,
+                        ArticleStatusEnum.PUBLISHED_GLOBAL, pageable);
+            }
         }
 
         List<Article> articles = articlePage.getContent();
@@ -106,7 +102,6 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleDTO getArticle(String slug, String usernameViewer) {
-
         Article article = this.articleRepo.findBySlug(slug)
                 .orElseThrow(() -> new ArticleNotFoundException(slug));
 
@@ -133,14 +128,66 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public SeriesDTO getSeries(String slug, String usernameViewer) {
+        Article article = this.articleRepo.getSeriesBySlug(slug)
+                .orElseThrow(() -> new SeriesNotFoundException(slug));
+
+        ArticleStatusEnum articleStatus = article.getStatus();
+
+        if (articleStatus == ArticleStatusEnum.PENDING || articleStatus== ArticleStatusEnum.DRAFT
+                || articleStatus == ArticleStatusEnum.SPAM) {
+
+            if (usernameViewer == null) throw new SeriesNotFoundException(slug);
+
+            Long viewerId = this.userService.getUserIdByUsername(usernameViewer);
+
+            if (!article.getAuthor().getId().equals(viewerId)) {
+                throw new SeriesNotFoundException(slug);
+            }
+
+            return convertArticleToSeriesDTO(article);
+        } else if (articleStatus == ArticleStatusEnum.PUBLISHED_GLOBAL
+                || articleStatus == ArticleStatusEnum.PUBLISHED_LINK) {
+
+            return convertArticleToSeriesDTO(article);
+        }
+
+        throw new SeriesNotFoundException(slug);
+    }
+
+    // FIXME: Optmize by using Model Mapper custom
+    private SeriesDTO convertArticleToSeriesDTO(Article article) {
+        SeriesDTO seriesDTO = this.modelMapper.map(article, SeriesDTO.class);
+        Set<Article> articlesSet = new HashSet<>();
+        if (article.getArticles() != null && article.getArticles().size() > 0) {
+            for (SeriesArticle item : article.getArticles()) {
+                articlesSet.add(item.getArticle());
+            }
+        }
+        seriesDTO.setArticles(this.modelMapper.map(articlesSet, new TypeToken<Set<SeriesDTO.ArticleDTO>>() {}.getType()));
+        return seriesDTO;
+    }
+
+    @Override
     @Transactional
-    public ArticleDTO createNewArticle(CreateArticleDTO dto, PublishOption publishOption, String authorUsername) {
+    public ArticleDTO createNewArticle(@Valid CreateArticleDTO dto, PublishOption publishOption, String authorUsername,
+                                       boolean isSeries) {
         if (publishOption == null) {
             throw new MyRuntimeException(List.of(new MyError().setMessage("Publish Option must be not null")));
         }
 
         // get author and validate username
         Long authorId = this.userService.getUserIdByUsername(authorUsername);
+
+        // check if these articleIds are the articles (not series) and published and your own
+        if (isSeries && dto.getArticleIds() != null && dto.getArticleIds().size() > 0) {
+            long count = this.articleRepo.countValidYourPublishedArticle(dto.getArticleIds(), authorUsername);
+            if (count != dto.getArticleIds().size()) {
+                throw new RuntimeException("check if these articleIds are the articles (not series) and published and your own");
+            }
+        }
+
+        // FIXME: Check if exist tagId not found (count(tag.id))
 
         // mapping dto --> entity
         Article article = new Article();
@@ -153,6 +200,7 @@ public class ArticleServiceImpl implements ArticleService {
         article.setSlug(slug);
         article.setTransliterated(transliterated);
         article.setCategory(new Category().setId(dto.getCategoryId()));
+        if (isSeries) article.setType(ArticleType.SERIES);
 
         for (long tagId : dto.getTagIds()) {
             article.getTags().add(new Tag().setId(tagId));
@@ -164,6 +212,20 @@ public class ArticleServiceImpl implements ArticleService {
         assignProperlyPublishOption(article, publishOption);
 
         Article savedArticle = this.articleRepo.save(article);
+
+        if (isSeries) {
+            List<SeriesArticle> seriesList = new ArrayList<>();
+            for (long id : dto.getArticleIds()) {
+                SeriesArticle series = new SeriesArticle()
+                        .setId(new SeriesArticleId().setSeriesId(savedArticle.getId()).setArticleId(id))
+                        .setStatus(SeriesArticleStatus.ACCEPTED)
+                        .setSeries(new Article().setId(savedArticle.getId()))
+                        .setArticle(new Article().setId(id));
+
+                seriesList.add(series);
+            }
+            this.seriesRepo.saveAll(seriesList);
+        }
 
         return this.modelMapper.map(savedArticle, ArticleDTO.class);
     }
