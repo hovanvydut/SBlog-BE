@@ -28,7 +28,7 @@ services:
       - --default-authentication-plugin=mysql_native_password
       - --lower_case_table_names=1
     volumes:
-      - ./src/main/resources/dump_mysql:/docker-entrypoint-initdb.d
+      - ./scripts/sql:/docker-entrypoint-initdb.d
     networks:
         - blognetwork
 networks:
