@@ -1,3 +1,21 @@
+[x] CronJob delete all expired token (VerificationToken and PasswordResetToken)
+[x] Reset your password
+[x] Forgot password
+[x] Create model params for freemarker template
+[x] Define custom exception instead using RuntimeException
+[x] Create annotation to validate email
+[x] Upload image for tag
+[x] Allow upload avatar
+[x] Implement Adapter Pattern into slugify util
+
+[] Create series
+[] Bookmark article/series
+[] Vote article/series
+[] Tag name allow C++, C#
+[] Implement Default Tag, Default Category for article
+[] Facebook/Google login
+[] Custom annotation check that user is owner of article or editor or admin
+
 [] Define hostname, port const for email template, upload image url, ...
 [] How to make all token of user is invalid
 [] Check bookmark TODO, FIXME to resolve
@@ -7,18 +25,3 @@
 [] Upload image for the category
 [] Generate UUID with 11 characters
 [] Refresh token Service
-
-[x] CronJob delete all expired token (VerificationToken and PasswordResetToken)
-[x] Reset your password
-[x] Forgot password
-[x] Create model params for freemarker template
-[x] Define custom exception instead using RuntimeException
-[x] Create annotation to validate email
-[x] Upload image for tag
-[x] Allow upload avatar
-
-[] Create series
-[] Bookmark article/series
-[] Vote article/series
-
-[x] Implement Adapter Pattern into slugify util

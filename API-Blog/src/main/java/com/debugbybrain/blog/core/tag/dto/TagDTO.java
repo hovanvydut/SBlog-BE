@@ -31,9 +31,4 @@ public class TagDTO implements Serializable {
 
     private String image;
 
-    @NotNull
-    private LocalDateTime createdAt;
-
-    private LocalDateTime lastEditedAt;
-
 }

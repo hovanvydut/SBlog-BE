@@ -13,10 +13,7 @@ import com.debugbybrain.blog.core.listeners.event.RegistrationCompleteEvent;
 import com.debugbybrain.blog.core.upload.UploadService;
 import com.debugbybrain.blog.core.upload.UserImageRepository;
 import com.debugbybrain.blog.core.upload.dto.UserImageDTO;
-import com.debugbybrain.blog.core.user.dto.CreateUserDTO;
-import com.debugbybrain.blog.core.user.dto.ResetPasswordDto;
-import com.debugbybrain.blog.core.user.dto.UpdateUserDTO;
-import com.debugbybrain.blog.core.user.dto.UserDTO;
+import com.debugbybrain.blog.core.user.dto.*;
 import com.debugbybrain.blog.entity.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -35,10 +32,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author hovanvydut
@@ -107,6 +101,14 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("Could not found user with email = '" + email + "'"));
 
         return this.modelMapper.map(user, UserDTO.class);
+    }
+
+    @Override
+    public Set<RoleDTO> getRolesByUsername(String username) {
+        User user = this.userRepo.getUserAndRoleByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+        Set<Role> roles = user.getRoles();
+
+        return this.modelMapper.map(roles, new TypeToken<Set<RoleDTO>>() {}.getType());
     }
 
     @Override

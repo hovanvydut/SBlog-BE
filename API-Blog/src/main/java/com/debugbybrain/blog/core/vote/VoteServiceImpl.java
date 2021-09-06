@@ -6,7 +6,7 @@ import com.debugbybrain.blog.entity.Article;
 import com.debugbybrain.blog.entity.ArticleVote;
 import com.debugbybrain.blog.entity.ArticleVoteId;
 import com.debugbybrain.blog.entity.User;
-import hovanvydut.apiblog.entity.enums.ArticleVoteType;
+import com.debugbybrain.blog.entity.enums.ArticleVoteType;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;

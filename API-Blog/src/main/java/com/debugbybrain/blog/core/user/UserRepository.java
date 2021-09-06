@@ -36,6 +36,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<Long> getUserIdByEmail(@Param("email") String email);
 
     @Modifying
-    @Query("UPDATE User u SET u.avatar = ?2, u.hostAvatar = ?3 WHERE u.id = ?1")
+    @Query("UPDATE User u SET u.avatar = ?2 WHERE u.id = ?1")
     void updateAvatar(Long userId, String uploadDir, String hostAvatar);
 }

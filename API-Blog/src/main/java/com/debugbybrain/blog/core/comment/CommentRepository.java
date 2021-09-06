@@ -23,13 +23,13 @@ public interface CommentRepository extends PagingAndSortingRepository<Comment, L
     @Query("SELECT c.id FROM Comment c WHERE c.id = :commentId")
     Optional<Long> getCommentIdById(@Param("commentId") long commentId);
 
-    @Query("SELECT new hovanvydut.apiblog.core.comment.dto.CommentDTO(c.id, c.content, c.imageSlug, c.createdAt, " +
+    @Query("SELECT new com.debugbybrain.blog.core.comment.dto.CommentDTO(c.id, c.content, c.imageSlug, c.createdAt, " +
             "c.updatedAt, c.fromUser.fullName, c.fromUser.username, c.fromUser.avatar, count(pc.childComment.id) - 1) FROM Comment c " +
             "LEFT JOIN ParentChildComment pc ON pc.parentComment.id = c.id " +
             "WHERE c.article.id = :articleId AND c.root = true GROUP BY c.id")
     Page<CommentDTO> getRootCommentByArticleId(@Param("articleId") Long articleId, Pageable pageable);
 
-    @Query("SELECT new hovanvydut.apiblog.core.comment.dto.CommentDTO(c.id, c.content, c.imageSlug, c.createdAt, " +
+    @Query("SELECT new com.debugbybrain.blog.core.comment.dto.CommentDTO(c.id, c.content, c.imageSlug, c.createdAt, " +
             "c.updatedAt, c.fromUser.fullName, c.fromUser.username, c.fromUser.avatar) FROM ParentChildComment pc " +
             "INNER JOIN Comment c ON pc.childComment.id = c.id WHERE pc.parentComment.id = :commentId " +
             "AND pc.childComment.id <> :commentId")

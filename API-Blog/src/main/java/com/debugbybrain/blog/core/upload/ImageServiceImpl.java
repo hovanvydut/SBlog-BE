@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.core.upload;
+package com.debugbybrain.blog.core.upload;
 
 import com.debugbybrain.blog.common.util.SortAndPaginationUtil;
 import com.debugbybrain.blog.core.upload.ImageService;

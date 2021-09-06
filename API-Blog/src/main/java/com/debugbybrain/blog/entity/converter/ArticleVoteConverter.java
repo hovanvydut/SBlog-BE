@@ -1,6 +1,6 @@
 package com.debugbybrain.blog.entity.converter;
 
-import hovanvydut.apiblog.entity.enums.ArticleVoteType;
+import com.debugbybrain.blog.entity.enums.ArticleVoteType;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

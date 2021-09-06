@@ -3,16 +3,15 @@ package com.debugbybrain.blog.core.user;
 import com.debugbybrain.blog.common.exception.base.MyError;
 import com.debugbybrain.blog.core.auth.dto.CreateUserRegistrationDTO;
 import com.debugbybrain.blog.core.upload.dto.UserImageDTO;
-import com.debugbybrain.blog.core.user.dto.CreateUserDTO;
-import com.debugbybrain.blog.core.user.dto.ResetPasswordDto;
-import com.debugbybrain.blog.core.user.dto.UpdateUserDTO;
-import com.debugbybrain.blog.core.user.dto.UserDTO;
+import com.debugbybrain.blog.core.user.dto.*;
+import com.debugbybrain.blog.entity.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author hovanvydut
@@ -23,6 +22,7 @@ public interface UserService {
     Page<UserDTO> getUsers(int page, int size, String[] sort, String searchKeyword);
     UserDTO getUserByEmailOrUsername(String email, String username);
     UserDTO getUserByEmail(String email);
+    Set<RoleDTO> getRolesByUsername(String username);
     UserDTO getUserByUsername(String username);
     UserDTO createUser(@Valid CreateUserDTO dto, boolean needHashPassword);
     UserDTO updateUser(String username, UpdateUserDTO dto);

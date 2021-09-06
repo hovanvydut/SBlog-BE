@@ -28,9 +28,9 @@ public class ArticleResp {
     private UserResp author;
     private Set<TagResp> tags;
     private CategoryResp category;
-    private LocalDateTime lastUpdatedAt;
-    private LocalDateTime publishedAt;
-    private LocalDateTime deletedAt;
+    private String lastUpdatedAt;
+    private String publishedAt;
+    private String deletedAt;
     private int viewCount = 10;
     private int commentCount = 3;
     private int bookmarkCount = 8;

@@ -1,4 +1,4 @@
-package hovanvydut.apiblog.core.mail;
+package com.debugbybrain.blog.core.mail;
 
 import com.debugbybrain.blog.common.enums.FreeMarkerTemplate;
 import com.debugbybrain.blog.common.freemarker.FreeMarkerTemplateModel;

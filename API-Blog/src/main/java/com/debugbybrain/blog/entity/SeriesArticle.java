@@ -30,7 +30,7 @@ public class SeriesArticle {
     @JoinColumn(name = "series_id", nullable = false)
     private Article series;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("articleId")
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
