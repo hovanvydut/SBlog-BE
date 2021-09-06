@@ -30,21 +30,21 @@ import java.util.Set;
 public class CreateArticleReq {
 
     @NotBlank
-    private String title;
+    protected String title;
 
     @NotBlank
-    private String content;
+    protected String content;
 
     @NotNull
     @Size(min = 1, max = 5)
-    private Set<Long> tagIds;
+    protected Set<Long> tagIds;
 
     @NotNull
     @Min(1)
-    private long categoryId;
+    protected long categoryId;
 
     @URL
-    private String thumbnail;
+    protected String thumbnail;
 
     public void setTitle(String title) {
         this.title = title.trim().replaceAll("\\s{2,}", " ");

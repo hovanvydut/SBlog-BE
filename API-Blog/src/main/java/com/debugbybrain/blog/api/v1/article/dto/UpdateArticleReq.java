@@ -29,23 +29,26 @@ import java.util.Set;
 @ToString
 public class UpdateArticleReq {
     @NotBlank
-    private String title;
+    protected String title;
 
     @NotBlank
-    private String content;
+    protected String content;
 
     @NotNull
     @Size(min = 1, max = 5)
-    private Set<Long> tags;
+    protected Set<Long> tagIds;
 
     @NotNull
     @Min(1)
-    private long category;
+    protected long categoryId;
 
     @URL
-    private String thumbnail;
+    protected String thumbnail;
 
     public void setTitle(String title) {
         this.title = title.trim().replaceAll("\\s{2,}", " ");
+    }
+    public void setContent(String content) {
+        this.content = content.trim();
     }
 }

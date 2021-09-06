@@ -29,6 +29,9 @@ public interface ArticleRepository extends PagingAndSortingRepository<Article, L
             "WHERE a.slug = ?1")
     Optional<Article> findBySlug(String slug);
 
+    @Query(value = "SELECT a.id FROM Article a WHERE a.slug = ?1")
+    Optional<Long> getIdBySlug(String slug);
+
     @Query(value = "SELECT a FROM Article a INNER JOIN FETCH a.author LEFT JOIN FETCH a.category LEFT JOIN FETCH a.tags " +
             "LEFT JOIN FETCH a.articles WHERE a.type = com.debugbybrain.blog.entity.enums.ArticleType.SERIES AND a.slug = ?1")
     Optional<Article> getSeriesBySlug(String slug);
@@ -36,8 +39,11 @@ public interface ArticleRepository extends PagingAndSortingRepository<Article, L
     @Query("SELECT a FROM Article a WHERE a.slug = :slug AND a.author.id = :authorId")
     Optional<Article> findBySlugAndAuthorId(@Param("slug") String slug, @Param("authorId") Long authorId);
 
-    @Query("SELECT a FROM Article a INNER JOIN User u ON a.author.id = u.id WHERE a.slug = :slug AND u.username = :authorUsername")
-    Optional<Article> findBySlugAndAuthorUsername(@Param("slug") String slug, @Param("authorUsername") String authorUsername);
+    @Query("SELECT a FROM Article a LEFT JOIN FETCH a.category LEFT JOIN FETCH a.tags INNER JOIN User u ON a.author.id = u.id WHERE a.slug = :slug AND u.username = :authorUsername")
+    Optional<Article> findBySlugAndAuthorUsernameEager(@Param("slug") String slug, @Param("authorUsername") String authorUsername);
+
+    @Query("SELECT a.id FROM Article a INNER JOIN User u ON a.author.id = u.id WHERE a.slug = :slug AND u.username = :authorUsername")
+    Optional<Long> getIdBySlugAndAuthorUsername(@Param("slug") String slug, @Param("authorUsername") String authorUsername);
 
     @Query(value = "SELECT a FROM Article a INNER JOIN FETCH a.author LEFT JOIN FETCH a.tags LEFT JOIN FETCH a.category " +
             "WHERE a.type = :type AND a.status = :status",

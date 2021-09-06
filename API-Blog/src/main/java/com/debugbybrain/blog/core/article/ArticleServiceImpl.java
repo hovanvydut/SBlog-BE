@@ -1,5 +1,6 @@
 package com.debugbybrain.blog.core.article;
 
+import com.debugbybrain.blog.core.article.dto.UpdateSeriesDTO;
 import com.debugbybrain.blog.common.exception.ArticleNotFoundException;
 import com.debugbybrain.blog.common.exception.SeriesNotFoundException;
 import com.debugbybrain.blog.common.exception.base.MyError;
@@ -9,6 +10,7 @@ import com.debugbybrain.blog.common.util.SlugUtilImpl;
 import com.debugbybrain.blog.common.util.SortAndPaginationUtil;
 import com.debugbybrain.blog.core.article.dto.*;
 import com.debugbybrain.blog.core.user.UserService;
+import com.debugbybrain.blog.core.user.dto.RoleDTO;
 import com.debugbybrain.blog.entity.*;
 import com.debugbybrain.blog.entity.enums.ArticleScopeEnum;
 import com.debugbybrain.blog.entity.enums.ArticleStatusEnum;
@@ -155,19 +157,6 @@ public class ArticleServiceImpl implements ArticleService {
         throw new SeriesNotFoundException(slug);
     }
 
-    // FIXME: Optmize by using Model Mapper custom
-    private SeriesDTO convertArticleToSeriesDTO(Article article) {
-        SeriesDTO seriesDTO = this.modelMapper.map(article, SeriesDTO.class);
-        Set<Article> articlesSet = new HashSet<>();
-        if (article.getArticles() != null && article.getArticles().size() > 0) {
-            for (SeriesArticle item : article.getArticles()) {
-                articlesSet.add(item.getArticle());
-            }
-        }
-        seriesDTO.setArticles(this.modelMapper.map(articlesSet, new TypeToken<Set<SeriesDTO.ArticleDTO>>() {}.getType()));
-        return seriesDTO;
-    }
-
     @Override
     @Transactional
     public ArticleDTO createNewArticle(@Valid CreateArticleDTO dto, PublishOption publishOption, String authorUsername,
@@ -266,19 +255,40 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     @Transactional
-    public ArticleDTO updateArticle(String slug, UpdateArticleDTO dto, PublishOption publishOption, String authorUsername) {
-        Article article = this.articleRepo.findBySlugAndAuthorUsername(slug, authorUsername)
+    public ArticleDTO updateArticle(String slug, UpdateArticleDTO dto, PublishOption publishOption,
+                                    String authorUsername, boolean isSeries) {
+
+        Article article = this.articleRepo.findBySlugAndAuthorUsernameEager(slug, authorUsername)
                 .orElseThrow(() -> new ArticleNotFoundException(slug));
 
         // Mapping dto -> entity
-        this.modelMapper.map(dto, article);
-        article.setTransliterated(this.slugUtil.slugify(article.getTitle()));
-        article.setCategory(new Category().setId(dto.getCategory()));
+        long seriesId = article.getId();
+        if (isSeries) {
+            UpdateSeriesDTO seriesDTO = (UpdateSeriesDTO) dto;
+            this.modelMapper.map(seriesDTO, article);
 
-        if (dto.getTags() != null) {
+            if (seriesDTO != null && seriesDTO.getArticleIds().size() > 0) {
+                List<SeriesArticle> listNewArticle = new ArrayList<>();
+                for (long id : seriesDTO.getArticleIds()) {
+                    if (id == seriesId) throw new RuntimeException("Duplicate articleId and seriesId");
+
+                    listNewArticle.add(new SeriesArticle().setId(new SeriesArticleId().setSeriesId(seriesId).setArticleId(id))
+                            .setSeries(new Article().setId(seriesId)).setArticle(new Article().setId(id)));
+                }
+                article.setArticles(listNewArticle);
+            }
+        } else {
+            this.modelMapper.map(dto, article);
+        }
+
+        article.setId(seriesId);
+        article.setTransliterated(this.slugUtil.slugify(article.getTitle()));
+        article.setCategory(new Category().setId(dto.getCategoryId()));
+
+        if (dto.getTagIds() != null) {
             Set<Tag> newTags = new HashSet<>();
 
-            for (long tagId : dto.getTags()) {
+            for (long tagId : dto.getTagIds()) {
                 newTags.add(new Tag().setId(tagId));
             }
 
@@ -295,10 +305,17 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional
     public void deleteArticle(String slug, String authorUsername) {
-        Article article = this.articleRepo.findBySlugAndAuthorUsername(slug, authorUsername)
-                .orElseThrow(() -> new ArticleNotFoundException(slug));
+        Set<RoleDTO> roles = this.userService.getRolesByUsername(authorUsername);
+        Long articleId;
 
-        this.articleRepo.delete(article);
+        if (isContainAdminRole(roles)) {
+            articleId = this.articleRepo.getIdBySlug(slug).orElseThrow(() -> new ArticleNotFoundException(slug));
+        } else {
+            articleId = this.articleRepo.getIdBySlugAndAuthorUsername(slug, authorUsername)
+                    .orElseThrow(() -> new ArticleNotFoundException(slug));
+        }
+
+        this.articleRepo.delete(new Article().setId(articleId));
     }
 
     @Override
@@ -327,4 +344,28 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
 
+    private boolean isContainAdminRole(Set<RoleDTO> roles) {
+        if (roles == null || roles.size() == 0) return false;
+
+        for (RoleDTO role : roles) {
+            if ("ROLE_ADMIN".equals(role.getName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // FIXME: Optmize by using Model Mapper custom
+    private SeriesDTO convertArticleToSeriesDTO(Article article) {
+        SeriesDTO seriesDTO = this.modelMapper.map(article, SeriesDTO.class);
+        Set<Article> articlesSet = new HashSet<>();
+        if (article.getArticles() != null && article.getArticles().size() > 0) {
+            for (SeriesArticle item : article.getArticles()) {
+                articlesSet.add(item.getArticle());
+            }
+        }
+        seriesDTO.setArticles(this.modelMapper.map(articlesSet, new TypeToken<Set<SeriesDTO.ArticleDTO>>() {}.getType()));
+        return seriesDTO;
+    }
 }

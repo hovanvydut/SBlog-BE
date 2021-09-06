@@ -4,7 +4,6 @@ import com.debugbybrain.blog.api.v1.article.dto.*;
 import com.debugbybrain.blog.api.v1.user.dto.UserPaginationParams;
 import com.debugbybrain.blog.core.article.ArticleService;
 import com.debugbybrain.blog.core.article.dto.*;
-import com.debugbybrain.blog.entity.Article;
 import com.debugbybrain.blog.entity.enums.ArticleType;
 import io.swagger.annotations.ApiOperation;
 import org.modelmapper.ModelMapper;
@@ -131,6 +130,8 @@ public class ArticleController {
         return ResponseEntity.ok(articleDTO);
     }
 
+    // FIXME: Allow Admin or Editor can edit
+    // FIXME: Custom annotation check that user is owner of article or editor or admin
     @ApiOperation(value = "Create a new series")
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/series")
@@ -141,7 +142,6 @@ public class ArticleController {
         String authorUsername = principal.getName();
 
         ArticleDTO articleDTO = this.articleService.createNewArticle(dto, publishOption, authorUsername, true);
-
     }
 
     @ApiOperation(value = "Update article by slug")
@@ -154,7 +154,23 @@ public class ArticleController {
         UpdateArticleDTO dto = this.modelMapper.map(req, UpdateArticleDTO.class);
         String authorUsername = principal.getName();
 
-        ArticleDTO articleDTO = this.articleService.updateArticle(slug, dto, publishOption, authorUsername);
+        ArticleDTO articleDTO = this.articleService.updateArticle(slug, dto, publishOption, authorUsername, false);
+
+        return ResponseEntity.ok(articleDTO);
+    }
+
+    @ApiOperation(value = "Update series by slug")
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/series/{slug}")
+    public ResponseEntity<ArticleDTO> updateSeries(@Valid @RequestBody UpdateSeriesReq req,
+                                                    Principal principal,
+                                                    @RequestParam("publish") PublishOption publishOption,
+                                                    @PathVariable String slug) {
+        UpdateSeriesDTO dto = this.modelMapper.map(req, UpdateSeriesDTO.class);
+
+        String authorUsername = principal.getName();
+
+        ArticleDTO articleDTO = this.articleService.updateArticle(slug, dto, publishOption, authorUsername, true);
 
         return ResponseEntity.ok(articleDTO);
     }

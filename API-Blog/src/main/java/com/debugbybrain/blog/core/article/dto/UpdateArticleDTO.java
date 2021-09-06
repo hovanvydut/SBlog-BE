@@ -33,14 +33,14 @@ public class UpdateArticleDTO {
 
     @NotNull
     @Size(min = 1, max = 5)
-    private Set<Long> tags;
+    private Set<Long> tagIds;
 
     @URL
     private String thumbnail;
 
     @NotNull
     @Min(1)
-    private long category;
+    private long categoryId;
 
     public void setTitle(String title) {
         this.title = title.trim().replaceAll("\\s{2,}", " ");

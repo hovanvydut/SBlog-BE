@@ -21,7 +21,7 @@ public interface ArticleService {
     ArticleDTO createNewArticle(@Valid CreateArticleDTO dto, PublishOption publishOption, String authorUsername, boolean isSeries);
     void approveArticle(String slug);
     void markArticleSpam(String slug);
-    ArticleDTO updateArticle(String slug, UpdateArticleDTO dto, PublishOption publishOption, String authorUsername);
+    ArticleDTO updateArticle(String slug, UpdateArticleDTO dto, PublishOption publishOption, String authorUsername, boolean isSeries);
     void deleteArticle(String slug, String authorUsername);
     Long getArticleIdBySlug(String slug);
 }

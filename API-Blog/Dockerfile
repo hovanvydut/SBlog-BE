@@ -28,7 +28,7 @@ COPY --from=build ${HOME}/src/main/resources src/main/resources
 COPY --from=build ${HOME}/target target
 
 #RUN ls -la ./target
-RUN ["chmod", "-R", "777", "${HOME}"]
+RUN ["chmod", "-R", "777", "/home/sblog"]
 #RUN ls -la ./target
 
 ENTRYPOINT ["java", "-jar", "target/API-Blog-0.0.1-SNAPSHOT.jar"]
